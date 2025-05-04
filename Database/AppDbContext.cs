@@ -45,6 +45,7 @@ namespace BookBagaicha.Database
 
                 );
         }
+        public DbSet<Book> Books { get; set; }
 
     }
 }
