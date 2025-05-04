@@ -1,7 +1,10 @@
-﻿namespace BookBagaicha.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BookBagaicha.Models
 {
     public class Book
     {
+        [Key]
         public Guid BookId { get; set; }
         public required string Title { get; set; }
         public required string ISBN { get; set; }
