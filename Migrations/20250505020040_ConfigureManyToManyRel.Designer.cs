@@ -3,6 +3,7 @@ using System;
 using BookBagaicha.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookBagaicha.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505020040_ConfigureManyToManyRel")]
+    partial class ConfigureManyToManyRel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,23 +122,6 @@ namespace BookBagaicha.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("BookBagaicha.Models.Genre", b =>
-                {
-                    b.Property<int>("GenreId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("GenreId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("GenreId");
-
-                    b.ToTable("Genres");
-                });
-
             modelBuilder.Entity("BookBagaicha.Models.User", b =>
                 {
                     b.Property<long>("Id")
@@ -212,21 +198,6 @@ namespace BookBagaicha.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("BookGenre", b =>
-                {
-                    b.Property<Guid>("BooksBookId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("GenresGenreId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("BooksBookId", "GenresGenreId");
-
-                    b.HasIndex("GenresGenreId");
-
-                    b.ToTable("BookGenre");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<long>", b =>
@@ -395,21 +366,6 @@ namespace BookBagaicha.Migrations
                     b.HasOne("BookBagaicha.Models.Book", null)
                         .WithMany()
                         .HasForeignKey("BooksBookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BookGenre", b =>
-                {
-                    b.HasOne("BookBagaicha.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksBookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BookBagaicha.Models.Genre", null)
-                        .WithMany()
-                        .HasForeignKey("GenresGenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

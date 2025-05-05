@@ -24,10 +24,9 @@ namespace BookBagaicha.Models
 
         public int PublisherId { get; set; }
 
-        //public Publisher Publisher { get; set; }
+        public ICollection<Author> Authors { get; set; } = new List<Author>();
+        public ICollection<Genre> Genres { get; set; } = new List<Genre>(); // Added Genres navigation property
 
-        //public ICollection<BookAuthor> BookAuthors { get; set; }
-        //public ICollection<BookGenre> BookGenres { get; set; }
-        //public ICollection<Review> Reviews { get; set; }
+
     }
 }

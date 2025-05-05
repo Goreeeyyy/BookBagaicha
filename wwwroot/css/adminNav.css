@@ -1,0 +1,142 @@
+body {
+    overflow-x: auto;
+}
+
+.bona-nova-regular {
+    font-family: "Bona Nova", serif;
+
+    font-style: normal;
+}
+
+.nav {
+    gap: 1vh;
+
+}
+
+.navLogo {
+
+    color: rgb(204, 150, 0) !important;
+    margin: 3.5vh 0;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.adminNav {
+    background-color: #F7EDE1;
+    border-radius: 8px;
+    height: 99vh;
+    font-size: 16px;
+    font-family: "Open Sans", sans-serif;
+
+    a {
+        color: black;
+    }
+
+}
+
+.active {
+    border-right: 6px rgb(204, 150, 0) solid;
+    background-color: rgb(241, 229, 214);
+    color: rgb(204, 150, 0) !important;
+
+
+}
+
+.nav-item:hover {
+    a {
+        color: rgb(204, 150, 0) !important;
+
+    }
+
+    background-color: #F7EDE1 !important;
+}
+
+.profileImage {
+    border-radius: 50%;
+    background-color: rgb(211, 236, 236);
+    height: 7vh;
+    width: 7vh;
+}
+
+.profileSection {
+    flex: 1;
+    gap: 4vh;
+
+    padding-left: 5vh;
+}
+
+.greet {
+    flex: 3;
+}
+
+.profileDetails {
+    padding: 0;
+
+    margin: 0;
+}
+
+h6 {
+    margin: none;
+}
+
+.searchHead {
+    gap: 3vh;
+    align-items: center;
+}
+
+.search {
+    flex: 8;
+    border-radius: 12px;
+    border: 1px solid rgb(204, 150, 0);
+}
+
+.sort {
+    flex: 2;
+    border-radius: 12px;
+    border: 1px solid rgb(204, 150, 0);
+    background-color: #F7EDE1;
+
+}
+
+.filterIcon {
+    flex: 1;
+}
+
+.primaryBtn {
+    background-color: rgb(204, 150, 0);
+    color: White;
+    border: none;
+    border-radius: 8px;
+    padding: 1%
+}
+
+.actionBtns {
+
+    svg path {
+        stroke: rgb(204, 150, 0);
+        fill: rgb(204, 150, 0);
+    }
+}
+
+button {
+    background-color: white;
+    border: none;
+}
+
+.bookTable {
+    width: 100%;
+    overflow-x: scroll !important;
+}
+
+.bookTable table th {
+    text-wrap: nowrap;
+}
+
+#bookForm {
+    width: 100%;
+}
+
+.form-row {
+    gap: 5vh;
+    flex-wrap: nowrap;
+}

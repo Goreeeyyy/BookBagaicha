@@ -32,4 +32,11 @@
     <None Include="C:\Users\cales\OneDrive\Documents\C# Projects\BookBagaicha\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\js\" />
+    <Folder Include="wwwroot\image\" />
+    <Folder Include="wwwroot\pages\" />
+  </ItemGroup>
+
 </Project>

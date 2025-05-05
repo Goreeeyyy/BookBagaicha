@@ -1,4 +1,5 @@
-﻿using BookBagaicha.Models;
+﻿using System.Reflection.Emit;
+using BookBagaicha.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -44,8 +45,19 @@ namespace BookBagaicha.Database
 
 
                 );
+           builder.Entity<Book>()
+     .HasMany(b => b.Authors)
+     .WithMany(a => a.Books)
+     .UsingEntity(j => j.ToTable("BookAuthors"));
+
         }
+
+
+
         public DbSet<Book> Books { get; set; }
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Genre> Genres { get; set; }
 
     }
 }
