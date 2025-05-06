@@ -3,6 +3,7 @@ using System;
 using BookBagaicha.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookBagaicha.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506164512_AddWishlistTables")]
+    partial class AddWishlistTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,53 +120,6 @@ namespace BookBagaicha.Migrations
                     b.HasKey("BookId");
 
                     b.ToTable("Books");
-                });
-
-            modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
-                {
-                    b.Property<Guid>("CartId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("CartTotal")
-                        .HasColumnType("numeric");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CartId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("BookBagaicha.Models.CartItem", b =>
-                {
-                    b.Property<Guid>("CartItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CartId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CartItemId");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("CartId");
-
-                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("BookBagaicha.Models.Genre", b =>
@@ -486,36 +442,6 @@ namespace BookBagaicha.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
-                {
-                    b.HasOne("BookBagaicha.Models.User", "User")
-                        .WithOne()
-                        .HasForeignKey("BookBagaicha.Models.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BookBagaicha.Models.CartItem", b =>
-                {
-                    b.HasOne("BookBagaicha.Models.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BookBagaicha.Models.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("Cart");
-                });
-
             modelBuilder.Entity("BookBagaicha.Models.Wishlist", b =>
                 {
                     b.HasOne("BookBagaicha.Models.User", "User")
@@ -610,11 +536,6 @@ namespace BookBagaicha.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("BookBagaicha.Models.Wishlist", b =>
