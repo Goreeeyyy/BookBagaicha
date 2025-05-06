@@ -14,13 +14,18 @@ namespace BookBagaicha.Controllers
 
         private readonly SignInManager<User> _signInManager;
 
+        private readonly RoleManager<IdentityRole<long>> _roleManager;
+
         private readonly JWTService _jwtService;
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, JWTService jwtService)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, JWTService jwtService, RoleManager<IdentityRole<long>> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
+            _roleManager = roleManager;
+
+
         }
 
 
@@ -40,15 +45,24 @@ namespace BookBagaicha.Controllers
 
             if (result.Succeeded)
             {
-                var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                string roleToAssign = string.IsNullOrEmpty(userdto.Role) ? "User" : userdto.Role;
+
+                var roleExists = await _roleManager.RoleExistsAsync(roleToAssign);
+                if (!roleExists)
+                {
+                    return BadRequest(new { Error = $"Role '{roleToAssign}' does not exist." });
+                }
+
+                var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
 
                 if (!roleResult.Succeeded)
                 {
                     return BadRequest(roleResult.Errors);
                 }
 
-                return Ok("Successful Registration with assigned roles");
+                return Ok(new { Message = "Successful Registration with assigned roles", Role = roleToAssign });
             }
+
 
             return BadRequest(result.Errors);
         }
