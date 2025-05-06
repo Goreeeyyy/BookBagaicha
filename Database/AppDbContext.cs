@@ -50,14 +50,19 @@ namespace BookBagaicha.Database
      .WithMany(a => a.Books)
      .UsingEntity(j => j.ToTable("BookAuthors"));
 
+        builder.Entity<Book>()
+         .HasOne(b => b.Publisher)
+         .WithMany(p => p.Books)
+         .HasForeignKey(b => b.PublisherId);
+
+
         }
-
-
 
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Genre> Genres { get; set; }
+        public DbSet<Publisher> Publishers { get; set; }
 
     }
 }

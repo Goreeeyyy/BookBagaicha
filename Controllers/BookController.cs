@@ -12,10 +12,12 @@ namespace BookBagaicha.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private readonly AppDbContext _context;
 
-        public BookController(IBookService bookService)
+        public BookController(IBookService bookService, AppDbContext context)
         {
             _bookService = bookService;
+            _context = context;
         }
 
         [HttpPost("api/addBooks")]
