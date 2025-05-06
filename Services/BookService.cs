@@ -17,6 +17,27 @@ namespace BookBagaicha.Services
 
         public async Task<Book?> CreateBookWithAuthors(BookCreationRequest request)
         {
+            // Find an existing publisher by name
+            var existingPublisher = await _context.Publishers
+                .FirstOrDefaultAsync(p => p.PublisherName == request.PublisherName);
+
+            Publisher publisherToAdd;
+
+            if (existingPublisher != null)
+            {
+                Console.WriteLine($"Found existing publisher: {request.PublisherName}");
+                publisherToAdd = existingPublisher;
+            }
+            else
+            {
+                // Create a new publisher if it doesn't exist
+                var newPublisher = new Publisher { PublisherName = request.PublisherName };
+                Console.WriteLine($"Adding new publisher: {request.PublisherName}");
+                _context.Publishers.Add(newPublisher);
+                await _context.SaveChangesAsync(); // Save the new publisher to get its ID
+                publisherToAdd = newPublisher;
+            }
+
             var newBook = new Book
             {
                 BookId = Guid.NewGuid(),
@@ -34,6 +55,7 @@ namespace BookBagaicha.Services
                 SaleEndDate = request.SaleEndDate.ToUniversalTime(),
                 Category = request.Category,
                 Image = request.Image,
+                PublisherId = publisherToAdd.PublisherId, // Set the PublisherId
                 Authors = new List<Author>(),
                 Genres = new List<Genre>()
             };
@@ -97,17 +119,22 @@ namespace BookBagaicha.Services
             {
                 newBook.Genres.Add(genre);
             }
+            
+
 
             // Add the book after associating the authors
             _context.Books.Add(newBook);
             await _context.SaveChangesAsync();
 
             // Reload the book with its authors
-            var bookWithAuthors = await _context.Books
-                .Include(b => b.Authors) // Ensure Authors are loaded
-                .FirstOrDefaultAsync(b => b.BookId == newBook.BookId);
+            var bookWithDetails = await _context.Books
+        .Include(b => b.Publisher)
+        .Include(b => b.Authors)
+        .Include(b => b.Genres)
+        .FirstOrDefaultAsync(b => b.BookId == newBook.BookId);
 
-            return bookWithAuthors;
+            return bookWithDetails;
+
         }
 
 

@@ -19,6 +19,7 @@ namespace BookBagaicha.Models.Dto
         public string? Category { get; set; }
         public string? Image { get; set; }
         public int? PublisherId { get; set; }
+        public string PublisherName { get; set; }
         public List<string> Authors { get; set; } = new List<string>();
         public List<string> Genres { get; set; } = new List<string>(); // Added Genres property
     }

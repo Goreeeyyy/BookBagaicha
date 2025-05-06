@@ -22,10 +22,11 @@ namespace BookBagaicha.Models
         public  string? Category {  get; set; }
         public string? Image {  get; set; }
 
-        public int PublisherId { get; set; }
+        public int? PublisherId { get; set; }
 
         [Required]
         public Publisher Publisher { get; set; }
+        
 
         public ICollection<Author> Authors { get; set; } = new List<Author>();
         public ICollection<Genre> Genres { get; set; } = new List<Genre>(); // Added Genres navigation property

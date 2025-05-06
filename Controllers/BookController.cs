@@ -53,7 +53,7 @@ namespace BookBagaicha.Controllers
             return Ok(allBooks);
         }
 
-        [HttpPut("api/books/{id}")]
+        [HttpPut("api/updateBooks/{id}")]
         public async Task<IActionResult> UpdateBook(Guid id, [FromBody] Book updatedBook)
         {
             if (ModelState.IsValid)
@@ -94,7 +94,7 @@ namespace BookBagaicha.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpDelete("api/books/{id}")]
+        [HttpDelete("api/deleteBooks/{id}")]
         public async Task<IActionResult> DeleteBook(Guid id)
         {
             var book = await _context.Books.FindAsync(id);
