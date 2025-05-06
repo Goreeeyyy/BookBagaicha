@@ -1,0 +1,88 @@
+﻿document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    const errorMessageDiv = document.getElementById('errorMessage');
+
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const userData = {
+            email: email,
+            password: password
+        };
+
+        try {
+            const response = await fetch('/api/Auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Toastify({
+                    text: data.message || "Login successful!",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }
+                }).showToast();
+
+                // Store the token (you might want to use localStorage or sessionStorage)
+                const token = data.token;
+                console.log('Login successful, Token:', token);
+                localStorage.setItem('authToken', token); // Example of storing token
+
+                // Redirect to a dashboard or home page
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html'; // Replace with your actual dashboard URL
+                }, 3500);
+            } else if (response.status === 401) {
+                const errorData = await response.text(); // Or response.json() if your backend sends JSON error
+                Toastify({
+                    text: errorData || "Invalid credentials.",
+                    duration: 5000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#dc3545",
+                    }
+                }).showToast();
+                console.error('Login failed:', errorData);
+            } else {
+                Toastify({
+                    text: `Login failed with status: ${response.status}`,
+                    duration: 5000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#dc3545",
+                    }
+                }).showToast();
+                console.error('Login failed with status:', response.status);
+            }
+        } catch (error) {
+            Toastify({
+                text: 'An unexpected error occurred during login.',
+                duration: 5000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#dc3545",
+                }
+            }).showToast();
+            console.error('Fetch error:', error);
+        }
+    });
+});

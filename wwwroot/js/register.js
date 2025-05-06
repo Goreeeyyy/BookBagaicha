@@ -53,16 +53,33 @@
 
                 // Redirect to login page after a delay
                 setTimeout(() => {
-                    window.location.href = 'pages/login.html';
+                    window.location.href = 'login.html';
                 }, 3500); 
             } else {
-                errorMessageDiv.textContent = data.error || data.errors ? (data.errors[0]?.description || "Registration failed.") : "Registration failed.";
-                successMessageDiv.textContent = "";
+                Toastify({
+                    text: data.error || (data.errors && data.errors[0]?.description) || "Registration failed.",
+                    duration: 5000, // Longer duration for errors
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "#dc3545", // Red color for error
+                    }
+                }).showToast();
+                
                 console.error('Registration failed:', data);
             }
         } catch (error) {
-            errorMessageDiv.textContent = 'An unexpected error occurred.';
-            successMessageDiv.textContent = "";
+            Toastify({
+                text: 'An unexpected error occurred.',
+                duration: 5000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#dc3545", // Red color for error
+                }
+            }).showToast();
             console.error('Fetch error:', error);
         }
     });
