@@ -1,5 +1,7 @@
 ﻿using BookBagaicha.Database;
+using BookBagaicha.IService;
 using BookBagaicha.Models;
+using BookBagaicha.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
@@ -9,40 +11,43 @@ namespace BookBagaicha.Controllers
 
     public class BookController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IBookService _bookService;
 
-        public BookController(AppDbContext context)
+        public BookController(IBookService bookService)
         {
-            _context = context;
+            _bookService = bookService;
         }
 
-        [HttpPost("api/books/add")]
-        public async Task<IActionResult> AddNewBook([FromBody] Book newBook)
+        [HttpPost("api/addBooks")]
+        public async Task<IActionResult> AddNewBook([FromBody] BookCreationRequest request)
         {
             if (ModelState.IsValid)
             {
-                newBook.BookId = Guid.NewGuid(); // Generate a new unique ID for the book
-                _context.Books.Add(newBook);
-                await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetBookById), new { id = newBook.BookId }, newBook);
+                var newBook = await _bookService.CreateBookWithAuthors(request);
+                if (newBook != null)
+                {
+                    return CreatedAtAction(nameof(GetBookById), new { id = newBook.BookId }, newBook);
+                }
+                return StatusCode(500, "Failed to create book with authors.");
             }
             return BadRequest(ModelState);
         }
 
-        [HttpGet("api/books/{id}")]
+        [HttpGet("api/getBooksByID/{id}")]
         public async Task<IActionResult> GetBookById(Guid id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await _bookService.GetBookByIdAsync(id);
             if (book == null)
             {
                 return NotFound();
             }
             return Ok(book);
         }
-        [HttpGet("api/books")]
+
+        [HttpGet("api/allBooks")]
         public async Task<IActionResult> GetAllBooks()
         {
-            var allBooks = await _context.Books.ToListAsync();
+            var allBooks = await _bookService.GetAllBooksAsync();
             return Ok(allBooks);
         }
 
