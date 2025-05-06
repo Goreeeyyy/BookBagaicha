@@ -1,0 +1,161 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="BookDetails.aspx.cs" Inherits="WebApplication1.BookDetails" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Book Details - Book Bagsicha</title>
+    <link href="Content/style.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <form id="form1" runat="server">
+        <!-- Navigation Bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="HomePage.aspx">Book Bagsicha</a>
+        <div class="d-flex align-items-center ms-auto">
+            <ul class="navbar-nav me-4">
+                <li class="nav-item">
+                    <a class="nav-link active" href="HomePage.aspx">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Books.aspx">BOOKS</a>
+                </li>
+            </ul>
+            <!-- Rest of the navigation bar remains the same -->
+            <div class="d-flex me-3">
+                <input class="form-control form-control-sm"
+                       type="search"
+                       placeholder="Search for products..."
+                       aria-label="Search" />
+            </div>
+            <div class="d-flex gap-2">
+                <a href="#" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-user"></i>
+                </a>
+                <a href="#" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-shopping-basket"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+        <!-- Enhanced Book Details Section -->
+        <div class="container my-5">
+            <div class="row g-5">
+                <!-- Book Image -->
+                <div class="col-md-5">
+                    <div class="book-cover-container border p-3 rounded-3 bg-white shadow-sm">
+                        <img src="Images/default.jpg" 
+                             class="img-fluid" 
+                             alt="Thunmanhandiya Book Cover" />
+                    </div>
+                </div>
+
+                <!-- Book Details -->
+                <div class="col-md-7">
+                    <!-- Title Section -->
+                    <div class="border-bottom pb-3 mb-4">
+                        <h1 class="mb-3">THUNMANHANDIYA</h1>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="text-muted">288 reviews</span>
+                            <span class="text-muted">|</span>
+                            <span class="text-muted">Paperback</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Section -->
+                    <div class="bg-light p-3 rounded-2 mb-4 border border-primary">
+                        <h3 class="text-primary mb-0">Rs. 700/-</h3>
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div class="card border-primary mb-4">
+                        <div class="card-header bg-primary text-white py-2">
+                            <h5 class="card-title mb-0">SUMMARY</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2"><strong>Genre:</strong> Fiction</li>
+                                <li class="mb-2"><strong>Author:</strong> Mahagamasakara</li>
+                                <li class="mb-2"><strong>Release Date:</strong> 2025/10/12</li>
+                                <li class="mb-2"><strong>Publisher:</strong> Example Publications</li>
+                                <li><strong>Editor:</strong> John Doe</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 mb-5 border-top border-bottom py-4">
+                        <asp:Button ID="btnWishlist" runat="server" 
+                            CssClass="btn btn-outline-primary px-4" 
+                            Text="Add to Wishlist" />
+                        <asp:Button ID="btnCart" runat="server" 
+                            CssClass="btn btn-primary px-4" 
+                            Text="Add to Cart" />
+                    </div>
+
+                    <!-- Ratings & Reviews Section -->
+                    <!-- Ratings & Reviews Section -->
+<!-- Ratings & Reviews Section -->
+<div class="ratings-section border-top pt-4">
+    <h4 class="mb-4 pb-2 border-bottom">RATINGS & REVIEWS (2)</h4>
+
+    <!-- Review 1 -->
+    <div class="card mb-4 border-1 shadow-sm highlight-review bg-light">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+                <div>
+                    <h6 class="mb-0">User Name</h6>
+                    <small class="text-muted">2024-03-15 14:30</small>
+                </div>
+                <div class="star-rating text-warning">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+            </div>
+            <p class="mb-0 review-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam...
+            </p>
+        </div>
+    </div>
+
+    <!-- Review 2 -->
+    <div class="card border-1 shadow-sm highlight-review bg-light" >
+        <div class="card-body" >
+            <div class="d-flex justify-content-between mb-3 ">
+                <div>
+                    <h6 class="mb-0">Another User</h6>
+                    <small class="text-muted">2024-03-14 10:15</small>
+                </div>
+                <div class="star-rating text-warning">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <i class="far fa-star"></i>
+                </div>
+            </div>
+            <p class="mb-0 review-text">
+                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+                doloremque laudantium, totam rem aperiam...
+            </p>
+        </div>
+    </div>
+</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    </form>
+</body>
+</html>
