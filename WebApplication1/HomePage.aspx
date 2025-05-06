@@ -20,42 +20,45 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
           type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
     <!-- Carousel-specific CSS -->
     <link href="Content/style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <form id="form1" runat="server">
-        <!-- Navigation Bar -->
+                        <!-- Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" href="HomePage.aspx">Book Bagaicha</a>
-                <div class="d-flex align-items-center ms-auto">
-                    <ul class="navbar-nav me-4">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="HomePage.aspx">HOME</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="Books.aspx">BOOKS</a>
-                        </li>
-                    </ul>
-                    <div class="d-flex me-3">
-                        <input class="form-control form-control-sm"
-                               type="search"
-                               placeholder="Search for products..."
-                               aria-label="Search" />
-                    </div>
-                    <div class="d-flex gap-2">
-                        <a href="#" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-user"></i>
-                        </a>
-                        <a href="#" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-shopping-basket"></i>
-                        </a>
-                    </div>
-                </div>
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="HomePage.aspx">Book Bagsicha</a>
+        <div class="d-flex align-items-center ms-auto">
+            <ul class="navbar-nav me-4">
+                <li class="nav-item">
+                    <a class="nav-link active" href="HomePage.aspx">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Books.aspx">BOOKS</a>
+                </li>
+            </ul>
+            <!-- Rest of the navigation bar remains the same -->
+            <div class="d-flex me-3">
+                <input class="form-control form-control-sm"
+                       type="search"
+                       placeholder="Search for products..."
+                       aria-label="Search" />
             </div>
-        </nav>
+            <div class="d-flex gap-2">
+                <a href="UserProfile.aspx" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-user"></i>
+                </a>
+                <a href="#" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-shopping-basket"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
 
         <!-- Hero Section -->
         <div class="hero-section bg-light py-5">

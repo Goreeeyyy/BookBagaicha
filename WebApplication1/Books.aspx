@@ -31,7 +31,7 @@
                        aria-label="Search" />
             </div>
             <div class="d-flex gap-2">
-                <a href="#" class="btn btn-outline-light btn-sm">
+                <a href="UserProfile.aspx" class="btn btn-outline-light btn-sm">
                     <i class="fas fa-user"></i>
                 </a>
                 <a href="#" class="btn btn-outline-light btn-sm">
