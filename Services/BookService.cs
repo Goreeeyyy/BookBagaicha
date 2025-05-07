@@ -3,16 +3,22 @@ using BookBagaicha.IService;
 using BookBagaicha.Models;
 using BookBagaicha.Models.Dto;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BookBagaicha.Services
 {
     public class BookService : IBookService
     {
         private readonly AppDbContext _context;
+        private readonly IImageService _imageService;
 
-        public BookService(AppDbContext context)
+        public BookService(AppDbContext context, IImageService imageService)
         {
             _context = context;
+            _imageService = imageService;
         }
 
         public async Task<Book?> CreateBookWithAuthors(BookCreationRequest request)
@@ -33,10 +39,22 @@ namespace BookBagaicha.Services
                 SaleStartDate = request.SaleStartDate.ToUniversalTime(),
                 SaleEndDate = request.SaleEndDate.ToUniversalTime(),
                 Category = request.Category,
-                Image = request.Image,
                 Authors = new List<Author>(),
-                Genres = new List<Genre>()
+                Genres = new List<Genre>(),
+                PublisherId = request.PublisherId ?? 0,
             };
+
+            if (request.ImageFile != null)
+            {
+                try
+                {
+                    newBook.Image = await _imageService.SaveImageAsync(request.ImageFile, newBook.BookId);
+                }
+                catch (ArgumentException)
+                {
+                    return null;
+                }
+            }
 
 
             var authorsToAdd = new List<Author>();

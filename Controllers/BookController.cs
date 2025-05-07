@@ -5,6 +5,7 @@ using BookBagaicha.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace BookBagaicha.Controllers
 {
@@ -21,7 +22,7 @@ namespace BookBagaicha.Controllers
         }
 
         [HttpPost("api/addBooks")]
-        public async Task<IActionResult> AddNewBook([FromBody] BookCreationRequest request)
+        public async Task<IActionResult> AddNewBook([FromForm] BookCreationRequest request)
         {
             if (ModelState.IsValid)
             {
@@ -52,6 +53,7 @@ namespace BookBagaicha.Controllers
             var allBooks = await _bookService.GetAllBooksAsync();
             return Ok(allBooks);
         }
+
 
         [HttpPut("api/books/{id}")]
         public async Task<IActionResult> UpdateBook(Guid id, [FromBody] Book updatedBook)

@@ -12,7 +12,24 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
+
 // Add services to the container.
+builder.Services.AddControllersWithViews();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -78,6 +95,8 @@ builder.Services.AddScoped<JWTService>();
 
 builder.Services.AddScoped<IBookService, BookService>();
 
+builder.Services.AddScoped<IImageService, ImageService>();
+
 builder.Services.AddAuthorization();
 
 builder.Services.Configure<JsonOptions>(options =>
@@ -97,8 +116,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
+app.UseCors();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Books}/{action=AddBooks}/{id?}");
+
+app.Urls.Add("http://localhost:5000");
+app.Urls.Add("https://localhost:7147");
 
 app.Run();
