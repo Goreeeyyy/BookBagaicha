@@ -50,10 +50,53 @@ namespace BookBagaicha.Database
      .WithMany(a => a.Books)
      .UsingEntity(j => j.ToTable("BookAuthors"));
 
+
         builder.Entity<Book>()
          .HasOne(b => b.Publisher)
          .WithMany(p => p.Books)
          .HasForeignKey(b => b.PublisherId);
+
+
+            // WishlistItem relationships
+            builder.Entity<WishlistItem>()
+                .HasOne(wi => wi.Wishlist)
+                .WithMany(w => w.WishlistItems)
+                .HasForeignKey(wi => wi.WishlistId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistItem>()
+                .HasOne(wi => wi.Book)
+                .WithMany()
+                .HasForeignKey(wi => wi.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Wishlist relationships
+            builder.Entity<Wishlist>()
+                .HasOne(w => w.User)
+                .WithMany()
+                .HasForeignKey(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure one-to-one relationship between User and Cart
+            builder.Entity<Cart>()
+                .HasOne(c => c.User)
+                .WithOne()
+                .HasForeignKey<Cart>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure one-to-many relationship between Cart and CartItems
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.Cart)
+                .WithMany(c => c.CartItems)
+                .HasForeignKey(ci => ci.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationship between CartItem and Book
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.Book)
+                .WithMany()
+                .HasForeignKey(ci => ci.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }
@@ -62,7 +105,14 @@ namespace BookBagaicha.Database
         public DbSet<Author> Authors { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Genre> Genres { get; set; }
+
         public DbSet<Publisher> Publishers { get; set; }
+
+        public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<WishlistItem> WishlistItems { get; set; }
+         public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+
 
     }
 }

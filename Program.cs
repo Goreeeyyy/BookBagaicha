@@ -78,6 +78,11 @@ builder.Services.AddScoped<JWTService>();
 
 builder.Services.AddScoped<IBookService, BookService>();
 
+builder.Services.AddScoped<IWishlistService, WishlistService>();
+
+builder.Services.AddScoped<ICartService, CartService>();
+
+
 builder.Services.AddAuthorization();
 
 builder.Services.Configure<JsonOptions>(options =>

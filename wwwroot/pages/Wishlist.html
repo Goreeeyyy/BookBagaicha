@@ -1,0 +1,788 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&display=swap"
+          rel="stylesheet" />
+    <title>My Wishlist - Book Bagaicha</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Bona Nova', serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .site-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .bona-nova-regular {
+            font-family: 'Bona Nova', serif;
+        }
+
+        /* Navigation */
+        .main-nav .nav-link {
+            color: #555;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            position: relative;
+        }
+
+            .main-nav .nav-link.active {
+                color: #2c3e50;
+                font-weight: 700;
+            }
+
+                .main-nav .nav-link.active:after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 25%;
+                    width: 50%;
+                    height: 2px;
+                    background-color: #e74c3c;
+                }
+
+        /* Wishlist specific styles */
+        .wishlist-title {
+            color: #2c3e50;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+            .wishlist-title:after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 30%;
+                width: 40%;
+                height: 3px;
+                background-color: #e74c3c;
+            }
+
+        .wishlist-header {
+            background-color: #f1f2f6;
+            border-radius: 5px 5px 0 0;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .wishlist-item {
+            transition: all 0.3s ease;
+        }
+
+            .wishlist-item:hover {
+                background-color: #f9f9f9;
+            }
+
+        .book-image {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .wishlist-item:hover .book-image {
+            transform: scale(1.05);
+        }
+
+        .book-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+        }
+
+        .book-authors {
+            font-style: italic;
+            margin-bottom: 0.3rem;
+        }
+
+        .book-category .badge {
+            background-color: #34495e;
+            font-weight: 500;
+        }
+
+        .book-price {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .price-container .book-price.on-sale {
+            text-decoration: line-through;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .book-sale-price {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .book-status.badge-success {
+            background-color: #27ae60;
+        }
+
+        .book-status.badge-danger {
+            background-color: #e74c3c;
+        }
+
+        .book-status.badge-warning {
+            background-color: #f39c12;
+            color: #fff;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+            max-width: 130px;
+        }
+
+        .add-to-cart-btn {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+            .add-to-cart-btn:hover {
+                background-color: #3498db;
+                border-color: #3498db;
+            }
+
+        .remove-wishlist-btn {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+            .remove-wishlist-btn:hover {
+                background-color: #e74c3c;
+                color: white;
+            }
+
+        /* Empty wishlist styling */
+        .empty-wishlist-icon {
+            color: #bdc3c7;
+            font-size: 4rem;
+        }
+
+        /* Toast styling */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1051;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            border-top: 1px solid #ddd;
+        }
+
+            footer a {
+                color: #2c3e50;
+                text-decoration: none;
+            }
+
+                footer a:hover {
+                    color: #e74c3c;
+                    text-decoration: none;
+                }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(30px);
+                opacity: 0;
+            }
+        }
+
+        .slide-out {
+            animation: slideOut 0.3s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header/Navigation -->
+        <header class="row py-3 bg-light">
+            <div class="col-md-3">
+                <h1 class="site-logo bona-nova-regular">Book Bagaicha</h1>
+            </div>
+            <div class="col-md-6">
+                <nav class="main-nav">
+                    <ul class="nav justify-content-center">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="books.html">Books</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="wishlist.html">Wishlist</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="cart.html">Cart</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-md-3 d-flex justify-content-end align-items-center">
+                <div class="user-actions">
+                    <a href="login.html" id="loginBtn" class="btn btn-outline-secondary mr-2">Login</a>
+                    <a href="signup.html" id="signupBtn" class="btn btn-outline-primary mr-2">Sign Up</a>
+                    <div id="userDropdown" class="dropdown d-none">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span id="username">User</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuButton">
+                            <a class="dropdown-item" href="profile.html">My Profile</a>
+                            <a class="dropdown-item" href="orders.html">My Orders</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="row py-5">
+            <div class="col-md-12">
+                <h2 class="wishlist-title text-center mb-4">My Wishlist</h2>
+
+                <!-- Empty wishlist message (shown when wishlist is empty) -->
+                <div id="emptyWishlist" class="text-center py-5 d-none">
+                    <div class="empty-wishlist-icon mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5C22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1l-.1-.1C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5c0 2.89-3.14 5.74-7.9 10.05z" />
+                        </svg>
+                    </div>
+                    <h4>Your wishlist is empty</h4>
+                    <p class="text-muted">Browse our books and add some to your wishlist!</p>
+                    <a href="books.html" class="btn btn-primary mt-3">Explore Books</a>
+                </div>
+
+                <!-- Wishlist items container (hidden when empty) -->
+                <div id="wishlistContainer" class="container">
+                    <!-- Wishlist table header -->
+                    <div class="row wishlist-header py-3 border-bottom">
+                        <div class="col-md-2 text-center">Image</div>
+                        <div class="col-md-4">Book Details</div>
+                        <div class="col-md-2 text-center">Price</div>
+                        <div class="col-md-2 text-center">Status</div>
+                        <div class="col-md-2 text-center">Actions</div>
+                    </div>
+
+                    <!-- Wishlist items will be added here dynamically -->
+                    <div id="wishlistItems">
+                        <!-- Loading indicator -->
+                        <div id="loadingWishlist" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading your wishlist...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="row py-4 bg-light">
+            <div class="col-md-12 text-center">
+                <p>&copy; 2025 Book Bagaicha. All rights reserved.</p>
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href="about.html">About Us</a></li>
+                    <li class="list-inline-item"><a href="contact.html">Contact</a></li>
+                    <li class="list-inline-item"><a href="privacy.html">Privacy Policy</a></li>
+                    <li class="list-inline-item"><a href="terms.html">Terms of Service</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Wishlist Item Template (hidden, used for JavaScript cloning) -->
+    <template id="wishlistItemTemplate">
+        <div class="row wishlist-item py-4 border-bottom align-items-center fade-in">
+            <div class="col-md-2 text-center">
+                <img src="" alt="Book Cover" class="book-image img-fluid" style="max-height: 120px;">
+            </div>
+            <div class="col-md-4">
+                <h5 class="book-title"></h5>
+                <p class="book-authors text-muted"></p>
+                <p class="book-category"><span class="badge badge-secondary"></span></p>
+                <p class="book-added-date text-muted small"></p>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="price-container">
+                    <span class="book-price"></span>
+                    <span class="book-sale-price text-danger d-none"></span>
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <span class="book-status badge"></span>
+            </div>
+            <div class="col-md-2 text-center action-buttons">
+                <button class="btn btn-sm btn-primary add-to-cart-btn mb-2">Add to Cart</button>
+                <button class="btn btn-sm btn-outline-danger remove-wishlist-btn">Remove</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Toast for notifications -->
+    <div class="toast-container">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+            <div class="toast-header">
+                <strong class="mr-auto" id="toastTitle">Notification</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Action completed successfully.
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        // User Authentication Utilities
+        const AUTH = {
+            // JWT token key in localStorage
+            TOKEN_KEY: 'auth_token',
+            USER_KEY: 'user_info',
+
+            // Check if user is logged in
+            isLoggedIn: function() {
+                return localStorage.getItem(this.TOKEN_KEY) !== null;
+            },
+
+            // Get JWT token
+            getToken: function() {
+                return localStorage.getItem(this.TOKEN_KEY);
+            },
+
+            // Set token and user info on login
+            setAuth: function(token, user) {
+                localStorage.setItem(this.TOKEN_KEY, token);
+                localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+                this.updateUI();
+            },
+
+            // Clear auth on logout
+            clearAuth: function() {
+                localStorage.removeItem(this.TOKEN_KEY);
+                localStorage.removeItem(this.USER_KEY);
+                this.updateUI();
+            },
+
+            // Get current user info
+            getCurrentUser: function() {
+                const userJson = localStorage.getItem(this.USER_KEY);
+                return userJson ? JSON.parse(userJson) : null;
+            },
+
+            // Update UI based on auth status
+            updateUI: function() {
+                const isLoggedIn = this.isLoggedIn();
+                const user = this.getCurrentUser();
+
+                const loginBtn = document.getElementById('loginBtn');
+                const signupBtn = document.getElementById('signupBtn');
+                const userDropdown = document.getElementById('userDropdown');
+                const usernameSpan = document.getElementById('username');
+
+                if (isLoggedIn && user) {
+                    // Hide login/signup, show user dropdown
+                    loginBtn.classList.add('d-none');
+                    signupBtn.classList.add('d-none');
+                    userDropdown.classList.remove('d-none');
+
+                    // Update username display
+                    usernameSpan.textContent = `${user.firstName} ${user.lastName}`;
+                } else {
+                    // Show login/signup, hide user dropdown
+                    loginBtn.classList.remove('d-none');
+                    signupBtn.classList.remove('d-none');
+                    userDropdown.classList.add('d-none');
+                }
+            }
+        };
+
+        // API Helper
+        const API = {
+            BASE_URL: '/api',
+
+            // Headers for authenticated requests
+            getAuthHeaders: function() {
+                const token = AUTH.getToken();
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+            },
+
+            // Generic fetch with error handling
+            fetch: async function(endpoint, options = {}) {
+                try {
+                    const isAuthRequest = options.auth !== false;
+
+                    if (isAuthRequest) {
+                        options.headers = {
+                            ...options.headers,
+                            ...this.getAuthHeaders()
+                        };
+                    }
+
+                    const response = await fetch(`${this.BASE_URL}${endpoint}`, options);
+
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            // Unauthorized - clear auth and redirect to login
+                            AUTH.clearAuth();
+                            window.location.href = '/login.html';
+                            return null;
+                        }
+
+                        const error = await response.json().catch(() => ({}));
+                        throw new Error(error.message || `Request failed with status ${response.status}`);
+                    }
+
+                    // Check if response is empty or not JSON
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return await response.json();
+                    }
+
+                    return null;
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            },
+
+            // Wishlist API endpoints
+            Wishlist: {
+                getWishlist: async function() {
+                    return API.fetch('/wishlist');
+                },
+
+                addToWishlist: async function(bookId) {
+                    return API.fetch('/wishlist/add', {
+                        method: 'POST',
+                        body: JSON.stringify({ bookId })
+                    });
+                },
+
+                removeFromWishlist: async function(wishlistItemId) {
+                    return API.fetch(`/wishlist/remove/${wishlistItemId}`, {
+                        method: 'DELETE'
+                    });
+                },
+
+                isBookInWishlist: async function(bookId) {
+                    return API.fetch(`/wishlist/check/${bookId}`);
+                }
+            }
+        };
+
+        // Toast Notification Helper
+        const Toast = {
+            element: document.getElementById('toast'),
+            titleElement: document.getElementById('toastTitle'),
+            messageElement: document.getElementById('toastMessage'),
+
+            show: function(title, message, type = 'success') {
+                this.titleElement.textContent = title;
+                this.messageElement.textContent = message;
+
+                // Set appropriate styling based on type
+                this.element.classList.remove('bg-success', 'bg-danger', 'bg-warning');
+                if (type === 'success') {
+                    this.element.classList.add('bg-success', 'text-white');
+                } else if (type === 'error') {
+                    this.element.classList.add('bg-danger', 'text-white');
+                } else if (type === 'warning') {
+                    this.element.classList.add('bg-warning');
+                }
+
+                // Show the toast
+                $(this.element).toast('show');
+            },
+
+            success: function(message) {
+                this.show('Success', message, 'success');
+            },
+
+            error: function(message) {
+                this.show('Error', message, 'error');
+            },
+
+            warning: function(message) {
+                this.show('Warning', message, 'warning');
+            }
+        };
+
+        // Wishlist Manager
+        const WishlistManager = {
+            containerElement: document.getElementById('wishlistContainer'),
+            itemsElement: document.getElementById('wishlistItems'),
+            emptyElement: document.getElementById('emptyWishlist'),
+            loadingElement: document.getElementById('loadingWishlist'),
+            template: document.getElementById('wishlistItemTemplate'),
+            wishlistData: null,
+
+            init: async function() {
+                // Initialize event listeners
+                document.addEventListener('DOMContentLoaded', () => {
+                    this.attachEventListeners();
+                    this.loadWishlist();
+                });
+            },
+
+            attachEventListeners: function() {
+                // Logout button
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        AUTH.clearAuth();
+                        window.location.reload();
+                    });
+                }
+            },
+
+            loadWishlist: async function() {
+                // Check if user is logged in
+                if (!AUTH.isLoggedIn()) {
+                    this.showLoginMessage();
+                    return;
+                }
+
+                try {
+                    // Show loading indicator
+                    this.loadingElement.classList.remove('d-none');
+                    this.emptyElement.classList.add('d-none');
+
+                    // Fetch wishlist data
+                    this.wishlistData = await API.Wishlist.getWishlist();
+
+                    // Hide loading indicator
+                    this.loadingElement.classList.add('d-none');
+
+                    // Render wishlist items
+                    this.renderWishlist();
+                } catch (error) {
+                    console.error('Error loading wishlist:', error);
+                    this.loadingElement.classList.add('d-none');
+                    Toast.error('Failed to load wishlist. Please try again later.');
+                }
+            },
+
+            renderWishlist: function() {
+                // Clear existing items (except loading indicator)
+                while (this.itemsElement.firstChild) {
+                    if (this.itemsElement.firstChild !== this.loadingElement) {
+                        this.itemsElement.removeChild(this.itemsElement.firstChild);
+                    }
+                }
+
+                // Show empty message if no items
+                if (!this.wishlistData || this.wishlistData.items.length === 0) {
+                    this.containerElement.classList.add('d-none');
+                    this.emptyElement.classList.remove('d-none');
+                    return;
+                }
+
+                // Show container and hide empty message
+                this.containerElement.classList.remove('d-none');
+                this.emptyElement.classList.add('d-none');
+
+                // Create and append items
+                this.wishlistData.items.forEach(item => {
+                    const itemElement = this.createWishlistItemElement(item);
+                    this.itemsElement.appendChild(itemElement);
+                });
+            },
+
+            createWishlistItemElement: function(item) {
+                const template = this.template.content.cloneNode(true);
+                const itemElement = template.querySelector('.wishlist-item');
+
+                // Set item ID as data attribute
+                itemElement.dataset.itemId = item.wishlistItemId;
+                itemElement.dataset.bookId = item.bookId;
+
+                // Set image
+                const imageElement = itemElement.querySelector('.book-image');
+                imageElement.src = item.image || '/images/book-placeholder.jpg';
+                imageElement.alt = item.bookTitle;
+
+                // Set book details
+                itemElement.querySelector('.book-title').textContent = item.bookTitle;
+                itemElement.querySelector('.book-authors').textContent = item.authors.join(', ');
+                itemElement.querySelector('.book-category .badge').textContent = item.category || 'General';
+
+                // Format and set date
+                const addedDate = new Date(item.addedDate);
+                const formattedDate = addedDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                itemElement.querySelector('.book-added-date').textContent = `Added on ${formattedDate}`;
+
+                // Set price (handle sales)
+                const priceElement = itemElement.querySelector('.book-price');
+                const salePriceElement = itemElement.querySelector('.book-sale-price');
+
+                if (item.onSale && item.salePercentage > 0) {
+                    const originalPrice = item.price;
+                    const discountAmount = (item.price * item.salePercentage) / 100;
+                    const salePrice = originalPrice - discountAmount;
+
+                    priceElement.textContent = `$${originalPrice.toFixed(2)}`;
+                    priceElement.classList.add('on-sale');
+
+                    salePriceElement.textContent = `$${salePrice.toFixed(2)}`;
+                    salePriceElement.classList.remove('d-none');
+                } else {
+                    priceElement.textContent = `$${item.price.toFixed(2)}`;
+                    salePriceElement.classList.add('d-none');
+                }
+
+                // Set stock status
+                const statusElement = itemElement.querySelector('.book-status');
+                // Assuming you have a quantity property to determine stock status
+                if (item.quantity > 10) {
+                    statusElement.textContent = 'In Stock';
+                    statusElement.classList.add('badge-success');
+                } else if (item.quantity > 0) {
+                    statusElement.textContent = 'Low Stock';
+                    statusElement.classList.add('badge-warning');
+                } else {
+                    statusElement.textContent = 'Out of Stock';
+                    statusElement.classList.add('badge-danger');
+                }
+
+                // Set action button event listeners
+                const addToCartBtn = itemElement.querySelector('.add-to-cart-btn');
+                const removeBtn = itemElement.querySelector('.remove-wishlist-btn');
+
+                addToCartBtn.addEventListener('click', () => this.addToCart(item));
+                removeBtn.addEventListener('click', () => this.removeFromWishlist(item.wishlistItemId));
+
+                return itemElement;
+            },
+
+            showLoginMessage: function() {
+                this.loadingElement.classList.add('d-none');
+                this.containerElement.classList.add('d-none');
+
+                const loginMessage = document.createElement('div');
+                loginMessage.className = 'text-center py-5';
+                loginMessage.innerHTML = `
+                    <div class="mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <h4>Please Login to View Your Wishlist</h4>
+                    <p class="text-muted">You need to be logged in to access your wishlist.</p>
+                    <a href="login.html" class="btn btn-primary mt-3">Log In</a>
+                    <a href="signup.html" class="btn btn-outline-secondary mt-3 ml-2">Sign Up</a>
+                `;
+
+                // Replace the empty wishlist with the login message
+                this.emptyElement.parentNode.replaceChild(loginMessage, this.emptyElement);
+            },
+
+            addToCart: function(item) {
+                // This would call your cart API - implement based on your cart structure
+                console.log('Adding to cart:', item);
+                Toast.success(`"${item.bookTitle}" added to your cart.`);
+
+                // Here you would typically:
+                // 1. Call an API to add the item to the cart
+                // 2. Update UI to reflect the change
+                // 3. Show a success message
+            },
+
+            removeFromWishlist: async function(wishlistItemId) {
+                try {
+                    const element = document.querySelector(`.wishlist-item[data-item-id="${wishlistItemId}"]`);
+                    if (!element) return;
+
+                    // Add animation class
+                    element.classList.add('slide-out');
+
+                    // Call API to remove item
+                    await API.Wishlist.removeFromWishlist(wishlistItemId);
+
+                    // Wait for animation to complete then remove element
+                    setTimeout(() => {
+                        element.remove();
+
+                        // Check if wishlist is now empty
+                        const remainingItems = this.itemsElement.querySelectorAll('.wishlist-item');
+                        if (remainingItems.length === 0) {
+                            this.containerElement.classList.add('d-none');
+                            this.emptyElement.classList.remove('d-none');
+                        }
+
+                        // Update local data
+                        if (this.wishlistData) {
+                            this.wishlistData.items = this.wishlistData.items.filter(
+                                item => item.wishlistItemId !== wishlistItemId
+                            );
+                        }
+
+                        Toast.success("Item removed from your wishlist");
+                    }, 300);
+                } catch (error) {
+                    console.error('Error removing item from wishlist:', error);
+                    Toast.error('Failed to remove item. Please try again.');
+                }
+            }
+        };
+
+        // Initialize the Authentication UI
+        AUTH.updateUI();
+
+        // Initialize Wishlist Manager
+        WishlistManager.init();
+    </script>
+</body>
+</html>
