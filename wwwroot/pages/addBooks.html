@@ -145,7 +145,7 @@
                                   <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
                                       <div class="modal-dialog">
                                           <div class="modal-content">
-                                              <form id="bookForm">
+                                              <form id="bookForm" enctype="multipart/form-data">
                                                   <div class="modal-header">
                                                       <h5 class="modal-title" id="bookModalLabel">
                                                           Add book
@@ -201,8 +201,14 @@
                                                               </select>
                                                           </div>
                                                           <div class="mb-3">
+                                                              <label for="PublisherName" class="form-label">Publisher</label>
+                                                              <input class="form-control" id="PublisherName" name="PublisherName" />
+                                                                 
+                                                            
+                                                          </div>
+                                                          <div class="mb-3">
                                                               <label for="Author" class="form-label">Author</label>
-                                                              <select class="form-control" id="AuthorSelect" name="Authors">
+                                                              <select class="form-control" id="AuthorSelect" name="Authors" mutiple>
                                                                   <option value="">Select Author</option>
                                                                   <option value="authorID1">Author Name 1</option>
                                                                   <option value="authorID2">Author Name 2</option>
@@ -297,13 +303,14 @@
           }
 
           // Update table with books
-          function updateBookTable(books) {
+          function updateBookTable(data) { // Renamed 'books' to 'data' for clarity
               const tbody = document.querySelector(".bookTable tbody");
               tbody.innerHTML = ""; // Clear existing rows
 
-              books.forEach(book => {
-                  const row = document.createElement("tr");
-                  row.innerHTML = `
+              if (data && data.$values && Array.isArray(data.$values)) {
+                  data.$values.forEach(book => {
+                      const row = document.createElement("tr");
+                      row.innerHTML = `
                 <td>${book.bookId}</td>
                 <td>${book.title}</td>
                 <td>${book.summary}</td>
@@ -319,8 +326,8 @@
                 <td>${book.category || "N/A"}</td>
                 <td><img src="/${book.image}" alt="${book.title}" width="50" onerror="this.src='placeholder.jpg';" /></td>
                 <td>${book.publisher ? book.publisher.name : "N/A"}</td>
-                <td>${book.authors ? book.authors.map(a => `${a.firstName} ${a.lastName}`).join(", ") : "N/A"}</td>
-                <td>${book.genres ? book.genres.map(g => g.name).join(", ") : "N/A"}</td>
+                <td>${book.authors && book.authors.$values ? book.authors.$values.map(a => `${a.firstName} ${a.lastName}`).join(", ") : "N/A"}</td>
+                <td>${book.genres && book.genres.$values ? book.genres.$values.map(g => g.name).join(", ") : "N/A"}</td>
                 <td class="actionBtns d-flex justify-content-between">
                     <button class="edit-Btn">${editSVG}</button>
                     <button onclick="deleteBook('${book.bookId}')">
@@ -330,11 +337,14 @@
                     </button>
                 </td>
             `;
-                  tbody.appendChild(row);
-              });
-
-              // Re-attach edit button event listeners
-              attachEditListeners();
+                      tbody.appendChild(row);
+                  });
+                  // Re-attach edit button event listeners
+                  attachEditListeners();
+              } else {
+                  console.error("Error: Invalid book data received from the API", data);
+                  // Optionally display a message to the user that book data couldn't be loaded properly
+              }
           }
 
           // Delete book
@@ -405,12 +415,13 @@
                   editBtn.innerHTML = enable ? saveSVG : editSVG;
               }
           }
-
+          
           // Initialize table on page load
           document.addEventListener("DOMContentLoaded", function () {
               fetchBooks(); // Load books initially
 
               document.getElementById("bookForm").addEventListener("submit", async function (e) {
+                  
                   e.preventDefault();
 
                   const formData = new FormData();
@@ -421,7 +432,11 @@
                   formData.append("Quantity", document.getElementById("quantity").value);
                   formData.append("Format", document.getElementById("format").value);
                   formData.append("Language", document.getElementById("language").value);
-                  formData.append("PublicationDate", document.getElementById("publicationDate").value);
+                  const publicationDateInput = document.getElementById("publicationDate").value;
+                  if (publicationDateInput) {
+                      formData.append("PublicationDate", `${publicationDateInput}T00:00:00Z`);
+                  }
+
                   formData.append("Category", document.getElementById("category").value);
                   formData.append("OnSale", document.getElementById("onSaleCheckbox").checked);
 
@@ -429,10 +444,14 @@
                   if (publisherSelect && publisherSelect.value) {
                       formData.append("PublisherId", publisherSelect.value);
                   }
+                  formData.append("PublisherName", document.getElementById("PublisherName").value);
 
-                  const authorSelect = document.querySelector('select[for="Author"]');
-                  if (authorSelect && authorSelect.value) {
-                      formData.append("Authors", authorSelect.value);
+                  const authorSelect = document.querySelector('#AuthorSelect');
+                  if (authorSelect && authorSelect.selectedOptions) {
+                      const authorIds = Array.from(authorSelect.selectedOptions).map(option => option.value);
+                      authorIds.forEach(authorId => {
+                          formData.append("Authors", authorId); // Append each selected ID
+                      });
                   }
 
                   const genreInput = document.getElementById("genre").value;

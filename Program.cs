@@ -108,6 +108,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IImageService, ImageService>();
 
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddAuthorization();
 

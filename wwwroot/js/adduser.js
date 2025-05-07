@@ -210,6 +210,7 @@ function handleDelete(userId) {
             address: address,
             role: role,
         };
+        //Authorization
         const adminToken = localStorage.getItem('authToken');
 
         const headers = {
@@ -220,6 +221,7 @@ function handleDelete(userId) {
         if (adminToken) {
             headers['Authorization'] = `Bearer ${adminToken}`;
         }
+        //Authorization End
         fetch('/api/Auth/register', {
             method: 'POST',
             headers: headers,
