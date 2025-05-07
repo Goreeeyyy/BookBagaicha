@@ -17,7 +17,7 @@ namespace BookBagaicha.Models.Dto
         public DateTime SaleStartDate { get; set; }
         public DateTime SaleEndDate { get; set; }
         public string? Category { get; set; }
-        public string? Image { get; set; }
+        public IFormFile? ImageFile { get; set; }
         public int? PublisherId { get; set; }
         public string PublisherName { get; set; }
         public List<string> Authors { get; set; } = new List<string>();
