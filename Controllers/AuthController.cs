@@ -51,6 +51,12 @@ namespace BookBagaicha.Controllers
                 {
                     return BadRequest(new { Error = $"Role '{roleToAssign}' does not exist." });
                 }
+                if ((roleToAssign.ToLower() == "staff" || roleToAssign.ToLower() == "admin") && !User.IsInRole("Admin"))
+                {
+                    return Unauthorized(new { Error = "Only administrators can register new staff or admin users." });
+                }
+
+
 
                 var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
 

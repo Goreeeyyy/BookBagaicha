@@ -9,6 +9,7 @@ using BookBagaicha.Services;
 using BookBagaicha.IService;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +93,10 @@ builder.Services.Configure<JWTTokenInfo>(builder.Configuration.GetSection("jwt")
 
 //Registering JWTService in DI container for dependency injection. 
 builder.Services.AddScoped<JWTService>();
+
+builder.Services.AddScoped<JWTService>(provider =>
+    new JWTService(provider.GetRequiredService<IOptions<JWTTokenInfo>>(),
+                   provider.GetRequiredService<UserManager<User>>()));
 
 builder.Services.AddScoped<IBookService, BookService>();
 

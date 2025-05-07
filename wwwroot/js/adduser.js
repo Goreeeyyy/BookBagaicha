@@ -210,13 +210,20 @@ function handleDelete(userId) {
             address: address,
             role: role,
         };
+        const adminToken = localStorage.getItem('authToken');
 
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+
+        // Add the Authorization header with the Bearer token if it exists
+        if (adminToken) {
+            headers['Authorization'] = `Bearer ${adminToken}`;
+        }
         fetch('/api/Auth/register', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData),
+            headers: headers,
+            body: JSON.stringify(userData)
         })
             .then(response => {
                 if (!response.ok) {
@@ -230,8 +237,7 @@ function handleDelete(userId) {
                 console.log('Registration successful:', data);
                 $('#staffModal').modal('hide');
                 this.reset();
-                // Optionally, update the staff list in the table here
-                // You would typically make another API call to fetch the updated list
+                
             })
             .catch(error => {
                 console.error('Error during registration:', error);
