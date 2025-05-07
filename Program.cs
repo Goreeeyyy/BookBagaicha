@@ -133,17 +133,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
 app.UseCors();
 
 app.UseStaticFiles();
+
 app.UseRouting();
-
-
 app.UseStaticFiles();
-
 app.UseCors();
-
 app.UseAuthorization();
 
 app.MapControllers();

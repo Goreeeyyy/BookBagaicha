@@ -78,15 +78,18 @@ namespace BookBagaicha.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(
+                // Get the user's roles
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault(); // Assuming a user has one primary role
 
+                return Ok(
                     new
                     {
                         Message = "Login Success",
-                        Token = _jwtService.GenerateToken()
+                        Token = _jwtService.GenerateToken(user), // Pass user to generate token with claims
+                        Role = role // Include the user's role in the response
                     }
-
-                    );
+                );
             }
 
             return Unauthorized("Password is not valid");

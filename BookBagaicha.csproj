@@ -39,7 +39,6 @@
     <Folder Include="wwwroot\image\" />
 
     <Folder Include="wwwroot\js\NewFolder\" />
-    <Folder Include="wwwroot\pages\" />
 
   </ItemGroup>
 

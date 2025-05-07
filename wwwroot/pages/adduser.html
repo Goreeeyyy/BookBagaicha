@@ -246,70 +246,8 @@
       integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
       crossorigin="anonymous"
     ></script>
-    <script>
-      const editSVG = `
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-  <path fill="currentColor" d="M15.748 2.947a2 2 0 0 1 2.828 0l2.475 2.475a2 2 0 0 1 0 2.829L9.158 20.144l-6.38 1.076l1.077-6.38zm-.229 3.057l2.475 2.475l1.643-1.643l-2.475-2.474zm1.06 3.89l-2.474-2.475l-8.384 8.384l-.503 2.977l2.977-.502z"/>
-</svg>`;
-
-      const saveSVG = `
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-  <path fill="currentColor" d="M20.285 6.709l-11.2 11.2l-5.657-5.657L5.8 10.88l3.286 3.285L18.17 5.08z"/>
-</svg>`;
-        document.getElementById("staffForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const firstName = document.getElementById("firstName").value;
-            const lastName = document.getElementById("lastName").value;
-            const email = document.getElementById("email").value;
-            const role = document.getElementById("role").value;
-            const phone = document.getElementById("phone").value;
-            const address = document.getElementById("address").value;
-            const password = document.getElementById("password").value;
-            const confirmPassword = document.getElementById("confirmPassword").value;
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-
-            const userData = {
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                password: password,
-                confirmPassword: confirmPassword,
-                address: address,
-                role: role,
-            };
-
-            fetch('/api/Auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            throw new Error(err.message || 'Registration failed');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Registration successful:', data);
-                    $('#staffModal').modal('hide');
-                    this.reset();
-                    // Optionally, update the staff list in the table here
-                    // You would typically make another API call to fetch the updated list
-                })
-                .catch(error => {
-                    console.error('Error during registration:', error);
-                    alert(error.message);
-                });
-        });
+    <script src="../js/adduser.js">
+      
 </script>
     
   </body>

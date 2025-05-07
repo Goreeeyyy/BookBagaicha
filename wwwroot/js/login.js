@@ -36,19 +36,29 @@
                     }
                 }).showToast();
 
-                // Store the token (you might want to use localStorage or sessionStorage)
                 const token = data.token;
-                console.log('Login successful, Token:', token);
-                localStorage.setItem('authToken', token); // Example of storing token
+                const role = data.role; // Get the role from the response
+                console.log('Login successful, Token:', token, 'Role:', role);
+                localStorage.setItem('authToken', token);
 
-                // Redirect to a dashboard or home page
+                let redirectUrl = 'dashboard.html'; // Default redirect
+
+                if (role === 'Admin') {
+                    redirectUrl = 'adminDashboard.html'; // Replace with your admin dashboard URL
+                } else if (role === 'Staff') {
+                    redirectUrl = 'staffHome.html'; // Replace with your staff dashboard URL
+                } else if (role === 'User') {
+                    redirectUrl = 'userHome.html'; // Replace with your customer dashboard URL
+                }
+
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html'; // Replace with your actual dashboard URL
+                    window.location.href = redirectUrl;
                 }, 3500);
+
             } else if (response.status === 401) {
-                const errorData = await response.text(); // Or response.json() if your backend sends JSON error
+                const errorData = await response.json(); // Expect JSON error for unauthorized
                 Toastify({
-                    text: errorData || "Invalid credentials.",
+                    text: errorData.message || "Invalid credentials.",
                     duration: 5000,
                     close: true,
                     gravity: "top",
@@ -59,8 +69,9 @@
                 }).showToast();
                 console.error('Login failed:', errorData);
             } else {
+                const errorText = await response.text();
                 Toastify({
-                    text: `Login failed with status: ${response.status}`,
+                    text: `Login failed with status: ${response.status} - ${errorText}`,
                     duration: 5000,
                     close: true,
                     gravity: "top",
@@ -69,7 +80,7 @@
                         background: "#dc3545",
                     }
                 }).showToast();
-                console.error('Login failed with status:', response.status);
+                console.error('Login failed with status:', response.status, errorText);
             }
         } catch (error) {
             Toastify({
