@@ -60,14 +60,12 @@ namespace BookBagaicha.Services
                 SaleStartDate = request.SaleStartDate.ToUniversalTime(),
                 SaleEndDate = request.SaleEndDate.ToUniversalTime(),
                 Category = request.Category,
-<<<<<<< HEAD
-                Image = request.Image,
+                Image = null,
                 PublisherId = publisherToAdd.PublisherId, // Set the PublisherId
-=======
->>>>>>> origin/Lipi
+
                 Authors = new List<Author>(),
                 Genres = new List<Genre>(),
-                PublisherId = request.PublisherId ?? 0,
+                
             };
 
             if (request.ImageFile != null)

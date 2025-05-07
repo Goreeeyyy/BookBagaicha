@@ -148,11 +148,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Books}/{action=AddBooks}/{id?}");
-
-app.Urls.Add("http://localhost:5000");
-app.Urls.Add("https://localhost:7147");
-
 app.Run();

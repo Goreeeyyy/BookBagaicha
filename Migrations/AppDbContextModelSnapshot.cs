@@ -505,7 +505,6 @@ namespace BookBagaicha.Migrations
                         .IsRequired();
                 });
 
-
             modelBuilder.Entity("BookBagaicha.Models.Book", b =>
                 {
                     b.HasOne("BookBagaicha.Models.Publisher", "Publisher")
@@ -515,152 +514,149 @@ namespace BookBagaicha.Migrations
                         .IsRequired();
 
                     b.Navigation("Publisher");
-
-                    modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.User", "User")
-                                .WithOne()
-                                .HasForeignKey("BookBagaicha.Models.Cart", "UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.Navigation("User");
-                        });
-
-                    modelBuilder.Entity("BookBagaicha.Models.CartItem", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.Book", "Book")
-                                .WithMany()
-                                .HasForeignKey("BookId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.HasOne("BookBagaicha.Models.Cart", "Cart")
-                                .WithMany("CartItems")
-                                .HasForeignKey("CartId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.Navigation("Book");
-
-                            b.Navigation("Cart");
-                        });
-
-                    modelBuilder.Entity("BookBagaicha.Models.Wishlist", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.User", "User")
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.Navigation("User");
-                        });
-
-                    modelBuilder.Entity("BookBagaicha.Models.WishlistItem", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.Book", "Book")
-                                .WithMany()
-                                .HasForeignKey("BookId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.HasOne("BookBagaicha.Models.Wishlist", "Wishlist")
-                                .WithMany("WishlistItems")
-                                .HasForeignKey("WishlistId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.Navigation("Book");
-
-                            b.Navigation("Wishlist");
-
-                        });
-
-                    modelBuilder.Entity("BookGenre", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.Book", null)
-                                .WithMany()
-                                .HasForeignKey("BooksBookId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.HasOne("BookBagaicha.Models.Genre", null)
-                                .WithMany()
-                                .HasForeignKey("GenresGenreId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                    modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
-                        {
-                            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<long>", null)
-                                .WithMany()
-                                .HasForeignKey("RoleId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                    modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.User", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                    modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.User", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                    modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<long>", b =>
-                        {
-                            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<long>", null)
-                                .WithMany()
-                                .HasForeignKey("RoleId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.HasOne("BookBagaicha.Models.User", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                    modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<long>", b =>
-                        {
-                            b.HasOne("BookBagaicha.Models.User", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-
-                    modelBuilder.Entity("BookBagaicha.Models.Publisher", b =>
-                        {
-                            b.Navigation("Books");
-
-                            modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
-                        {
-                            b.Navigation("CartItems");
-                        });
-
-                            modelBuilder.Entity("BookBagaicha.Models.Wishlist", b =>
-                        {
-                            b.Navigation("WishlistItems");
-
-                        });
-#pragma warning restore 612, 618
-                        });
                 });
+
+            modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.User", "User")
+                        .WithOne()
+                        .HasForeignKey("BookBagaicha.Models.Cart", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.CartItem", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookBagaicha.Models.Cart", "Cart")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Cart");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Wishlist", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.WishlistItem", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookBagaicha.Models.Wishlist", "Wishlist")
+                        .WithMany("WishlistItems")
+                        .HasForeignKey("WishlistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Wishlist");
+                });
+
+            modelBuilder.Entity("BookGenre", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksBookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookBagaicha.Models.Genre", null)
+                        .WithMany()
+                        .HasForeignKey("GenresGenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<long>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<long>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<long>", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BookBagaicha.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<long>", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
+                {
+                    b.Navigation("CartItems");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Publisher", b =>
+                {
+                    b.Navigation("Books");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Wishlist", b =>
+                {
+                    b.Navigation("WishlistItems");
+                });
+#pragma warning restore 612, 618
         }
     }
 }

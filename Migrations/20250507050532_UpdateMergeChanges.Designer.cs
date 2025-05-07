@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookBagaicha.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250506170851_AddCartTables")]
-    partial class AddCartTables
+    [Migration("20250507050532_UpdateMergeChanges")]
+    partial class UpdateMergeChanges
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -119,6 +119,8 @@ namespace BookBagaicha.Migrations
 
                     b.HasKey("BookId");
 
+                    b.HasIndex("PublisherId");
+
                     b.ToTable("Books");
                 });
 
@@ -184,6 +186,23 @@ namespace BookBagaicha.Migrations
                     b.HasKey("GenreId");
 
                     b.ToTable("Genres");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Publisher", b =>
+                {
+                    b.Property<int>("PublisherId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PublisherId"));
+
+                    b.Property<string>("PublisherName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("PublisherId");
+
+                    b.ToTable("Publishers");
                 });
 
             modelBuilder.Entity("BookBagaicha.Models.User", b =>
@@ -489,6 +508,17 @@ namespace BookBagaicha.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BookBagaicha.Models.Book", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.Publisher", "Publisher")
+                        .WithMany("Books")
+                        .HasForeignKey("PublisherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Publisher");
+                });
+
             modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
                 {
                     b.HasOne("BookBagaicha.Models.User", "User")
@@ -618,6 +648,11 @@ namespace BookBagaicha.Migrations
             modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
                 {
                     b.Navigation("CartItems");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Publisher", b =>
+                {
+                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("BookBagaicha.Models.Wishlist", b =>

@@ -30,15 +30,15 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/template/adminDashboard.html"
+              <a class="nav-link" href="adminDashboard.html"
                 >Dashboard</a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/template/adduser.html">Staff</a>
+              <a class="nav-link active" href="adduser.html">Staff</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/template/addBooks.html">Books</a>
+              <a class="nav-link" href="addBooks.html">Books</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Logout</a>
@@ -163,40 +163,54 @@
                   <div class="modal fade" id="staffModal" tabindex="-1" aria-labelledby="staffModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                       <div class="modal-content">
-                        <form id="staffForm">
+                        <form id="staffForm" action="/api/Auth/register" method="POST">
                           <div class="modal-header">
                             <h5 class="modal-title" id="staffModalLabel">Add Staff</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
-                                                      </div>
+                          </div>
                   
                           <div class="modal-body">
                             <div class="mb-3">
-                              <label for="staffName" class="form-label">Full Name</label>
-                              <input type="text" class="form-control" id="staffName" required />
+                              <label for="firstName" class="form-label">First Name</label>
+                              <input type="text" class="form-control" id="firstName" name="firstName" required />
                             </div>
+                              <div class="mb-3">
+                              <label for="lastName" class="form-label">Last Name</label>
+                              <input type="text" class="form-control" id="lastName" name="lastName" required />
+                            </div>
+                              
                   
                             <div class="mb-3">
-                              <label for="staffEmail" class="form-label">Email</label>
-                              <input type="email" class="form-control" id="staffEmail" required />
+                              <label for="email" class="form-label">Email</label>
+                              <input type="email" class="form-control" id="email" name="email" required />
                             </div>
                             <div class="mb-3">
-                                <label for="staffAddress" class="form-label">Address</label>
-                                <input type="text" class="form-control" id="staffAddress" required />
+                                <label for="address" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="address" name="address" required />
                               </div>
                               <div class="mb-3">
-                                <label for="staffPhone" class="form-label">Phone</label>
-                                <input type="text" class="form-control" id="staffPhone" required />
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="text" class="form-control" id="phone" name="phone" required />
+                              </div>
+                              <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required />
+                              </div>
+                              <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required />
                               </div>
 
                   
                             <div class="mb-3">
-                              <label for="staffRole" class="form-label">Role</label>
-                              <select class="form-select" id="staffRole" required>
+                              <label for="role" class="form-label">Role</label>
+                              <select class="form-select" id="role" required>
                                 <option value="">-- Select Role --</option>
-                                <option value="staff">Staff</option>
-                                <option value="admin">Admin</option>
+                                <option value="Staff">Staff</option>
+                                <option value="Admin">Admin</option>
+                                  <option value="User">User</option>
                               </select>
                             </div>
                           </div>
@@ -242,72 +256,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
   <path fill="currentColor" d="M20.285 6.709l-11.2 11.2l-5.657-5.657L5.8 10.88l3.286 3.285L18.17 5.08z"/>
 </svg>`;
-      document.addEventListener("DOMContentLoaded", function () {
-        let currentlyEditingRow = null;
+        document.getElementById("staffForm").addEventListener("submit", function (e) {
+            e.preventDefault();
 
-        document.querySelectorAll(".edit-Btn").forEach((editBtn) => {
-          editBtn.addEventListener("click", function () {
-            const row = this.closest("tr");
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const email = document.getElementById("email").value;
+            const role = document.getElementById("role").value;
+            const phone = document.getElementById("phone").value;
+            const address = document.getElementById("address").value;
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
 
-            // If another row is being edited, save and disable it
-            if (currentlyEditingRow && currentlyEditingRow !== row) {
-              toggleEditMode(currentlyEditingRow, false);
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
             }
 
-            const isEditing = row.classList.contains("editing");
+            const userData = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword,
+                address: address,
+                role: role,
+            };
 
-            if (!isEditing) {
-              toggleEditMode(row, true);
-              currentlyEditingRow = row;
-            } else {
-              toggleEditMode(row, false);
-              currentlyEditingRow = null;
-            }
-          });
+            fetch('/api/Auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'Registration failed');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Registration successful:', data);
+                    $('#staffModal').modal('hide');
+                    this.reset();
+                    // Optionally, update the staff list in the table here
+                    // You would typically make another API call to fetch the updated list
+                })
+                .catch(error => {
+                    console.error('Error during registration:', error);
+                    alert(error.message);
+                });
         });
-
-        function toggleEditMode(row, enable) {
-          const editBtn = row.querySelector(".edit-Btn");
-          row.classList.toggle("editing", enable);
-
-          Array.from(row.children).forEach((cell, index) => {
-            if (index < 6) {
-              if (enable) {
-                const value = cell.innerText;
-                cell.setAttribute("data-original", value);
-                cell.innerHTML = `<input type="text" class="form-control" value="${value}" />`;
-              } else {
-                const input = cell.querySelector("input");
-                if (input) {
-                  cell.textContent = input.value;
-                }
-              }
-            }
-          });
-
-          editBtn.innerHTML = enable ? saveSVG : editSVG;
-        }
-      });
-
-      document.getElementById("staffForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById("staffName").value;
-    const email = document.getElementById("staffEmail").value;
-    const role = document.getElementById("staffRole").value;
-    const phone = document.getElementById("staffPhone").value;
-    const address = document.getElementById("staffAddress").value;
-    console.log("Staff Added:", { name, email, role });
-
-    $('#staffModal').modal('hide');
-
-
-    // Reset form
-    this.reset();
-
-    // Optionally add row to your staff table here
-  });
 </script>
-    </script>
+    
   </body>
 </html>
