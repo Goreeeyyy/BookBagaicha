@@ -54,44 +54,24 @@ namespace BookBagaicha.Controllers
             return Ok(allBooks);
         }
 
-        [HttpPut("api/updateBooks/{id}")]
+        
 
-        public async Task<IActionResult> UpdateBook(Guid id, [FromBody] Book updatedBook)
+        [HttpPut("api/updateBooks/{id}")]
+        public async Task<IActionResult> UpdateBook(Guid id, [FromForm] UpdateBookRequest request)
         {
+            if (id != request.BookId)
+            {
+                return BadRequest("Book ID in the route does not match the ID in the request body.");
+            }
+
             if (ModelState.IsValid)
             {
-                var book = await _context.Books.FindAsync(id);
-                if (book == null)
+                var updatedBook = await _bookService.UpdateBookAsync(request);
+                if (updatedBook != null)
                 {
-                    return NotFound();
+                    return Ok(updatedBook); // Or NoContent if you prefer
                 }
-
-                // Update the book's fields
-                book.Title = updatedBook.Title;
-                book.ISBN = updatedBook.ISBN;
-                book.Price = updatedBook.Price;
-                book.Summary = updatedBook.Summary;
-                book.Language = updatedBook.Language;
-                book.Format = updatedBook.Format;
-                book.PublicationDate = updatedBook.PublicationDate;
-                book.Quantity = updatedBook.Quantity;
-                book.OnSale = updatedBook.OnSale;
-                book.SalePercntage = updatedBook.SalePercntage;
-                book.SaleStartDate = updatedBook.SaleStartDate;
-                book.SaleEndDate = updatedBook.SaleEndDate;
-                book.Category = updatedBook.Category;
-                book.Image = updatedBook.Image;
-                book.PublisherId = updatedBook.PublisherId;
-
-                try
-                {
-                    await _context.SaveChangesAsync();
-                    return NoContent();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    return Conflict("Concurrency error: Book has been modified by another user.");
-                }
+                return NotFound($"Book with ID '{id}' not found.");
             }
             return BadRequest(ModelState);
         }

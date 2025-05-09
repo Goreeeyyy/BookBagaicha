@@ -8,5 +8,7 @@ namespace BookBagaicha.IService
         Task<Book?> CreateBookWithAuthors(BookCreationRequest request);
         Task<Book?> GetBookByIdAsync(Guid id);
         Task<List<Book>> GetAllBooksAsync();
+
+        Task<Book?> UpdateBookAsync(UpdateBookRequest request);
     }
 }
