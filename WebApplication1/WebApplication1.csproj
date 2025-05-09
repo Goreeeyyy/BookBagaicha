@@ -67,35 +67,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BookDetails.aspx" />
+    <Content Include="js\app.js" />
+    <Content Include="js\book-details.js" />
+    <Content Include="js\books.js" />
+    <Content Include="js\user-profile.js" />
+    <Content Include="Pages\BookDetails.html" />
     <Content Include="Content\style.css" />
-    <Content Include="Books.aspx" />
-    <Content Include="HomePage.aspx" />
-    <Content Include="Scripts\app.js" />
-    <Content Include="UserProfile.aspx" />
-    <Content Include="Web.config" />
+    <Content Include="Pages\Books.html" />
+    <Content Include="Pages\HomePage.html" />
+    <Content Include="Pages\UserProfile.html" />
+    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BookDetails.aspx.cs">
-      <DependentUpon>BookDetails.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Books.aspx.cs">
-      <DependentUpon>Books.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="HomePage.aspx.cs">
-      <DependentUpon>HomePage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserProfile.aspx.cs">
-      <DependentUpon>UserProfile.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Images\" />
