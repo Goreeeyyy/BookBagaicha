@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace BookBagaicha.Controllers
 {
     [ApiController]
-    [Authorize] // Require authentication for all cart operations
+    // Require authentication for all cart operations
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;

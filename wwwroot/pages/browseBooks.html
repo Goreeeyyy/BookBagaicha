@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Book Bagsicha</title>
+    <link href="Content/style.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        .book-img {
+            height:50vh;
+            width: contain;
+            object-fit: cover;
+        }
+
+        .on-sale {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagsicha</a>
+            <div class="d-flex align-items-center ms-auto">
+                <ul class="navbar-nav me-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="HomePage.html">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Books.html">BOOKS</a>
+                    </li>
+                </ul>
+                <div class="d-flex me-3">
+                    <input class="form-control form-control-sm" type="search" placeholder="Search for products..." aria-label="Search" />
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="UserProfile.html" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <a href="#" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-shopping-basket"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="filter-bar mb-4 d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    All
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item small" href="#">All</a></li>
+                    <li><a class="dropdown-item small" href="#">Award Winners</a></li>
+                    <li><a class="dropdown-item small" href="#">Best Sellers</a></li>
+                    <li><a class="dropdown-item small" href="#">New Releases</a></li>
+                    <li><a class="dropdown-item small" href="#">Coming Soon</a></li>
+                    <li><a class="dropdown-item small" href="#">On Sale</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Sort
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item small" href="#">Price high to low</a></li>
+                    <li><a class="dropdown-item small" href="#">Price low to high</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Genre
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item small" href="#">Adventure</a></li>
+                    <li><a class="dropdown-item small" href="#">Romance</a></li>
+                    <li><a class="dropdown-item small" href="#">Mystery</a></li>
+                    <li><a class="dropdown-item small" href="#">Science Fiction</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 class="mb-4">Explore All Books Here</h3>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="bookList">
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const apiUrl = '/api/allBooks';
+
+            $.ajax({
+                url: apiUrl,
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) { // Changed 'data' to 'response' to be more descriptive
+                    if (response && response.$values && Array.isArray(response.$values)) {
+                        const bookListContainer = $('#bookList');
+                        bookListContainer.empty();
+
+                        response.$values.forEach(book => { // Access the books through response.$values
+                            const bookCard = `
+                                    <div class="col">
+                                        <div class="card h-100 text-center p-2 position-relative">
+                                            <a href="BookDetails.html?id=${book.bookId}" class="stretched-link"></a>
+                                            <img src="../${book.image}" class="card-img-top book-img" alt="${book.title}" />
+                                            <div class="card-body">
+                                                <h6 class="card-title mb-1">${book.title}</h6>
+                                                <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => author.name).join(', ') : 'No Author'}</p>
+                                                <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">
+                                                        <i class="far fa-heart"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            bookListContainer.append(bookCard);
+                        });
+                    } else {
+                        $('#bookList').html('<p>No books found or invalid data format.</p>');
+                        console.error('Invalid API response format:', response);
+                    }
+                },
+                error: function (error) {
+                    console.error('Error fetching books:', error);
+                    $('#bookList').html('<p>Failed to load books.</p>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -191,30 +191,18 @@
                                                           </div>
                                                       </div>
                                                       <div class="d-flex justify-content-between form-row">
-                                                          <div class="mb-3">
-                                                              <label for="Publisher" class="form-label">Publisher</label>
-                                                              <select class="form-control" id="PublisherSelect" name="PublisherId">
-                                                                  <option value="">Select Publisher</option>
-                                                                  <option value="publisherID1">Publisher Name 1</option>
-                                                                  <option value="publisherID2">Publisher Name 2</option>
-                                                                  <option value="publisherID3">Publisher Name 3</option>
-                                                              </select>
-                                                          </div>
+                                                          
                                                           <div class="mb-3">
                                                               <label for="PublisherName" class="form-label">Publisher</label>
                                                               <input class="form-control" id="PublisherName" name="PublisherName" />
-                                                                 
-                                                            
+
+
                                                           </div>
                                                           <div class="mb-3">
-                                                              <label for="Author" class="form-label">Author</label>
-                                                              <select class="form-control" id="AuthorSelect" name="Authors" mutiple>
-                                                                  <option value="">Select Author</option>
-                                                                  <option value="authorID1">Author Name 1</option>
-                                                                  <option value="authorID2">Author Name 2</option>
-                                                                  <option value="authorID3">Author Name 3</option>
-                                                              </select>
+                                                              <label for="AuthorName" class="form-label">Authors (comma separated)</label>
+                                                              <input type="text" class="form-control" id="AuthorName" name="AuthorName" placeholder="e.g., J.K. Rowling, Neil Gaiman" />
                                                           </div>
+
                                                           <div class="mb-3">
                                                               <label for="publicationDate" class="form-label">Published Date</label>
                                                               <input type="date"
@@ -225,8 +213,8 @@
                                                       </div>
                                                       <div class="d-flex justify-content-between">
                                                           <div class="mb-3">
-                                                              <label for="genre" class="form-label">Genre</label>
-                                                              <input id="genre" class="form-control" name="Genres" />
+                                                              <label for="genre" class="form-label">Genres (comma separated)</label>
+                                                              <input id="genre" class="form-control" name="Genres" placeholder="e.g., Fiction, Mystery" />
                                                           </div>
                                                           <div class="mb-3">
                                                               <label for="category" class="form-label">Category</label>
@@ -440,19 +428,21 @@
                   formData.append("Category", document.getElementById("category").value);
                   formData.append("OnSale", document.getElementById("onSaleCheckbox").checked);
 
-                  const publisherSelect = document.querySelector('select[for="Publisher"]');
-                  if (publisherSelect && publisherSelect.value) {
-                      formData.append("PublisherId", publisherSelect.value);
-                  }
-                  formData.append("PublisherName", document.getElementById("PublisherName").value);
-
-                  const authorSelect = document.querySelector('#AuthorSelect');
-                  if (authorSelect && authorSelect.selectedOptions) {
-                      const authorIds = Array.from(authorSelect.selectedOptions).map(option => option.value);
-                      authorIds.forEach(authorId => {
-                          formData.append("Authors", authorId); // Append each selected ID
-                      });
-                  }
+                 
+                  const publisherInput = document.getElementById("PublisherName").value;
+                    if (publisherInput) {
+                        publisherInput.split(",").map(p => p.trim()).forEach(publisher => {
+                            if (publisher) formData.append("PublisherName", publisher);
+                        });
+                    }
+                                      //formData.append("PublisherName", document.getElementById("PublisherName").value);
+                    
+                                      const authorInput = document.getElementById("AuthorName").value;
+                    if (authorInput) {
+                        authorInput.split(",").map(a => a.trim()).forEach(author => {
+                            if (author) formData.append("Authors", author);
+                        });
+                    }
 
                   const genreInput = document.getElementById("genre").value;
                   if (genreInput) {

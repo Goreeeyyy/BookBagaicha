@@ -62,7 +62,6 @@ namespace BookBagaicha.Services
                 Category = request.Category,
                 Image = null,
                 PublisherId = publisherToAdd.PublisherId, // Set the PublisherId
-
                 Authors = new List<Author>(),
                 Genres = new List<Genre>(),
                 

@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace BookBagaicha.Controllers
 {
     [ApiController]
-    [Authorize] // Require authentication for all wishlist operations
+    // Require authentication for all wishlist operations
     public class WishlistController : ControllerBase
     {
         private readonly IWishlistService _wishlistService;
