@@ -5,7 +5,7 @@
 namespace BookBagaicha.Migrations
 {
     /// <inheritdoc />
-    public partial class Update : Migration
+    public partial class AddWishlistFeature : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookBagaicha.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250507155000_AddReviewsTable")]
-    partial class AddReviewsTable
+    [Migration("20250509170444_FixingWL")]
+    partial class FixingWL
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -336,9 +336,6 @@ namespace BookBagaicha.Migrations
                     b.Property<Guid>("WishlistItemId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("AddedDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("BookId")
                         .HasColumnType("uuid");

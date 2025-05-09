@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookBagaicha.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250509024242_Update")]
-    partial class Update
+    [Migration("20250509163351_AddWishlistFeature")]
+    partial class AddWishlistFeature
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -2,6 +2,6 @@
 {
     public class AddToWishlistRequest
     {
-        public required Guid BookId { get; set; }
+        public Guid BookId { get; set; }
     }
 }

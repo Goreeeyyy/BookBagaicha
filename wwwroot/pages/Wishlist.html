@@ -1,788 +1,475 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-          crossorigin="anonymous" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&display=swap"
-          rel="stylesheet" />
     <title>My Wishlist - Book Bagaicha</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Add Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Bona Nova', serif;
-            color: #333;
-            background-color: #f8f9fa;
+        .book-img {
+            height: 200px;
+            object-fit: cover;
         }
 
-        .site-logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 0;
+        .on-sale {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
         }
 
-        .bona-nova-regular {
-            font-family: 'Bona Nova', serif;
+        .empty-wishlist {
+            text-align: center;
+            padding: 3rem 0;
         }
 
-        /* Navigation */
-        .main-nav .nav-link {
-            color: #555;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            position: relative;
-        }
-
-            .main-nav .nav-link.active {
-                color: #2c3e50;
-                font-weight: 700;
-            }
-
-                .main-nav .nav-link.active:after {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    left: 25%;
-                    width: 50%;
-                    height: 2px;
-                    background-color: #e74c3c;
-                }
-
-        /* Wishlist specific styles */
-        .wishlist-title {
-            color: #2c3e50;
-            font-weight: 700;
-            position: relative;
-            display: inline-block;
-            padding-bottom: 0.5rem;
-        }
-
-            .wishlist-title:after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 30%;
-                width: 40%;
-                height: 3px;
-                background-color: #e74c3c;
-            }
-
-        .wishlist-header {
-            background-color: #f1f2f6;
-            border-radius: 5px 5px 0 0;
-            font-weight: 700;
-            color: #2c3e50;
-        }
-
-        .wishlist-item {
-            transition: all 0.3s ease;
-        }
-
-            .wishlist-item:hover {
-                background-color: #f9f9f9;
-            }
-
-        .book-image {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .wishlist-item:hover .book-image {
-            transform: scale(1.05);
-        }
-
-        .book-title {
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.3rem;
-        }
-
-        .book-authors {
-            font-style: italic;
-            margin-bottom: 0.3rem;
-        }
-
-        .book-category .badge {
-            background-color: #34495e;
-            font-weight: 500;
-        }
-
-        .book-price {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .price-container .book-price.on-sale {
-            text-decoration: line-through;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        .book-sale-price {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .book-status.badge-success {
-            background-color: #27ae60;
-        }
-
-        .book-status.badge-danger {
-            background-color: #e74c3c;
-        }
-
-        .book-status.badge-warning {
-            background-color: #f39c12;
-            color: #fff;
-        }
-
-        .action-buttons .btn {
-            width: 100%;
-            max-width: 130px;
-        }
-
-        .add-to-cart-btn {
-            background-color: #2980b9;
-            border-color: #2980b9;
-        }
-
-            .add-to-cart-btn:hover {
-                background-color: #3498db;
-                border-color: #3498db;
-            }
-
-        .remove-wishlist-btn {
-            color: #e74c3c;
-            border-color: #e74c3c;
-        }
-
-            .remove-wishlist-btn:hover {
-                background-color: #e74c3c;
-                color: white;
-            }
-
-        /* Empty wishlist styling */
-        .empty-wishlist-icon {
-            color: #bdc3c7;
+        .empty-wishlist i {
             font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
         }
-
-        /* Toast styling */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1051;
+        
+        .card {
+            transition: transform 0.2s;
         }
-
-        /* Footer */
-        footer {
-            margin-top: 3rem;
-            border-top: 1px solid #ddd;
-        }
-
-            footer a {
-                color: #2c3e50;
-                text-decoration: none;
-            }
-
-                footer a:hover {
-                    color: #e74c3c;
-                    text-decoration: none;
-                }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateX(30px);
-                opacity: 0;
-            }
-        }
-
-        .slide-out {
-            animation: slideOut 0.3s ease-in-out forwards;
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <!-- Header/Navigation -->
-        <header class="row py-3 bg-light">
-            <div class="col-md-3">
-                <h1 class="site-logo bona-nova-regular">Book Bagaicha</h1>
-            </div>
-            <div class="col-md-6">
-                <nav class="main-nav">
-                    <ul class="nav justify-content-center">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="books.html">Books</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="wishlist.html">Wishlist</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="cart.html">Cart</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="col-md-3 d-flex justify-content-end align-items-center">
-                <div class="user-actions">
-                    <a href="login.html" id="loginBtn" class="btn btn-outline-secondary mr-2">Login</a>
-                    <a href="signup.html" id="signupBtn" class="btn btn-outline-primary mr-2">Sign Up</a>
-                    <div id="userDropdown" class="dropdown d-none">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span id="username">User</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuButton">
-                            <a class="dropdown-item" href="profile.html">My Profile</a>
-                            <a class="dropdown-item" href="orders.html">My Orders</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="row py-5">
-            <div class="col-md-12">
-                <h2 class="wishlist-title text-center mb-4">My Wishlist</h2>
-
-                <!-- Empty wishlist message (shown when wishlist is empty) -->
-                <div id="emptyWishlist" class="text-center py-5 d-none">
-                    <div class="empty-wishlist-icon mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5C22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1l-.1-.1C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5c0 2.89-3.14 5.74-7.9 10.05z" />
-                        </svg>
-                    </div>
-                    <h4>Your wishlist is empty</h4>
-                    <p class="text-muted">Browse our books and add some to your wishlist!</p>
-                    <a href="books.html" class="btn btn-primary mt-3">Explore Books</a>
-                </div>
-
-                <!-- Wishlist items container (hidden when empty) -->
-                <div id="wishlistContainer" class="container">
-                    <!-- Wishlist table header -->
-                    <div class="row wishlist-header py-3 border-bottom">
-                        <div class="col-md-2 text-center">Image</div>
-                        <div class="col-md-4">Book Details</div>
-                        <div class="col-md-2 text-center">Price</div>
-                        <div class="col-md-2 text-center">Status</div>
-                        <div class="col-md-2 text-center">Actions</div>
-                    </div>
-
-                    <!-- Wishlist items will be added here dynamically -->
-                    <div id="wishlistItems">
-                        <!-- Loading indicator -->
-                        <div id="loadingWishlist" class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                            <p class="mt-2">Loading your wishlist...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="row py-4 bg-light">
-            <div class="col-md-12 text-center">
-                <p>&copy; 2025 Book Bagaicha. All rights reserved.</p>
-                <ul class="list-inline">
-                    <li class="list-inline-item"><a href="about.html">About Us</a></li>
-                    <li class="list-inline-item"><a href="contact.html">Contact</a></li>
-                    <li class="list-inline-item"><a href="privacy.html">Privacy Policy</a></li>
-                    <li class="list-inline-item"><a href="terms.html">Terms of Service</a></li>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagaicha</a>
+            <div class="d-flex align-items-center ms-auto">
+                <ul class="navbar-nav me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="HomePage.html">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="browseBooks.html">BOOKS</a>
+                    </li>
                 </ul>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Wishlist Item Template (hidden, used for JavaScript cloning) -->
-    <template id="wishlistItemTemplate">
-        <div class="row wishlist-item py-4 border-bottom align-items-center fade-in">
-            <div class="col-md-2 text-center">
-                <img src="" alt="Book Cover" class="book-image img-fluid" style="max-height: 120px;">
-            </div>
-            <div class="col-md-4">
-                <h5 class="book-title"></h5>
-                <p class="book-authors text-muted"></p>
-                <p class="book-category"><span class="badge badge-secondary"></span></p>
-                <p class="book-added-date text-muted small"></p>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="price-container">
-                    <span class="book-price"></span>
-                    <span class="book-sale-price text-danger d-none"></span>
+                <div class="d-flex me-3">
+                    <input class="form-control form-control-sm" type="search" placeholder="Search for products..." aria-label="Search" />
                 </div>
-            </div>
-            <div class="col-md-2 text-center">
-                <span class="book-status badge"></span>
-            </div>
-            <div class="col-md-2 text-center action-buttons">
-                <button class="btn btn-sm btn-primary add-to-cart-btn mb-2">Add to Cart</button>
-                <button class="btn btn-sm btn-outline-danger remove-wishlist-btn">Remove</button>
+                <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                            <li><a class="dropdown-item" href="userHome.html">User Profile</a></li>
+                            <li><a class="dropdown-item active" href="Wishlist.html">My Wishlist</a></li>
+                            <li><a class="dropdown-item" href="orderHistory.html">Order History</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                        </ul>
+                    </div>
+                    <a href="cart.html" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-shopping-basket"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </template>
+    </nav>
 
-    <!-- Toast for notifications -->
-    <div class="toast-container">
-        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
-            <div class="toast-header">
-                <strong class="mr-auto" id="toastTitle">Notification</strong>
-                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="toast-body" id="toastMessage">
-                Action completed successfully.
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>My Wishlist</h2>
+            <a href="browseBooks.html" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+            </a>
+        </div>
+
+        <div id="wishlistContainer">
+            <!-- Loading spinner -->
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading your wishlist...</p>
             </div>
         </div>
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        // User Authentication Utilities
-        const AUTH = {
-            // JWT token key in localStorage
-            TOKEN_KEY: 'auth_token',
-            USER_KEY: 'user_info',
-
+        // Wishlist functionality
+        $(document).ready(function () {
             // Check if user is logged in
-            isLoggedIn: function() {
-                return localStorage.getItem(this.TOKEN_KEY) !== null;
-            },
-
-            // Get JWT token
-            getToken: function() {
-                return localStorage.getItem(this.TOKEN_KEY);
-            },
-
-            // Set token and user info on login
-            setAuth: function(token, user) {
-                localStorage.setItem(this.TOKEN_KEY, token);
-                localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-                this.updateUI();
-            },
-
-            // Clear auth on logout
-            clearAuth: function() {
-                localStorage.removeItem(this.TOKEN_KEY);
-                localStorage.removeItem(this.USER_KEY);
-                this.updateUI();
-            },
-
-            // Get current user info
-            getCurrentUser: function() {
-                const userJson = localStorage.getItem(this.USER_KEY);
-                return userJson ? JSON.parse(userJson) : null;
-            },
-
-            // Update UI based on auth status
-            updateUI: function() {
-                const isLoggedIn = this.isLoggedIn();
-                const user = this.getCurrentUser();
-
-                const loginBtn = document.getElementById('loginBtn');
-                const signupBtn = document.getElementById('signupBtn');
-                const userDropdown = document.getElementById('userDropdown');
-                const usernameSpan = document.getElementById('username');
-
-                if (isLoggedIn && user) {
-                    // Hide login/signup, show user dropdown
-                    loginBtn.classList.add('d-none');
-                    signupBtn.classList.add('d-none');
-                    userDropdown.classList.remove('d-none');
-
-                    // Update username display
-                    usernameSpan.textContent = `${user.firstName} ${user.lastName}`;
-                } else {
-                    // Show login/signup, hide user dropdown
-                    loginBtn.classList.remove('d-none');
-                    signupBtn.classList.remove('d-none');
-                    userDropdown.classList.add('d-none');
-                }
+            if (!isUserLoggedIn()) {
+                // Save current page as redirect URL
+                localStorage.setItem('redirectAfterLogin', window.location.href);
+                // Redirect to login page
+                window.location.href = 'login.html';
+                return;
             }
-        };
 
-        // API Helper
-        const API = {
-            BASE_URL: '/api',
+            // Load wishlist items
+            loadWishlistItems();
 
-            // Headers for authenticated requests
-            getAuthHeaders: function() {
-                const token = AUTH.getToken();
-                return {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                };
-            },
+            // Function to check if user is logged in
+            function isUserLoggedIn() {
+                return localStorage.getItem('authToken') !== null;
+            }
 
-            // Generic fetch with error handling
-            fetch: async function(endpoint, options = {}) {
+            // Function to load wishlist items
+            async function loadWishlistItems() {
                 try {
-                    const isAuthRequest = options.auth !== false;
+                    // Get wishlist using the endpoint from WishlistController
+                    const response = await fetch('/api/wishlist', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
 
-                    if (isAuthRequest) {
-                        options.headers = {
-                            ...options.headers,
-                            ...this.getAuthHeaders()
-                        };
-                    }
-
-                    const response = await fetch(`${this.BASE_URL}${endpoint}`, options);
-
-                    if (!response.ok) {
+                    if (response.ok) {
+                        const wishlistData = await response.json();
+                        displayWishlistItems(wishlistData);
+                    } else {
+                        // Handle error response
                         if (response.status === 401) {
-                            // Unauthorized - clear auth and redirect to login
-                            AUTH.clearAuth();
-                            window.location.href = '/login.html';
-                            return null;
+                            // Unauthorized - token might be expired
+                            Toastify({
+                                text: "Your session has expired. Please login again.",
+                                duration: 5000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                style: {
+                                    background: "#dc3545",
+                                }
+                            }).showToast();
+
+                            // Clear token and redirect to login
+                            localStorage.removeItem('authToken');
+                            localStorage.setItem('redirectAfterLogin', window.location.href);
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 2000);
+                        } else {
+                            handleLoadError('Failed to load wishlist items.');
                         }
-
-                        const error = await response.json().catch(() => ({}));
-                        throw new Error(error.message || `Request failed with status ${response.status}`);
                     }
-
-                    // Check if response is empty or not JSON
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        return await response.json();
-                    }
-
-                    return null;
                 } catch (error) {
-                    console.error('API Error:', error);
-                    throw error;
-                }
-            },
-
-            // Wishlist API endpoints
-            Wishlist: {
-                getWishlist: async function() {
-                    return API.fetch('/wishlist');
-                },
-
-                addToWishlist: async function(bookId) {
-                    return API.fetch('/wishlist/add', {
-                        method: 'POST',
-                        body: JSON.stringify({ bookId })
-                    });
-                },
-
-                removeFromWishlist: async function(wishlistItemId) {
-                    return API.fetch(`/wishlist/remove/${wishlistItemId}`, {
-                        method: 'DELETE'
-                    });
-                },
-
-                isBookInWishlist: async function(bookId) {
-                    return API.fetch(`/wishlist/check/${bookId}`);
+                    console.error('Error loading wishlist items:', error);
+                    handleLoadError('An error occurred while loading your wishlist.');
                 }
             }
-        };
 
-        // Toast Notification Helper
-        const Toast = {
-            element: document.getElementById('toast'),
-            titleElement: document.getElementById('toastTitle'),
-            messageElement: document.getElementById('toastMessage'),
+            // Function to display wishlist items
+            function displayWishlistItems(wishlistData) {
+                const wishlistContainer = $('#wishlistContainer');
+                wishlistContainer.empty();
 
-            show: function(title, message, type = 'success') {
-                this.titleElement.textContent = title;
-                this.messageElement.textContent = message;
+                // Adjust to handle .NET format where items are in wishlistData.items.$values
+                const itemsArray = wishlistData.items && wishlistData.items.$values 
+                    ? wishlistData.items.$values 
+                    : [];
 
-                // Set appropriate styling based on type
-                this.element.classList.remove('bg-success', 'bg-danger', 'bg-warning');
-                if (type === 'success') {
-                    this.element.classList.add('bg-success', 'text-white');
-                } else if (type === 'error') {
-                    this.element.classList.add('bg-danger', 'text-white');
-                } else if (type === 'warning') {
-                    this.element.classList.add('bg-warning');
-                }
-
-                // Show the toast
-                $(this.element).toast('show');
-            },
-
-            success: function(message) {
-                this.show('Success', message, 'success');
-            },
-
-            error: function(message) {
-                this.show('Error', message, 'error');
-            },
-
-            warning: function(message) {
-                this.show('Warning', message, 'warning');
-            }
-        };
-
-        // Wishlist Manager
-        const WishlistManager = {
-            containerElement: document.getElementById('wishlistContainer'),
-            itemsElement: document.getElementById('wishlistItems'),
-            emptyElement: document.getElementById('emptyWishlist'),
-            loadingElement: document.getElementById('loadingWishlist'),
-            template: document.getElementById('wishlistItemTemplate'),
-            wishlistData: null,
-
-            init: async function() {
-                // Initialize event listeners
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.attachEventListeners();
-                    this.loadWishlist();
-                });
-            },
-
-            attachEventListeners: function() {
-                // Logout button
-                const logoutBtn = document.getElementById('logoutBtn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        AUTH.clearAuth();
-                        window.location.reload();
-                    });
-                }
-            },
-
-            loadWishlist: async function() {
-                // Check if user is logged in
-                if (!AUTH.isLoggedIn()) {
-                    this.showLoginMessage();
+                if (itemsArray.length === 0) {
+                    // Display empty wishlist message
+                    wishlistContainer.html(`
+                        <div class="empty-wishlist">
+                            <i class="far fa-heart"></i>
+                            <h4>Your wishlist is empty</h4>
+                            <p class="text-muted">Browse our books and add your favorites to the wishlist</p>
+                            <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
+                        </div>
+                    `);
                     return;
                 }
 
-                try {
-                    // Show loading indicator
-                    this.loadingElement.classList.remove('d-none');
-                    this.emptyElement.classList.add('d-none');
+                // Create a row for the grid
+                let booksRow = $('<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">');
+                wishlistContainer.append(booksRow);
 
-                    // Fetch wishlist data
-                    this.wishlistData = await API.Wishlist.getWishlist();
-
-                    // Hide loading indicator
-                    this.loadingElement.classList.add('d-none');
-
-                    // Render wishlist items
-                    this.renderWishlist();
-                } catch (error) {
-                    console.error('Error loading wishlist:', error);
-                    this.loadingElement.classList.add('d-none');
-                    Toast.error('Failed to load wishlist. Please try again later.');
-                }
-            },
-
-            renderWishlist: function() {
-                // Clear existing items (except loading indicator)
-                while (this.itemsElement.firstChild) {
-                    if (this.itemsElement.firstChild !== this.loadingElement) {
-                        this.itemsElement.removeChild(this.itemsElement.firstChild);
+                itemsArray.forEach(item => {
+                    // Extract book information properly based on structure
+                    const bookId = item.bookId || (item.book ? item.book.bookId : null);
+                    const bookTitle = item.bookTitle || (item.book ? item.book.title : "Unknown Title");
+                    const image = item.image || (item.book ? item.book.image : "default-book.jpg");
+                    const price = item.price || (item.book ? item.book.price : 0);
+                    const onSale = item.onSale || (item.book ? item.book.onSale : false);
+                    const wishlistItemId = item.wishlistItemId || item.id || "unknown";
+                    
+                    // Get authors array
+                    let authors = [];
+                    if (item.authors && Array.isArray(item.authors)) {
+                        authors = item.authors;
+                    } else if (item.book && item.book.authors) {
+                        if (Array.isArray(item.book.authors)) {
+                            authors = item.book.authors;
+                        } else if (item.book.authors.$values && Array.isArray(item.book.authors.$values)) {
+                            authors = item.book.authors.$values.map(a => a.firstName + ' ' + a.lastName);
+                        }
                     }
-                }
-
-                // Show empty message if no items
-                if (!this.wishlistData || this.wishlistData.items.length === 0) {
-                    this.containerElement.classList.add('d-none');
-                    this.emptyElement.classList.remove('d-none');
-                    return;
-                }
-
-                // Show container and hide empty message
-                this.containerElement.classList.remove('d-none');
-                this.emptyElement.classList.add('d-none');
-
-                // Create and append items
-                this.wishlistData.items.forEach(item => {
-                    const itemElement = this.createWishlistItemElement(item);
-                    this.itemsElement.appendChild(itemElement);
+                    
+                    const wishlistItem = `
+                        <div class="col">
+                            <div class="card h-100 text-center p-2 position-relative">
+                                <img src="../${image}" class="card-img-top book-img" alt="${bookTitle}" />
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">${bookTitle}</h6>
+                                    <p class="card-subtitle text-muted small mb-2">
+                                        ${authors.length > 0 ? authors.join(', ') : 'No Author'}
+                                    </p>
+                                    <p class="mb-2 text-dark fw-bold">Rs. ${price}/-</p>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="BookDetails.html?id=${bookId}" class="btn btn-sm btn-outline-secondary">
+                                            Details
+                                        </a>
+                                        <button class="btn btn-sm btn-primary add-to-cart-btn" data-book-id="${bookId}">
+                                            Add to Cart
+                                        </button>
+                                        <button class="btn btn-sm btn-danger remove-from-wishlist-btn" data-wishlist-item-id="${wishlistItemId}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                ${onSale ? '<span class="on-sale">Sale!</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                    booksRow.append(wishlistItem);
                 });
-            },
 
-            createWishlistItemElement: function(item) {
-                const template = this.template.content.cloneNode(true);
-                const itemElement = template.querySelector('.wishlist-item');
+                // Add event listeners for buttons
+                setupEventListeners();
+            }
 
-                // Set item ID as data attribute
-                itemElement.dataset.itemId = item.wishlistItemId;
-                itemElement.dataset.bookId = item.bookId;
-
-                // Set image
-                const imageElement = itemElement.querySelector('.book-image');
-                imageElement.src = item.image || '/images/book-placeholder.jpg';
-                imageElement.alt = item.bookTitle;
-
-                // Set book details
-                itemElement.querySelector('.book-title').textContent = item.bookTitle;
-                itemElement.querySelector('.book-authors').textContent = item.authors.join(', ');
-                itemElement.querySelector('.book-category .badge').textContent = item.category || 'General';
-
-                // Format and set date
-                const addedDate = new Date(item.addedDate);
-                const formattedDate = addedDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
-                itemElement.querySelector('.book-added-date').textContent = `Added on ${formattedDate}`;
-
-                // Set price (handle sales)
-                const priceElement = itemElement.querySelector('.book-price');
-                const salePriceElement = itemElement.querySelector('.book-sale-price');
-
-                if (item.onSale && item.salePercentage > 0) {
-                    const originalPrice = item.price;
-                    const discountAmount = (item.price * item.salePercentage) / 100;
-                    const salePrice = originalPrice - discountAmount;
-
-                    priceElement.textContent = `$${originalPrice.toFixed(2)}`;
-                    priceElement.classList.add('on-sale');
-
-                    salePriceElement.textContent = `$${salePrice.toFixed(2)}`;
-                    salePriceElement.classList.remove('d-none');
-                } else {
-                    priceElement.textContent = `$${item.price.toFixed(2)}`;
-                    salePriceElement.classList.add('d-none');
-                }
-
-                // Set stock status
-                const statusElement = itemElement.querySelector('.book-status');
-                // Assuming you have a quantity property to determine stock status
-                if (item.quantity > 10) {
-                    statusElement.textContent = 'In Stock';
-                    statusElement.classList.add('badge-success');
-                } else if (item.quantity > 0) {
-                    statusElement.textContent = 'Low Stock';
-                    statusElement.classList.add('badge-warning');
-                } else {
-                    statusElement.textContent = 'Out of Stock';
-                    statusElement.classList.add('badge-danger');
-                }
-
-                // Set action button event listeners
-                const addToCartBtn = itemElement.querySelector('.add-to-cart-btn');
-                const removeBtn = itemElement.querySelector('.remove-wishlist-btn');
-
-                addToCartBtn.addEventListener('click', () => this.addToCart(item));
-                removeBtn.addEventListener('click', () => this.removeFromWishlist(item.wishlistItemId));
-
-                return itemElement;
-            },
-
-            showLoginMessage: function() {
-                this.loadingElement.classList.add('d-none');
-                this.containerElement.classList.add('d-none');
-
-                const loginMessage = document.createElement('div');
-                loginMessage.className = 'text-center py-5';
-                loginMessage.innerHTML = `
-                    <div class="mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+            // Function to handle loading errors
+            function handleLoadError(message) {
+                const wishlistContainer = $('#wishlistContainer');
+                wishlistContainer.html(`
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        ${message}
                     </div>
-                    <h4>Please Login to View Your Wishlist</h4>
-                    <p class="text-muted">You need to be logged in to access your wishlist.</p>
-                    <a href="login.html" class="btn btn-primary mt-3">Log In</a>
-                    <a href="signup.html" class="btn btn-outline-secondary mt-3 ml-2">Sign Up</a>
-                `;
+                    <div class="text-center mt-3">
+                        <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
+                    </div>
+                `);
+            }
 
-                // Replace the empty wishlist with the login message
-                this.emptyElement.parentNode.replaceChild(loginMessage, this.emptyElement);
-            },
+            // Function to set up event listeners
+            function setupEventListeners() {
+                // Remove from wishlist button
+                $('.remove-from-wishlist-btn').on('click', function () {
+                    const wishlistItemId = $(this).data('wishlist-item-id');
+                    removeFromWishlist(wishlistItemId);
+                });
 
-            addToCart: function(item) {
-                // This would call your cart API - implement based on your cart structure
-                console.log('Adding to cart:', item);
-                Toast.success(`"${item.bookTitle}" added to your cart.`);
+                // Add to cart button
+                $('.add-to-cart-btn').on('click', function () {
+                    const bookId = $(this).data('book-id');
+                    addToCartFromWishlist(bookId);
+                });
+            }
 
-                // Here you would typically:
-                // 1. Call an API to add the item to the cart
-                // 2. Update UI to reflect the change
-                // 3. Show a success message
-            },
-
-            removeFromWishlist: async function(wishlistItemId) {
+            // Function to remove item from wishlist
+            async function removeFromWishlist(wishlistItemId) {
                 try {
-                    const element = document.querySelector(`.wishlist-item[data-item-id="${wishlistItemId}"]`);
-                    if (!element) return;
-
-                    // Add animation class
-                    element.classList.add('slide-out');
-
-                    // Call API to remove item
-                    await API.Wishlist.removeFromWishlist(wishlistItemId);
-
-                    // Wait for animation to complete then remove element
-                    setTimeout(() => {
-                        element.remove();
-
-                        // Check if wishlist is now empty
-                        const remainingItems = this.itemsElement.querySelectorAll('.wishlist-item');
-                        if (remainingItems.length === 0) {
-                            this.containerElement.classList.add('d-none');
-                            this.emptyElement.classList.remove('d-none');
+                    // According to the endpoint in your WishlistController
+                    const response = await fetch(`/api/wishlist/remove/${wishlistItemId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                         }
+                    });
 
-                        // Update local data
-                        if (this.wishlistData) {
-                            this.wishlistData.items = this.wishlistData.items.filter(
-                                item => item.wishlistItemId !== wishlistItemId
-                            );
-                        }
+                    if (response.ok) {
+                        Toastify({
+                            text: "Item removed from wishlist!",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            }
+                        }).showToast();
 
-                        Toast.success("Item removed from your wishlist");
-                    }, 300);
+                        // Remove item from DOM with animation
+                        const itemElement = $(`.remove-from-wishlist-btn[data-wishlist-item-id="${wishlistItemId}"]`).closest('.col');
+                        itemElement.fadeOut(300, function () {
+                            $(this).remove();
+
+                            // Check if wishlist is now empty
+                            if ($('#wishlistContainer .col').length === 0) {
+                                // Reload the wishlist to show empty state
+                                loadWishlistItems();
+                            }
+                        });
+                    } else {
+                        Toastify({
+                            text: "Failed to remove item from wishlist.",
+                            duration: 5000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#dc3545",
+                            }
+                        }).showToast();
+                    }
                 } catch (error) {
                     console.error('Error removing item from wishlist:', error);
-                    Toast.error('Failed to remove item. Please try again.');
+                    Toastify({
+                        text: "An unexpected error occurred.",
+                        duration: 5000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "#dc3545",
+                        }
+                    }).showToast();
                 }
             }
-        };
 
-        // Initialize the Authentication UI
-        AUTH.updateUI();
+            // Function to get cart ID
+            async function getCartId() {
+                // If you store cartId in localStorage
+                let cartId = localStorage.getItem('cartId');
 
-        // Initialize Wishlist Manager
-        WishlistManager.init();
+                // If not stored, you might need to fetch it from the server
+                if (!cartId) {
+                    try {
+                        const response = await fetch('/api/cart/getUserCart', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            cartId = data.cartId;
+                            localStorage.setItem('cartId', cartId);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching cart ID:', error);
+                    }
+                }
+
+                return cartId;
+            }
+
+            // Function to add item to cart from wishlist
+            async function addToCartFromWishlist(bookId) {
+                try {
+                    // First get the cart ID
+                    const cartId = await getCartId();
+
+                    if (!cartId) {
+                        throw new Error('Could not determine cart ID');
+                    }
+                    
+                    // Add to cart using the correct endpoint
+                    const response = await fetch(`/api/cart/addCartItem/${cartId}/cartItems/${bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({
+                            quantity: 1
+                        })
+                    });
+
+                    if (response.ok) {
+                        Toastify({
+                            text: "Book added to cart successfully!",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            }
+                        }).showToast();
+
+                        // Ask if user wants to remove the item from wishlist
+                        const shouldRemove = confirm('Item added to cart. Would you like to remove it from your wishlist?');
+
+                        if (shouldRemove) {
+                            // Find the wishlistItemId for this book
+                            const wishlistItemId = $(`.add-to-cart-btn[data-book-id="${bookId}"]`)
+                                .closest('.card')
+                                .find('.remove-from-wishlist-btn')
+                                .data('wishlist-item-id');
+
+                            if (wishlistItemId) {
+                                await removeFromWishlist(wishlistItemId);
+                            }
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        Toastify({
+                            text: errorData.message || "Failed to add book to cart.",
+                            duration: 5000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#dc3545",
+                            }
+                        }).showToast();
+                    }
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+                    Toastify({
+                        text: "An unexpected error occurred.",
+                        duration: 5000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "#dc3545",
+                        }
+                    }).showToast();
+                }
+            }
+            
+            // Logout button
+            $('#logoutBtn').on('click', function(e) {
+                e.preventDefault();
+                
+                // Clear authentication token and other data
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('cartId');
+                
+                Toastify({
+                    text: "Logged out successfully!",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }
+                }).showToast();
+                
+                // Redirect to login page after a short delay
+                setTimeout(function() {
+                    window.location.href = 'login.html';
+                }, 1000);
+            });
+        });
     </script>
 </body>
 </html>

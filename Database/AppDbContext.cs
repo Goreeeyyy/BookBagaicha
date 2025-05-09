@@ -57,25 +57,35 @@ namespace BookBagaicha.Database
          .HasForeignKey(b => b.PublisherId);
 
 
-            // WishlistItem relationships
-            builder.Entity<WishlistItem>()
-                .HasOne(wi => wi.Wishlist)
-                .WithMany(w => w.WishlistItems)
-                .HasForeignKey(wi => wi.WishlistId)
-                .OnDelete(DeleteBehavior.Cascade);
+           // WishlistItem relationships
+    builder.Entity<WishlistItem>()
+        .HasKey(wi => wi.WishlistItemId);
+        
+    builder.Entity<WishlistItem>()
+        .HasOne(wi => wi.Wishlist)
+        .WithMany(w => w.WishlistItems)
+        .HasForeignKey(wi => wi.WishlistId)
+        .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<WishlistItem>()
-                .HasOne(wi => wi.Book)
-                .WithMany()
-                .HasForeignKey(wi => wi.BookId)
-                .OnDelete(DeleteBehavior.Cascade);
+    builder.Entity<WishlistItem>()
+        .HasOne(wi => wi.Book)
+        .WithMany()
+        .HasForeignKey(wi => wi.BookId)
+        .OnDelete(DeleteBehavior.Cascade);
 
-            // Wishlist relationships
-            builder.Entity<Wishlist>()
-                .HasOne(w => w.User)
-                .WithMany()
-                .HasForeignKey(w => w.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+    // Wishlist relationships
+    builder.Entity<Wishlist>()
+        .HasKey(w => w.WishlistId);
+        
+    builder.Entity<Wishlist>()
+        .HasOne(w => w.User)
+        .WithMany()
+        .HasForeignKey(w => w.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+            // Cart relationships
+            builder.Entity<Cart>()
+                .HasKey(c => c.CartId);
 
             // Configure one-to-one relationship between User and Cart
             builder.Entity<Cart>()
@@ -83,6 +93,15 @@ namespace BookBagaicha.Database
                 .WithOne()
                 .HasForeignKey<Cart>(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // CartItem relationships
+            builder.Entity<CartItem>()
+                .HasKey(ci => ci.CartItemId);
+
+            // Ensure a book can only appear once in a cart
+            builder.Entity<CartItem>()
+                .HasIndex(ci => new { ci.CartId, ci.BookId })
+                .IsUnique();
 
             // Configure one-to-many relationship between Cart and CartItems
             builder.Entity<CartItem>()
@@ -97,9 +116,8 @@ namespace BookBagaicha.Database
                 .WithMany()
                 .HasForeignKey(ci => ci.BookId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-
         }
+
 
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }

@@ -1,133 +1,47 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-          crossorigin="anonymous" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&display=swap"
-          rel="stylesheet" />
     <title>My Cart - Book Bagaicha</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Add Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Bona Nova', serif;
-            color: #333;
-            background-color: #f8f9fa;
+        .book-img {
+            height: 200px;
+            object-fit: cover;
         }
 
-        .site-logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 0;
+        .on-sale {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
         }
 
-        .bona-nova-regular {
-            font-family: 'Bona Nova', serif;
+        .empty-cart {
+            text-align: center;
+            padding: 3rem 0;
         }
 
-        /* Navigation */
-        .main-nav .nav-link {
-            color: #555;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            position: relative;
-        }
-
-            .main-nav .nav-link.active {
-                color: #2c3e50;
-                font-weight: 700;
+            .empty-cart i {
+                font-size: 4rem;
+                color: #ccc;
+                margin-bottom: 1rem;
             }
 
-                .main-nav .nav-link.active:after {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    left: 25%;
-                    width: 50%;
-                    height: 2px;
-                    background-color: #e74c3c;
-                }
-
-        /* Cart specific styles */
-        .cart-title {
-            color: #2c3e50;
-            font-weight: 700;
-            position: relative;
-            display: inline-block;
-            padding-bottom: 0.5rem;
+        .card {
+            transition: transform 0.2s;
         }
 
-            .cart-title:after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 30%;
-                width: 40%;
-                height: 3px;
-                background-color: #e74c3c;
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
-
-        .cart-header {
-            background-color: #f1f2f6;
-            border-radius: 5px 5px 0 0;
-            font-weight: 700;
-            color: #2c3e50;
-        }
-
-        .cart-item {
-            transition: all 0.3s ease;
-        }
-
-            .cart-item:hover {
-                background-color: #f9f9f9;
-            }
-
-        .book-image {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .cart-item:hover .book-image {
-            transform: scale(1.05);
-        }
-
-        .book-title {
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.3rem;
-        }
-
-        .book-authors {
-            font-style: italic;
-            margin-bottom: 0.3rem;
-        }
-
-        .book-category .badge {
-            background-color: #34495e;
-            font-weight: 500;
-        }
-
-        .book-price {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .price-container .book-price.on-sale {
-            text-decoration: line-through;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        .book-sale-price {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
 
         .quantity-control {
             display: flex;
@@ -138,830 +52,551 @@
         .quantity-btn {
             width: 30px;
             height: 30px;
-            border-radius: 50%;
-            background-color: #e9ecef;
-            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-            .quantity-btn:hover {
-                background-color: #dee2e6;
-            }
-
-        .quantity-input {
-            width: 40px;
-            height: 30px;
-            text-align: center;
+            background-color: #f8f9fa;
             border: 1px solid #ced4da;
             border-radius: 4px;
-            margin: 0 5px;
-        }
-
-        .remove-btn {
-            color: #e74c3c;
-            background: none;
-            border: none;
-            padding: 5px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-            .remove-btn:hover {
-                color: #c0392b;
-            }
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            margin: 0 5px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
 
-        .cart-summary {
-            background-color: white;
+        .order-summary {
+            background-color: #f8f9fa;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            padding: 1.5rem;
         }
-
-        .cart-total {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-        }
-
-        .checkout-btn {
-            background-color: #27ae60;
-            border-color: #27ae60;
-            font-weight: 600;
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-        }
-
-            .checkout-btn:hover {
-                background-color: #2ecc71;
-                border-color: #2ecc71;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-
-        .continue-shopping {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-            .continue-shopping:hover {
-                color: #2980b9;
-                text-decoration: none;
-            }
-
-        .empty-cart-icon {
-            color: #bdc3c7;
-            font-size: 4rem;
-        }
-
-        /* Toast styling */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1051;
-        }
-
-        /* Animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateX(30px);
-                opacity: 0;
-            }
-        }
-
-        .slide-out {
-            animation: slideOut 0.3s ease-in-out forwards;
-        }
-
-        /* Footer */
-        footer {
-            margin-top: 3rem;
-            border-top: 1px solid #ddd;
-        }
-
-            footer a {
-                color: #2c3e50;
-                text-decoration: none;
-            }
-
-                footer a:hover {
-                    color: #e74c3c;
-                    text-decoration: none;
-                }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <!-- Header/Navigation -->
-        <header class="row py-3 bg-light">
-            <div class="col-md-3">
-                <h1 class="site-logo bona-nova-regular">Book Bagaicha</h1>
-            </div>
-            <div class="col-md-6">
-                <nav class="main-nav">
-                    <ul class="nav justify-content-center">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="books.html">Books</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="wishlist.html">Wishlist</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="cart.html">Cart</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="col-md-3 d-flex justify-content-end align-items-center">
-                <div class="user-actions">
-                    <a href="login.html" id="loginBtn" class="btn btn-outline-secondary mr-2">Login</a>
-                    <a href="signup.html" id="signupBtn" class="btn btn-outline-primary mr-2">Sign Up</a>
-                    <div id="userDropdown" class="dropdown d-none">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span id="username">User</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuButton">
-                            <a class="dropdown-item" href="profile.html">My Profile</a>
-                            <a class="dropdown-item" href="orders.html">My Orders</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" id="logoutBtn">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="row py-5">
-            <div class="col-md-12">
-                <h2 class="cart-title text-center mb-4">My Shopping Cart</h2>
-
-                <!-- Empty cart message (shown when cart is empty) -->
-                <div id="emptyCart" class="text-center py-5 d-none">
-                    <div class="empty-cart-icon mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2s-.9-2-2-2zM1 3c0 .55.45 1 1 1h1l3.6 7.59l-1.35 2.44C4.52 15.37 5.48 17 7 17h11c.55 0 1-.45 1-1s-.45-1-1-1H7l1.1-2h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A.996.996 0 0 0 20.01 4H5.21l-.67-1.43a.993.993 0 0 0-.9-.57H2c-.55 0-1 .45-1 1zm16 15c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2s2-.9 2-2s-.9-2-2-2z" />
-                        </svg>
-                    </div>
-                    <h4>Your cart is empty</h4>
-                    <p class="text-muted">Add some books to your cart!</p>
-                    <a href="books.html" class="btn btn-primary mt-3">Explore Books</a>
-                </div>
-
-                <!-- Cart content container -->
-                <div id="cartContainer" class="row">
-                    <!-- Cart items column -->
-                    <div class="col-md-8">
-                        <div class="card">
-                            <div class="card-header cart-header">
-                                <div class="row">
-                                    <div class="col-md-6">Product</div>
-                                    <div class="col-md-2 text-center">Price</div>
-                                    <div class="col-md-2 text-center">Quantity</div>
-                                    <div class="col-md-2 text-center">Subtotal</div>
-                                </div>
-                            </div>
-                            <div class="card-body p-0">
-                                <!-- Cart items will be added here dynamically -->
-                                <div id="cartItems">
-                                    <!-- Loading indicator -->
-                                    <div id="loadingCart" class="text-center py-5">
-                                        <div class="spinner-border text-primary" role="status">
-                                            <span class="sr-only">Loading...</span>
-                                        </div>
-                                        <p class="mt-2">Loading your cart...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cart summary column -->
-                    <div class="col-md-4">
-                        <div class="cart-summary">
-                            <h4 class="mb-4">Cart Summary</h4>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span>Subtotal:</span>
-                                <span id="cart-subtotal">$0.00</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span>Shipping:</span>
-                                <span id="cart-shipping">$0.00</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-4">
-                                <span>Tax:</span>
-                                <span id="cart-tax">$0.00</span>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between mb-4">
-                                <span class="h5">Total:</span>
-                                <span id="cart-total" class="cart-total">$0.00</span>
-                            </div>
-                            <button id="checkout-btn" class="btn btn-success btn-block checkout-btn mb-3">
-                                Proceed to Checkout
-                            </button>
-                            <div class="text-center">
-                                <a href="books.html" class="continue-shopping">
-                                    <i class="fas fa-arrow-left mr-2"></i> Continue Shopping
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="row py-4 bg-light">
-            <div class="col-md-12 text-center">
-                <p>&copy; 2025 Book Bagaicha. All rights reserved.</p>
-                <ul class="list-inline">
-                    <li class="list-inline-item"><a href="about.html">About Us</a></li>
-                    <li class="list-inline-item"><a href="contact.html">Contact</a></li>
-                    <li class="list-inline-item"><a href="privacy.html">Privacy Policy</a></li>
-                    <li class="list-inline-item"><a href="terms.html">Terms of Service</a></li>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagaicha</a>
+            <div class="d-flex align-items-center ms-auto">
+                <ul class="navbar-nav me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="HomePage.html">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="browseBooks.html">BOOKS</a>
+                    </li>
                 </ul>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Cart Item Template (hidden, used for JavaScript cloning) -->
-    <template id="cartItemTemplate">
-        <div class="row cart-item py-3 px-3 border-bottom align-items-center fade-in">
-            <div class="col-md-6 d-flex align-items-center">
-                <img src="" alt="Book Cover" class="book-image mr-3" style="width: 80px; height: auto;">
-                <div>
-                    <h5 class="book-title mb-1"></h5>
-                    <p class="book-authors text-muted small mb-0"></p>
+                <div class="d-flex me-3">
+                    <input class="form-control form-control-sm" type="search" placeholder="Search for products..." aria-label="Search" />
                 </div>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="price-container">
-                    <span class="book-price"></span>
-                    <span class="book-sale-price text-danger d-none"></span>
-                </div>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="quantity-control">
-                    <button class="quantity-btn decrease-btn">-</button>
-                    <input type="number" class="quantity-input" min="1" value="1">
-                    <button class="quantity-btn increase-btn">+</button>
-                </div>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="d-flex flex-column align-items-center">
-                    <span class="item-subtotal font-weight-bold"></span>
-                    <button class="remove-btn mt-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                        </svg>
-                        Remove
-                    </button>
+                <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                            <li><a class="dropdown-item" href="userHome.html">User Profile</a></li>
+                            <li><a class="dropdown-item" href="Wishlist.html">My Wishlist</a></li>
+                            <li><a class="dropdown-item active" href="cart.html">Shopping Cart</a></li>
+                            <li><a class="dropdown-item" href="orderHistory.html">Order History</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                        </ul>
+                    </div>
+                    <a href="cart.html" class="btn btn-outline-light btn-sm active">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
                 </div>
             </div>
         </div>
-    </template>
+    </nav>
 
-    <!-- Toast for notifications -->
-    <div class="toast-container">
-        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
-            <div class="toast-header">
-                <strong class="mr-auto" id="toastTitle">Notification</strong>
-                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>My Shopping Cart</h2>
+            <a href="browseBooks.html" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+            </a>
+        </div>
+
+        <div id="cartContainer">
+            <!-- Loading spinner -->
+            <div class="text-center" id="loadingSpinner">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading your cart...</p>
             </div>
-            <div class="toast-body" id="toastMessage">
-                Action completed successfully.
-            </div>
+
+            <!-- Cart content will be loaded here -->
         </div>
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        // User Authentication Utilities
-        const AUTH = {
-            // JWT token key in localStorage
-            TOKEN_KEY: 'auth_token',
-            USER_KEY: 'user_info',
-
+        // Cart functionality
+        $(document).ready(function () {
             // Check if user is logged in
-            isLoggedIn: function() {
-                return localStorage.getItem(this.TOKEN_KEY) !== null;
-            },
-
-            // Get JWT token
-            getToken: function() {
-                return localStorage.getItem(this.TOKEN_KEY);
-            },
-
-            // Set token and user info on login
-            setAuth: function(token, user) {
-                localStorage.setItem(this.TOKEN_KEY, token);
-                localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-                this.updateUI();
-            },
-
-            // Clear auth on logout
-            clearAuth: function() {
-                localStorage.removeItem(this.TOKEN_KEY);
-                localStorage.removeItem(this.USER_KEY);
-                this.updateUI();
-            },
-
-            // Get current user info
-            getCurrentUser: function() {
-                const userJson = localStorage.getItem(this.USER_KEY);
-                return userJson ? JSON.parse(userJson) : null;
-            },
-
-            // Update UI based on auth status
-            updateUI: function() {
-                const isLoggedIn = this.isLoggedIn();
-                const user = this.getCurrentUser();
-
-                const loginBtn = document.getElementById('loginBtn');
-                const signupBtn = document.getElementById('signupBtn');
-                const userDropdown = document.getElementById('userDropdown');
-                const usernameSpan = document.getElementById('username');
-
-                if (isLoggedIn && user) {
-                    // Hide login/signup, show user dropdown
-                    loginBtn.classList.add('d-none');
-                    signupBtn.classList.add('d-none');
-                    userDropdown.classList.remove('d-none');
-
-                    // Update username display
-                    usernameSpan.textContent = `${user.firstName} ${user.lastName}`;
-                } else {
-                    // Show login/signup, hide user dropdown
-                    loginBtn.classList.remove('d-none');
-                    signupBtn.classList.remove('d-none');
-                    userDropdown.classList.add('d-none');
-                }
+            if (!isUserLoggedIn()) {
+                // Save current page as redirect URL
+                localStorage.setItem('redirectAfterLogin', window.location.href);
+                // Redirect to login page
+                window.location.href = 'login.html';
+                return;
             }
-        };
 
-        // API Helper
-        const API = {
-            BASE_URL: '/api',
+            // Load cart items
+            loadCartItems();
 
-            // Headers for authenticated requests
-            getAuthHeaders: function() {
-                const token = AUTH.getToken();
-                return {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                };
-            },
+            // Function to check if user is logged in
+            function isUserLoggedIn() {
+                return localStorage.getItem('authToken') !== null;
+            }
 
-            // Generic fetch with error handling
-            fetch: async function(endpoint, options = {}) {
-                try {
-                    const isAuthRequest = options.auth !== false;
+            // Function to get cart ID
+            async function getCartId() {
+                // Try to get cart ID from localStorage first
+                let cartId = localStorage.getItem('cartId');
 
-                    if (isAuthRequest) {
-                        options.headers = {
-                            ...options.headers,
-                            ...this.getAuthHeaders()
-                        };
-                    }
+                // If not in localStorage, fetch from API
+                if (!cartId) {
+                    try {
+                        const response = await fetch('/api/cart/getUserCart', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            }
+                        });
 
-                    const response = await fetch(`${this.BASE_URL}${endpoint}`, options);
-
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            // Unauthorized - clear auth and redirect to login
-                            AUTH.clearAuth();
-                            window.location.href = '/login.html';
-                            return null;
+                        if (response.ok) {
+                            const data = await response.json();
+                            cartId = data.cartId;
+                            localStorage.setItem('cartId', cartId);
                         }
+                    } catch (error) {
+                        console.error('Error fetching cart ID:', error);
+                    }
+                }
 
-                        const error = await response.json().catch(() => ({}));
-                        throw new Error(error.message || `Request failed with status ${response.status}`);
+                return cartId;
+            }
+
+            // Function to load cart items
+            async function loadCartItems() {
+                try {
+                    // Get cart ID
+                    const cartId = await getCartId();
+
+                    if (!cartId) {
+                        handleLoadError('Failed to determine cart ID.');
+                        return;
                     }
 
-                    // Check if response is empty or not JSON
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        return await response.json();
-                    }
+                    // Get cart items using the endpoint
+                    const response = await fetch(`/api/cart/getAllCartItems/${cartId}/cartItems`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
 
-                    return null;
+                    if (response.ok) {
+                        const cartData = await response.json();
+                        displayCartItems(cartData, cartId);
+                    } else {
+                        // Handle error response
+                        if (response.status === 401) {
+                            // Unauthorized - token might be expired
+                            showToastMessage("Your session has expired. Please login again.", "error");
+
+                            // Clear token and redirect to login
+                            localStorage.removeItem('authToken');
+                            localStorage.setItem('redirectAfterLogin', window.location.href);
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 2000);
+                        } else {
+                            handleLoadError('Failed to load cart items.');
+                        }
+                    }
                 } catch (error) {
-                    console.error('API Error:', error);
-                    throw error;
-                }
-            },
-
-            // Cart API endpoints
-            Cart: {
-                getCart: async function() {
-                    return API.fetch('/cart');
-                },
-
-                addToCart: async function(bookId, quantity = 1) {
-                    return API.fetch('/cart/add', {
-                        method: 'POST',
-                        body: JSON.stringify({ bookId, quantity })
-                    });
-                },
-
-                updateCartItem: async function(cartItemId, quantity) {
-                    return API.fetch('/cart/update', {
-                        method: 'PUT',
-                        body: JSON.stringify({ cartItemId, quantity })
-                    });
-                },
-
-                removeFromCart: async function(cartItemId) {
-                    return API.fetch(`/cart/remove/${cartItemId}`, {
-                        method: 'DELETE'
-                    });
-                },
-
-                clearCart: async function() {
-                    return API.fetch('/cart/clear', {
-                        method: 'DELETE'
-                    });
-                },
-
-                getCartTotal: async function() {
-                    return API.fetch('/cart/total');
+                    console.error('Error loading cart items:', error);
+                    handleLoadError('An error occurred while loading your cart.');
                 }
             }
-        };
 
-        // Toast Notification Helper
-        const Toast = {
-            element: document.getElementById('toast'),
-            titleElement: document.getElementById('toastTitle'),
-            messageElement: document.getElementById('toastMessage'),
+            // Function to display cart items
+            function displayCartItems(cartData, cartId) {
+                const cartContainer = $('#cartContainer');
+                cartContainer.empty(); // Remove loading spinner
 
-            show: function(title, message, type = 'success') {
-                this.titleElement.textContent = title;
-                this.messageElement.textContent = message;
+                // Adjust to handle .NET format where items might be in cartData.items.$values
+                const itemsArray = cartData.items && cartData.items.$values
+                    ? cartData.items.$values
+                    : (Array.isArray(cartData) ? cartData : []);
 
-                // Set appropriate styling based on type
-                this.element.classList.remove('bg-success', 'bg-danger', 'bg-warning');
-                if (type === 'success') {
-                    this.element.classList.add('bg-success', 'text-white');
-                } else if (type === 'error') {
-                    this.element.classList.add('bg-danger', 'text-white');
-                } else if (type === 'warning') {
-                    this.element.classList.add('bg-warning');
+                if (itemsArray.length === 0) {
+                    // Display empty cart message
+                    cartContainer.html(`
+                            <div class="empty-cart">
+                                <i class="fas fa-shopping-cart"></i>
+                                <h4>Your cart is empty</h4>
+                                <p class="text-muted">Browse our books and add items to your cart</p>
+                                <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
+                            </div>
+                        `);
+                    return;
                 }
 
-                // Show the toast
-                $(this.element).toast('show');
-            },
+                // Create a row for the cart layout
+                let cartContent = $('<div class="row"></div>');
 
-            success: function(message) {
-                this.show('Success', message, 'success');
-            },
+                // Cart items column
+                let cartItemsColumn = $('<div class="col-md-8 mb-4"></div>');
+                let cartItemsCard = $('<div class="card"></div>');
+                let cartItemsHeader = $(`
+                        <div class="card-header bg-light">
+                            <div class="row fw-bold">
+                                <div class="col-md-6">Product</div>
+                                <div class="col-md-2 text-center">Price</div>
+                                <div class="col-md-2 text-center">Quantity</div>
+                                <div class="col-md-2 text-center">Total</div>
+                            </div>
+                        </div>
+                    `);
+                let cartItemsBody = $('<div class="card-body p-0"></div>');
+                let cartItemsList = $('<div id="cartItemsList"></div>');
 
-            error: function(message) {
-                this.show('Error', message, 'error');
-            },
+                cartItemsBody.append(cartItemsList);
+                cartItemsCard.append(cartItemsHeader, cartItemsBody);
+                cartItemsColumn.append(cartItemsCard);
 
-            warning: function(message) {
-                this.show('Warning', message, 'warning');
-            }
-        };
+                // Cart summary column
+                let cartSummaryColumn = $('<div class="col-md-4"></div>');
+                let orderSummary = $('<div class="order-summary"></div>');
 
-        // Cart Manager
-        const CartManager = {
-            containerElement: document.getElementById('cartContainer'),
-            itemsElement: document.getElementById('cartItems'),
-            emptyElement: document.getElementById('emptyCart'),
-            loadingElement: document.getElementById('loadingCart'),
-            template: document.getElementById('cartItemTemplate'),
-            subtotalElement: document.getElementById('cart-subtotal'),
-            shippingElement: document.getElementById('cart-shipping'),
-            taxElement: document.getElementById('cart-tax'),
-            totalElement: document.getElementById('cart-total'),
-            checkoutBtn: document.getElementById('checkout-btn'),
-            cartData: null,
+                // Add cart items to the list
+                let totalPrice = 0;
 
-            // Shipping and tax rates (can be configured)
-            SHIPPING_RATE: 5.00, // Flat shipping rate
-            TAX_RATE: 0.07, // 7% tax rate
+                itemsArray.forEach(item => {
+                    // Extract item information
+                    const cartItemId = item.cartItemId || item.id || null;
+                    const bookId = item.bookId || (item.book ? item.book.bookId : null);
+                    const title = item.bookTitle || (item.book ? item.book.title : "Unknown Title");
+                    const image = item.image || (item.book ? item.book.image : "default-book.jpg");
+                    const price = item.price || (item.book ? item.book.price : 0);
+                    const quantity = item.quantity || 1;
+                    const itemTotal = price * quantity;
+                    totalPrice += itemTotal;
 
-            init: async function() {
-                // Initialize event listeners
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.attachEventListeners();
-                    this.loadCart();
+                    // Get authors array
+                    let authors = [];
+                    if (item.authors && Array.isArray(item.authors)) {
+                        authors = item.authors;
+                    } else if (item.book && item.book.authors) {
+                        if (Array.isArray(item.book.authors)) {
+                            authors = item.book.authors;
+                        } else if (item.book.authors.$values && Array.isArray(item.book.authors.$values)) {
+                            authors = item.book.authors.$values.map(a => a.firstName + ' ' + a.lastName);
+                        }
+                    }
+
+                    // Create cart item element
+                    const cartItemElement = $(`
+                            <div class="cart-item p-3 border-bottom" data-cart-item-id="${cartItemId}" data-book-id="${bookId}">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <img src="../${image}" class="me-3" style="width: 80px; height: auto;" alt="${title}">
+                                        <div>
+                                            <h6 class="mb-1">${title}</h6>
+                                            <p class="text-muted small mb-0">${authors.length > 0 ? authors.join(', ') : 'No Author'}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <span class="fw-bold">Rs. ${price.toFixed(2)}</span>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <div class="quantity-control">
+                                            <button class="quantity-btn decrease-btn" data-cart-item-id="${cartItemId}">-</button>
+                                            <input type="number" class="quantity-input" value="${quantity}" min="1" max="99" data-cart-item-id="${cartItemId}">
+                                            <button class="quantity-btn increase-btn" data-cart-item-id="${cartItemId}">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <span class="fw-bold">Rs. ${itemTotal.toFixed(2)}</span>
+                                            <button class="btn btn-sm btn-outline-danger mt-2 remove-btn" data-cart-item-id="${cartItemId}">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+
+                    cartItemsList.append(cartItemElement);
                 });
-            },
 
-            attachEventListeners: function() {
-                // Logout button
-                const logoutBtn = document.getElementById('logoutBtn');
-                if (logoutBtn) {
-                    logoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        AUTH.clearAuth();
-                        window.location.reload();
-                    });
+                // Add order summary to the page
+                let discount = 0;
+                const totalQuantity = itemsArray.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+                if (totalQuantity >= 5) {
+                    discount = totalPrice * 0.05; // 5% discount
                 }
+
+                const grandTotal = totalPrice - discount;
+
+                                orderSummary.html(`
+                    <h4 class="mb-4">Order Summary</h4>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>Rs. ${totalPrice.toFixed(2)}</span>
+                    </div>
+                    ${discount > 0 ? `
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Discount (5%):</span>
+                            <span>- Rs. ${discount.toFixed(2)}</span>
+                        </div>
+                    ` : ''}
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4 fw-bold">
+                        <span>Grand Total:</span>
+                        <span>Rs. ${grandTotal.toFixed(2)}</span>
+                    </div>
+                    <button id="checkoutBtn" class="btn btn-primary w-100 mb-3">Proceed to Checkout</button>
+                    <button id="clearCartBtn" class="btn btn-outline-secondary w-100" data-cart-id="${cartId}">Clear Cart</button>
+                `);
+
+
+                cartSummaryColumn.append(orderSummary);
+
+                // Append columns to the row and the row to the container
+                cartContent.append(cartItemsColumn, cartSummaryColumn);
+                cartContainer.append(cartContent);
+
+                // Set up event listeners for buttons
+                setupEventListeners(cartId);
+            }
+
+            // Function to handle loading errors
+            function handleLoadError(message) {
+                const cartContainer = $('#cartContainer');
+                cartContainer.html(`
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${message}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
+                        </div>
+                    `);
+            }
+
+            // Function to display toast notifications
+            function showToastMessage(message, type = 'success') {
+                const backgroundColor = type === 'success'
+                    ? "linear-gradient(to right, #00b09b, #96c93d)"
+                    : "#dc3545";
+
+                Toastify({
+                    text: message,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: backgroundColor,
+                    }
+                }).showToast();
+            }
+
+            // Function to set up event listeners
+            function setupEventListeners(cartId) {
+                // Decrease quantity button
+                $('.decrease-btn').on('click', function () {
+                    const cartItemId = $(this).data('cart-item-id');
+                    const inputElement = $(`.quantity-input[data-cart-item-id="${cartItemId}"]`);
+                    let currentQty = parseInt(inputElement.val());
+
+                    if (currentQty > 1) {
+                        currentQty -= 1;
+                        inputElement.val(currentQty);
+                        updateCartItemQuantity(cartId, cartItemId, currentQty);
+                    }
+                });
+
+                // Increase quantity button
+                $('.increase-btn').on('click', function () {
+                    const cartItemId = $(this).data('cart-item-id');
+                    const inputElement = $(`.quantity-input[data-cart-item-id="${cartItemId}"]`);
+                    let currentQty = parseInt(inputElement.val());
+
+                    currentQty += 1;
+                    inputElement.val(currentQty);
+                    updateCartItemQuantity(cartId, cartItemId, currentQty);
+                });
+
+                // Quantity input change
+                $('.quantity-input').on('change', function () {
+                    const cartItemId = $(this).data('cart-item-id');
+                    let quantity = parseInt($(this).val());
+
+                    // Validate quantity
+                    if (isNaN(quantity) || quantity < 1) {
+                        quantity = 1;
+                        $(this).val(1);
+                    } else if (quantity > 99) {
+                        quantity = 99;
+                        $(this).val(99);
+                    }
+
+                    updateCartItemQuantity(cartId, cartItemId, quantity);
+                });
+
+                // Remove item button
+                $('.remove-btn').on('click', function () {
+                    const cartItemId = $(this).data('cart-item-id');
+                    removeFromCart(cartId, cartItemId);
+                });
+
+                // Clear cart button
+                $('#clearCartBtn').on('click', function () {
+                    const cartId = $(this).data('cart-id');
+                    clearCart(cartId);
+                });
 
                 // Checkout button
-                if (this.checkoutBtn) {
-                    this.checkoutBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        this.proceedToCheckout();
+                $('#checkoutBtn').on('click', function () {
+                    // Redirect to checkout page
+                    window.location.href = 'checkout.html';
+                });
+            }
+
+            // Function to update cart item quantity
+            async function updateCartItemQuantity(cartId, cartItemId, quantity) {
+                try {
+                    // Correct endpoint based on your API documentation
+                    const bookId = $(`.cart-item[data-cart-item-id="${cartItemId}"]`).data('book-id');
+
+                    const response = await fetch(`/api/cart/updateCartItem/${cartId}/cartItems/${bookId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({
+                            quantity: quantity
+                        })
                     });
-                }
-            },
 
-            loadCart: async function() {
-                // Check if user is logged in
-                if (!AUTH.isLoggedIn()) {
-                    this.showLoginMessage();
-                    return;
-                }
+                    if (response.ok) {
+                        // Update item total in the UI
+                        const itemElement = $(`.cart-item[data-cart-item-id="${cartItemId}"]`);
+                        const priceText = itemElement.find('.col-md-2:nth-child(2) span').text();
+                        const priceValue = parseFloat(priceText.replace('Rs. ', ''));
+                        const newTotal = priceValue * quantity;
 
-                try {
-                    // Show loading indicator
-                    this.loadingElement.classList.remove('d-none');
-                    this.emptyElement.classList.add('d-none');
+                        itemElement.find('.col-md-2:nth-child(4) span').text(`Rs. ${newTotal.toFixed(2)}`);
 
-                    // Fetch cart data
-                    this.cartData = await API.Cart.getCart();
+                        // Reload the entire cart to update totals
+                        loadCartItems();
 
-                    // Hide loading indicator
-                    this.loadingElement.classList.add('d-none');
-
-                    // Render cart items
-                    this.renderCart();
-                } catch (error) {
-                    console.error('Error loading cart:', error);
-                    this.loadingElement.classList.add('d-none');
-                    Toast.error('Failed to load cart. Please try again later.');
-                }
-            },
-
-            renderCart: function() {
-                // Clear existing items (except loading indicator)
-                while (this.itemsElement.firstChild) {
-                    if (this.itemsElement.firstChild !== this.loadingElement) {
-                        this.itemsElement.removeChild(this.itemsElement.firstChild);
+                        showToastMessage("Cart updated successfully");
+                    } else {
+                        showToastMessage("Failed to update cart", "error");
                     }
-                }
-
-                // Show empty message if no items
-                if (!this.cartData || this.cartData.items.length === 0) {
-                    this.containerElement.classList.add('d-none');
-                    this.emptyElement.classList.remove('d-none');
-                    return;
-                }
-
-                // Show container and hide empty message
-                this.containerElement.classList.remove('d-none');
-                this.emptyElement.classList.add('d-none');
-
-                // Create and append items
-                this.cartData.items.forEach(item => {
-                    const itemElement = this.createCartItemElement(item);
-                    this.itemsElement.appendChild(itemElement);
-                });
-
-                // Update cart summary
-                this.updateCartSummary();
-            },
-
-            createCartItemElement: function(item) {
-                const template = this.template.content.cloneNode(true);
-                const itemElement = template.querySelector('.cart-item');
-
-                // Set item ID as data attribute
-                itemElement.dataset.itemId = item.cartItemId;
-                itemElement.dataset.bookId = item.bookId;
-
-                // Set image
-                const imageElement = itemElement.querySelector('.book-image');
-                imageElement.src = item.image || '/images/book-placeholder.jpg';
-                imageElement.alt = item.bookTitle;
-
-                // Set book details
-                itemElement.querySelector('.book-title').textContent = item.bookTitle;
-                itemElement.querySelector('.book-authors').textContent = item.authors.join(', ');
-
-                // Set price (handle sales)
-                const priceElement = itemElement.querySelector('.book-price');
-                const salePriceElement = itemElement.querySelector('.book-sale-price');
-
-                if (item.onSale && item.salePercentage > 0) {
-                    const originalPrice = item.price;
-                    const discountAmount = (item.price * item.salePercentage) / 100;
-                    const salePrice = originalPrice - discountAmount;
-
-                    priceElement.textContent = `${originalPrice.toFixed(2)}`;
-                    priceElement.classList.add('on-sale');
-
-                    salePriceElement.textContent = `${salePrice.toFixed(2)}`;
-                    salePriceElement.classList.remove('d-none');
-
-                    // Calculate and set subtotal
-                    const subtotal = salePrice * item.quantity;
-                    itemElement.querySelector('.item-subtotal').textContent = `${subtotal.toFixed(2)}`;
-                } else {
-                    priceElement.textContent = `${item.price.toFixed(2)}`;
-                    salePriceElement.classList.add('d-none');
-
-                    // Calculate and set subtotal
-                    const subtotal = item.price * item.quantity;
-                    itemElement.querySelector('.item-subtotal').textContent = `${subtotal.toFixed(2)}`;
-                }
-
-                // Set quantity
-                const quantityInput = itemElement.querySelector('.quantity-input');
-                quantityInput.value = item.quantity;
-
-                // Set quantity control event listeners
-                const decreaseBtn = itemElement.querySelector('.decrease-btn');
-                const increaseBtn = itemElement.querySelector('.increase-btn');
-                const removeBtn = itemElement.querySelector('.remove-btn');
-
-                decreaseBtn.addEventListener('click', () => {
-                    const currentVal = parseInt(quantityInput.value);
-                    if (currentVal > 1) {
-                        quantityInput.value = currentVal - 1;
-                        this.updateCartItemQuantity(item.cartItemId, currentVal - 1);
-                    }
-                });
-
-                increaseBtn.addEventListener('click', () => {
-                    const currentVal = parseInt(quantityInput.value);
-                    quantityInput.value = currentVal + 1;
-                    this.updateCartItemQuantity(item.cartItemId, currentVal + 1);
-                });
-
-                quantityInput.addEventListener('change', () => {
-                    let value = parseInt(quantityInput.value);
-                    if (isNaN(value) || value < 1) {
-                        value = 1;
-                        quantityInput.value = 1;
-                    }
-                    this.updateCartItemQuantity(item.cartItemId, value);
-                });
-
-                removeBtn.addEventListener('click', () => {
-                    this.removeFromCart(item.cartItemId);
-                });
-
-                return itemElement;
-            },
-
-            updateCartItemQuantity: async function(cartItemId, quantity) {
-                try {
-                    // Update the item in the API
-                    await API.Cart.updateCartItem(cartItemId, quantity);
-
-                    // Reload the cart to get updated totals
-                    this.cartData = await API.Cart.getCart();
-
-                    // Update the cart summary
-                    this.updateCartSummary();
-
-                    // Update the subtotal for this item
-                    const itemElement = document.querySelector(`.cart-item[data-item-id="${cartItemId}"]`);
-                    if (itemElement) {
-                        const item = this.cartData.items.find(i => i.cartItemId === cartItemId);
-                        if (item) {
-                            let price = item.price;
-                            if (item.onSale && item.salePercentage > 0) {
-                                const discountAmount = (item.price * item.salePercentage) / 100;
-                                price = item.price - discountAmount;
-                            }
-                            const subtotal = price * quantity;
-                            itemElement.querySelector('.item-subtotal').textContent = `${subtotal.toFixed(2)}`;
-                        }
-                    }
-
-                    Toast.success("Cart updated");
                 } catch (error) {
                     console.error('Error updating cart item:', error);
-                    Toast.error('Failed to update item. Please try again.');
+                    showToastMessage("An unexpected error occurred", "error");
                 }
-            },
+            }
 
-            removeFromCart: async function(cartItemId) {
+            // Function to remove item from cart
+            async function removeFromCart(cartId, cartItemId) {
                 try {
-                    const element = document.querySelector(`.cart-item[data-item-id="${cartItemId}"]`);
-                    if (!element) return;
+                    // Get the book ID associated with this cart item
+                    const bookId = $(`.cart-item[data-cart-item-id="${cartItemId}"]`).data('book-id');
 
-                    // Add animation class
-                    element.classList.add('slide-out');
-
-                    // Call API to remove item
-                    await API.Cart.removeFromCart(cartItemId);
-
-                    // Wait for animation to complete then remove element
-                    setTimeout(async () => {
-                        element.remove();
-
-                        // Reload cart data
-                        this.cartData = await API.Cart.getCart();
-
-                        // Check if cart is now empty
-                        if (!this.cartData || this.cartData.items.length === 0) {
-                            this.containerElement.classList.add('d-none');
-                            this.emptyElement.classList.remove('d-none');
+                    const response = await fetch(`/api/cart/deleteCartItem/${cartId}/cartItems/${bookId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                         }
+                    });
 
-                        // Update cart summary
-                        this.updateCartSummary();
+                    if (response.ok) {
+                        showToastMessage("Item removed from cart");
 
-                        Toast.success("Item removed from your cart");
-                    }, 300);
+                        // Remove item from UI with animation
+                        const itemElement = $(`.cart-item[data-cart-item-id="${cartItemId}"]`);
+                        itemElement.fadeOut(300, function () {
+                            $(this).remove();
+
+                            // Reload cart to update totals
+                            loadCartItems();
+                        });
+                    } else {
+                        showToastMessage("Failed to remove item from cart", "error");
+                    }
                 } catch (error) {
                     console.error('Error removing item from cart:', error);
-                    Toast.error('Failed to remove item. Please try again.');
+                    showToastMessage("An unexpected error occurred", "error");
                 }
-            },
-
-            updateCartSummary: function() {
-                if (!this.cartData) return;
-
-                const subtotal = this.cartData.cartTotal;
-                const shipping = subtotal > 0 ? this.SHIPPING_RATE : 0;
-                const tax = subtotal * this.TAX_RATE;
-                const total = subtotal + shipping + tax;
-
-                this.subtotalElement.textContent = `${subtotal.toFixed(2)}`;
-                this.shippingElement.textContent = `${shipping.toFixed(2)}`;
-                this.taxElement.textContent = `${tax.toFixed(2)}`;
-                this.totalElement.textContent = `${total.toFixed(2)}`;
-            },
-
-            showLoginMessage: function() {
-                this.loadingElement.classList.add('d-none');
-                this.containerElement.classList.add('d-none');
-
-                const loginMessage = document.createElement('div');
-                loginMessage.className = 'text-center py-5';
-                loginMessage.innerHTML = `
-                    <div class="mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                    </div>
-                    <h4>Please Login to View Your Cart</h4>
-                    <p class="text-muted">You need to be logged in to access your cart.</p>
-                    <a href="login.html" class="btn btn-primary mt-3">Log In</a>
-                    <a href="signup.html" class="btn btn-outline-secondary mt-3 ml-2">Sign Up</a>
-                `;
-
-                // Replace the empty cart with the login message
-                this.emptyElement.parentNode.replaceChild(loginMessage, this.emptyElement);
-            },
-
-            proceedToCheckout: function() {
-                // Redirect to checkout page
-                window.location.href = '/checkout.html';
             }
-        };
 
-        // Initialize the Authentication UI
-        AUTH.updateUI();
+            // Function to clear the entire cart
+            async function clearCart(cartId) {
+                if (!confirm("Are you sure you want to clear your cart?")) {
+                    return;
+                }
 
-        // Initialize Cart Manager
-        CartManager.init();
+                try {
+                    const response = await fetch(`/api/cart/deleteCart?cartID=${cartId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        showToastMessage("Cart cleared successfully");
+                        // Reload the page to show empty cart
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showToastMessage("Failed to clear cart", "error");
+                    }
+                } catch (error) {
+                    console.error('Error clearing cart:', error);
+                    showToastMessage("An unexpected error occurred", "error");
+                }
+            }
+
+            // Logout button
+            $('#logoutBtn').on('click', function (e) {
+                e.preventDefault();
+
+                // Clear authentication token and other data
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('cartId');
+
+                showToastMessage("Logged out successfully!");
+
+                // Redirect to login page after a short delay
+                setTimeout(function () {
+                    window.location.href = 'login.html';
+                }, 1000);
+            });
+        });
     </script>
 </body>
 </html>
