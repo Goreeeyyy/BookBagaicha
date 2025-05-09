@@ -96,15 +96,15 @@ builder.Services.AddScoped<JWTService>(provider =>
 
 builder.Services.AddScoped<IBookService, BookService>();
 
-
 builder.Services.AddScoped<IWishlistService, WishlistService>();
 
 builder.Services.AddScoped<ICartService, CartService>();
 
-
 builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddScoped<IReviewService, ReviewService>();
+
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 
 builder.Services.AddAuthorization();
 
@@ -145,5 +145,6 @@ app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();

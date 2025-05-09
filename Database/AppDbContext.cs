@@ -45,16 +45,16 @@ namespace BookBagaicha.Database
 
 
                 );
-           builder.Entity<Book>()
-     .HasMany(b => b.Authors)
-     .WithMany(a => a.Books)
-     .UsingEntity(j => j.ToTable("BookAuthors"));
+            builder.Entity<Book>()
+      .HasMany(b => b.Authors)
+      .WithMany(a => a.Books)
+      .UsingEntity(j => j.ToTable("BookAuthors"));
 
 
-        builder.Entity<Book>()
-         .HasOne(b => b.Publisher)
-         .WithMany(p => p.Books)
-         .HasForeignKey(b => b.PublisherId);
+            builder.Entity<Book>()
+             .HasOne(b => b.Publisher)
+             .WithMany(p => p.Books)
+             .HasForeignKey(b => b.PublisherId);
 
 
             // WishlistItem relationships
@@ -98,21 +98,39 @@ namespace BookBagaicha.Database
                 .HasForeignKey(ci => ci.BookId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
+            // Configure announcement entity
+            builder.Entity<Announcement>(entity =>
+            {
+                entity.ToTable("Announcements");
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.Id).ValueGeneratedOnAdd();
+                entity.Property(a => a.Title).IsRequired().HasMaxLength(200);
+                entity.Property(a => a.Message).IsRequired().HasMaxLength(1000);
+                entity.Property(a => a.StartDateTime)
+                    .HasColumnType("timestamp with time zone")
+                    .HasConversion(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                entity.Property(a => a.EndDateTime)
+                    .HasColumnType("timestamp with time zone")
+                    .HasConversion(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                entity.Property(a => a.IsActive).HasDefaultValue(true);
+            });
         }
 
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Genre> Genres { get; set; }
-
         public DbSet<Publisher> Publishers { get; set; }
-
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
          public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
 
 
     }

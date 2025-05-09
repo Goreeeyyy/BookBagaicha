@@ -55,7 +55,6 @@
 		<Folder Include="wwwroot\css\" />
 		<Folder Include="wwwroot\js\" />
 		<Folder Include="wwwroot\image\" />
-		<Folder Include="wwwroot\pages\" />
 	</ItemGroup>
 
   <ItemGroup>
