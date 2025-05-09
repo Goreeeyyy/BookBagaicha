@@ -15,30 +15,26 @@ var builder = WebApplication.CreateBuilder(args);
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    options.AddDefaultPolicy(policy =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.WithOrigins("https://localhost:7147", "http://localhost:5215", "http://localhost:8080")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
 
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-});
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+}); ;
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
-// Adding Controllers Class which identifies ControllerBase
-builder.Services.AddControllers(); 
 
 
 // Registering DB Context using Postgres Database with the connection strings of Postgres DB created in PgAdmin 4
@@ -147,12 +143,5 @@ app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Books}/{action=AddBooks}/{id?}");
-
-app.Urls.Add("http://localhost:5000");
-app.Urls.Add("https://localhost:7147");
 
 app.Run();
