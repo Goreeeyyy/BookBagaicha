@@ -1,4 +1,4 @@
-﻿using System.Reflection.Emit;
+﻿
 using BookBagaicha.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -112,6 +112,7 @@ namespace BookBagaicha.Database
         public DbSet<WishlistItem> WishlistItems { get; set; }
          public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
 
     }

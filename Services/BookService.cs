@@ -65,7 +65,7 @@ namespace BookBagaicha.Services
 
                 Authors = new List<Author>(),
                 Genres = new List<Genre>(),
-
+                
             };
 
             if (request.ImageFile != null)
