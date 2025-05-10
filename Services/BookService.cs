@@ -161,6 +161,7 @@ namespace BookBagaicha.Services
         public async Task<Book?> GetBookByIdAsync(Guid id)
         {
             return await _context.Books
+                .Include(b => b.Publisher)
                 .Include(b => b.Authors)
                 .Include(b => b.Genres) // Include Genres
                 .FirstOrDefaultAsync(b => b.BookId == id);
