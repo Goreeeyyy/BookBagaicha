@@ -10,6 +10,5 @@ namespace BookBagaicha.Models.Dto
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public bool IsActive { get; set; }
-        public long? CreatedByUserId { get; set; } 
     }
 }

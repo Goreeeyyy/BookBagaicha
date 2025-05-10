@@ -18,12 +18,11 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://localhost:7147", "http://localhost:5215", "http://localhost:8080")
+        policy.WithOrigins("https://localhost:7147", "http://localhost:5215", "http://localhost:8080", "https://localhost:44351", "http://localhost:5500") 
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
-
 
 
 // Add services to the container.
@@ -113,15 +112,7 @@ builder.Services.Configure<JsonOptions>(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.WithOrigins("https://localhost:7147", "http://localhost:5215", "https://localhost:44351" /* Replace with your actual backend URL */)
-               .AllowAnyHeader()
-               .AllowAnyMethod();
-    });
-});
+
 
 // Start building the app (Here, Start BookBagaicha)
 var app = builder.Build();
