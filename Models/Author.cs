@@ -11,7 +11,7 @@ namespace BookBagaicha.Models
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
 
-        
+        [JsonIgnore]
         public ICollection<Book> Books { get; set; } = new List<Book>();
     }
 }

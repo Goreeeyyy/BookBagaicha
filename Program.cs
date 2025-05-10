@@ -46,7 +46,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole<long>>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-
+builder.Services.AddLogging();
 
 // getting jwttokeninfo object from appsettings
 var jwtTokeInfo = builder.Configuration.GetSection("jwt").Get<JWTTokenInfo>();
@@ -109,7 +109,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.Configure<JsonOptions>(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 
@@ -126,12 +126,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors();
-
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseStaticFiles();
+app.UseAuthentication();
 app.UseCors();
 app.UseAuthorization();
 

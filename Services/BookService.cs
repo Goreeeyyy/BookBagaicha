@@ -62,7 +62,6 @@ namespace BookBagaicha.Services
                 Category = request.Category,
                 Image = null,
                 PublisherId = publisherToAdd.PublisherId, // Set the PublisherId
-
                 Authors = new List<Author>(),
                 Genres = new List<Genre>(),
                 
@@ -162,6 +161,7 @@ namespace BookBagaicha.Services
         public async Task<Book?> GetBookByIdAsync(Guid id)
         {
             return await _context.Books
+                .Include(b => b.Publisher)
                 .Include(b => b.Authors)
                 .Include(b => b.Genres) // Include Genres
                 .FirstOrDefaultAsync(b => b.BookId == id);
@@ -169,7 +169,147 @@ namespace BookBagaicha.Services
 
         public async Task<List<Book>> GetAllBooksAsync()
         {
-            return await _context.Books.Include(b => b.Genres).ToListAsync(); // Include Genres
+            return await _context.Books
+            .Include(b => b.Publisher)
+            .Include(b => b.Authors)
+            .Include(b => b.Genres)
+            .ToListAsync(); // Include Genres
+        }
+
+        public async Task<Book?> UpdateBookAsync(UpdateBookRequest request)
+        {
+             Console.WriteLine($"UpdateBookAsync called for BookId: {request.BookId}");
+    Console.WriteLine($"ImageFile received: {request.ImageFile != null}, Name: {request.ImageFile?.FileName}, Length: {request.ImageFile?.Length}");
+
+            var existingBook = await _context.Books
+                .Include(b => b.Publisher)
+                .Include(b => b.Authors)
+                .Include(b => b.Genres)
+                .FirstOrDefaultAsync(b => b.BookId == request.BookId);
+
+            if (existingBook == null)
+            {
+                return null; // Book not found
+            }
+
+            existingBook.Title = request.Title;
+            existingBook.Summary = request.Summary;
+            existingBook.ISBN = request.ISBN;
+            existingBook.Price = request.Price;
+            existingBook.Language = request.Language;
+            existingBook.Format = request.Format;
+            existingBook.PublicationDate = request.PublicationDate.ToUniversalTime();
+            existingBook.Quantity = request.Quantity;
+            existingBook.OnSale = request.OnSale;
+            existingBook.SalePercntage = request.SalePercntage;
+            existingBook.SaleStartDate = request.SaleStartDate.ToUniversalTime();
+            existingBook.SaleEndDate = request.SaleEndDate.ToUniversalTime();
+            existingBook.Category = request.Category;
+
+            // Handle publisher update
+            if (!string.IsNullOrWhiteSpace(request.PublisherName) && existingBook.Publisher?.PublisherName != request.PublisherName)
+            {
+                var existingPublisher = await _context.Publishers
+                    .FirstOrDefaultAsync(p => p.PublisherName == request.PublisherName);
+
+                if (existingPublisher != null)
+                {
+                    existingBook.Publisher = existingPublisher;
+                    existingBook.PublisherId = existingPublisher.PublisherId;
+                }
+                else
+                {
+                    var newPublisher = new Publisher { PublisherName = request.PublisherName };
+                    _context.Publishers.Add(newPublisher);
+                    await _context.SaveChangesAsync(); // Save to get the new publisher's ID
+                    existingBook.Publisher = newPublisher;
+                    existingBook.PublisherId = newPublisher.PublisherId;
+                }
+            }
+
+            // Handle image update
+            if (request.ImageFile != null)
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(existingBook.Image))
+                    {
+                        _imageService.DeleteBookImage(existingBook.Image); // Consider making this async
+                    }
+                    existingBook.Image = await _imageService.SaveImageAsync(request.ImageFile, existingBook.BookId);
+                }
+                catch (ArgumentException)
+                {
+                    // Handle invalid image format/size
+                    return null;
+                }
+            }
+
+            // Update authors
+            existingBook.Authors.Clear();
+            var authorsToAdd = new List<Author>();
+            foreach (var authorName in request.Authors)
+            {
+                var names = authorName.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (names.Length >= 2)
+                {
+                    var firstName = names[0];
+                    var lastName = string.Join(' ', names.Skip(1));
+
+                    var existingAuthor = await _context.Authors
+                        .FirstOrDefaultAsync(a => a.FirstName == firstName && a.LastName == lastName);
+
+                    if (existingAuthor != null)
+                    {
+                        authorsToAdd.Add(existingAuthor);
+                    }
+                    else
+                    {
+                        var newAuthor = new Author { FirstName = firstName, LastName = lastName };
+                        _context.Authors.Add(newAuthor);
+                        authorsToAdd.Add(newAuthor);
+                    }
+                }
+            }
+            await _context.SaveChangesAsync(); // Save new authors
+            foreach (var author in authorsToAdd)
+            {
+                existingBook.Authors.Add(author);
+            }
+
+            // Update genres
+            existingBook.Genres.Clear();
+            var genresToAdd = new List<Genre>();
+            foreach (var genreName in request.Genres)
+            {
+                var existingGenre = await _context.Genres.FirstOrDefaultAsync(g => g.Name == genreName);
+                if (existingGenre != null)
+                {
+                    genresToAdd.Add(existingGenre);
+                }
+                else
+                {
+                    var newGenre = new Genre { Name = genreName };
+                    _context.Genres.Add(newGenre);
+                    genresToAdd.Add(newGenre);
+                }
+            }
+            await _context.SaveChangesAsync(); // Save new genres
+            foreach (var genre in genresToAdd)
+            {
+                existingBook.Genres.Add(genre);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Reload the book with updated details
+            var updatedBookWithDetails = await _context.Books
+                .Include(b => b.Publisher)
+                .Include(b => b.Authors)
+                .Include(b => b.Genres)
+                .FirstOrDefaultAsync(b => b.BookId == request.BookId);
+
+            return updatedBookWithDetails;
         }
     }
 }

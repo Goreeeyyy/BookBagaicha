@@ -5,22 +5,22 @@ namespace BookBagaicha.IService
 {
     public interface ICartService
     {
-        // Get a user's cart
-        Task<CartDto> GetCartByUserIdAsync(string userId);
+        // Get a user's cart or create a new one if it doesn't exist
+        Task<CartDto> GetCartByUserIdAsync(long userId);
+
+        // Get cart by cart ID
+        Task<CartDto> GetCartByIdAsync(Guid cartId);
 
         // Add a book to the cart
-        Task<CartItemDto> AddToCartAsync(string userId, Guid bookId, int quantity = 1);
+        Task<CartItemDto> AddToCartAsync(Guid cartId, Guid bookId, int quantity);
 
-        // Update cart item quantity
-        Task<CartItemDto> UpdateCartItemAsync(string userId, Guid cartItemId, int quantity);
+        // Update item quantity in cart
+        Task<CartItemDto> UpdateCartItemQuantityAsync(Guid cartId, Guid bookId, int quantity);
 
-        // Remove a book from the cart
-        Task<bool> RemoveFromCartAsync(string userId, Guid cartItemId);
+        // Remove an item from cart
+        Task<bool> RemoveFromCartAsync(Guid cartId, Guid bookId);
 
-        // Clear the cart
-        Task<bool> ClearCartAsync(string userId);
-
-        // Calculate cart total
-        Task<decimal> CalculateCartTotalAsync(string userId);
+        // Clear all items from cart
+        Task<bool> ClearCartAsync(Guid cartId);
     }
 }

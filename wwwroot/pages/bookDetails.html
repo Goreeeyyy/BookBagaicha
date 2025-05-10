@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details - Book Bagsicha</title>
+    <link href="Content/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagsicha</a>
+            <div class="d-flex align-items-center ms-auto">
+                <ul class="navbar-nav me-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="HomePage.html">HOME</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Books.html">BOOKS</a>
+                    </li>
+                </ul>
+                <div class="d-flex me-3">
+                    <input class="form-control form-control-sm"
+                           type="search"
+                           placeholder="Search for products..."
+                           aria-label="Search">
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="UserProfile.html" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <a href="cart.html" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-shopping-basket"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row g-5">
+            <div class="col-md-5">
+                <div class="book-cover-container border p-3 rounded-3 bg-white shadow-sm">
+                    <img src="Images/default.jpg"
+                         class="img-fluid"
+                         alt="Book Cover"
+                         id="book-image">
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="border-bottom pb-3 mb-4">
+                    <h1 class="mb-3" id="book-title">THUNMANHANDIYA</h1>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-muted" id="review-count">288 reviews</span>
+                        <span class="text-muted">|</span>
+                        <span class="text-muted" id="book-format">Paperback</span>
+                    </div>
+                </div>
+
+                <div class="bg-light p-3 rounded-2 mb-4 border border-primary">
+                    <h3 class="text-primary mb-0" id="book-price">Rs. 700/-</h3>
+                </div>
+
+                <div class="card border-primary mb-4">
+                    <div class="card-header bg-primary text-white py-2">
+                        <h5 class="card-title mb-0">SUMMARY</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><strong id="genre-label">Genre:</strong> <span id="genre-value">Fiction</span></li>
+                            <li class="mb-2" id="summary-item">Lorem ipsum dolor sit amet...</li>
+                            <li class="mb-2"><strong id="author-label">Author:</strong> <span id="author-value">Mahagamasakara</span></li>
+                            <li class="mb-2"><strong id="release-date-label">Release Date:</strong> <span id="release-date-value">2025/10/12</span></li>
+                            <li class="mb-2"><strong id="publisher-label">Publisher:</strong> <span id="publisher-value">Example Publications</span></li>
+                            <li><strong id="editor-label">Editor:</strong> <span id="editor-value">John Doe</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mb-5 border-top border-bottom py-4">
+                    <button class="btn btn-outline-primary px-4" id="btnWishlist">
+                        Add to Wishlist
+                    </button>
+                    <button class="btn btn-primary px-4" id="btnCart">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <div class="ratings-section border-top pt-4">
+                    <h4 class="mb-4 pb-2 border-bottom">RATINGS & REVIEWS (2)</h4>
+                    <div class="card mb-4 border-1 shadow-sm highlight-review bg-light">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h6 class="mb-0">User Name</h6>
+                                    <small class="text-muted">2024-03-15 14:30</small>
+                                </div>
+                                <div class="star-rating text-warning">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                            <p class="mb-0 review-text">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam...
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card border-1 shadow-sm highlight-review bg-light">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h6 class="mb-0">Another User</h6>
+                                    <small class="text-muted">2024-03-14 10:15</small>
+                                </div>
+                                <div class="star-rating text-warning">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                            <p class="mb-0 review-text">
+                                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
+                                doloremque laudantium, totam rem aperiam...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+
+            if (bookId) {
+                const apiUrl = `/api/getBooksByID/${bookId}`; // Your API endpoint
+
+                fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Add other headers if needed, e.g., Authorization
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch book details: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(bookDetails => {
+                        if (bookDetails) {
+                            const bookImage = document.getElementById('book-image');
+                            const bookTitle = document.getElementById('book-title');
+                            const bookFormat = document.getElementById('book-format');
+                            const bookPrice = document.getElementById('book-price');
+                            const genreValue = document.getElementById('genre-value');
+                            const authorValue = document.getElementById('author-value');
+                            const releaseDateValue = document.getElementById('release-date-value');
+                            const publisherValue = document.getElementById('publisher-value');
+                            const editorValue = document.getElementById('editor-value');
+                            const summaryItem = document.getElementById('summary-item');
+                            const reviewCount = document.getElementById('review-count'); // Assuming you might want to add this later
+
+                            if (bookImage) bookImage.src = `/${bookDetails.image}`;
+                            if (bookImage) bookImage.alt = bookDetails.title;
+                            if (bookTitle) bookTitle.textContent = bookDetails.title;
+                            if (bookFormat) bookFormat.textContent = bookDetails.format;
+                            if (bookPrice) bookPrice.textContent = `Rs. ${bookDetails.price}/-`;
+
+                            if (genreValue) {
+                                genreValue.textContent = bookDetails.genres && Array.isArray(bookDetails.genres) && bookDetails.genres[0] ? bookDetails.genres[0].name : 'N/A';
+                            }
+
+                            if (authorValue) {
+                                authorValue.textContent = bookDetails.authors && Array.isArray(bookDetails.authors)
+                                    ? bookDetails.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ')
+                                    : 'N/A';
+                            }
+
+                            if (releaseDateValue) {
+                                releaseDateValue.textContent = new Date(bookDetails.publicationDate).toLocaleDateString();
+                            }
+
+                            if (publisherValue) {
+                                publisherValue.textContent = bookDetails.publisher ? bookDetails.publisher.publisherName : 'N/A';
+                            }
+
+                            if (editorValue) {
+                                editorValue.textContent = bookDetails.editor || 'N/A'; // Still 'N/A' as per current API response structure
+                            }
+
+                            if (summaryItem && bookDetails.summary) {
+                                summaryItem.textContent = bookDetails.summary;
+                            }
+                            // You can add logic to update reviewCount here if your API provides it
+                        } else {
+                            const detailsContainer = document.querySelector('.container.my-5');
+                            if (detailsContainer) detailsContainer.innerHTML = '<p class="alert alert-danger">Book not found.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching book details:', error);
+                        const detailsContainer = document.querySelector('.container.my-5');
+                        if (detailsContainer) detailsContainer.innerHTML = '<p class="alert alert-danger">Failed to load book details.</p>';
+                    });
+            } else {
+                const detailsContainer = document.querySelector('.container.my-5');
+                if (detailsContainer) detailsContainer.innerHTML = '<p class="alert alert-warning">Invalid book ID in the URL.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
