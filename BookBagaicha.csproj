@@ -37,8 +37,6 @@
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\image\" />
 
-    <Folder Include="wwwroot\js\NewFolder\" />
-
   </ItemGroup>
 
 </Project>

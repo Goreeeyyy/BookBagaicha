@@ -114,7 +114,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.Configure<JsonOptions>(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 builder.Services.AddCors(options =>

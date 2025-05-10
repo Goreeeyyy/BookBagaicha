@@ -98,6 +98,7 @@
                                                   <th>On Sale</th>
                                                   <th>Sale Percntage</th>
                                                   <th>Sale Start Date</th>
+                                                  <th>Sale End Date</th>
                                                   <th>Category</th>
                                                   <th>Image</th>
                                                   <th>Publisher</th>
@@ -120,6 +121,7 @@
                                                   <td>On Sale</td>
                                                   <td>Sale Percntage</td>
                                                   <td>Sale Start Date</td>
+                                                  <td>Sale End Date</td>
                                                   <td>Category</td>
                                                   <td>Image</td>
                                                   <td>Publisher</td>
@@ -283,92 +285,62 @@
                       throw new Error(`Failed to fetch books: ${response.status}`);
                   }
                   const books = await response.json();
-                  updateBookTable(books);
+                  updateBookTable(books); // Directly pass the array of book objects
               } catch (error) {
                   console.error("Error fetching books:", error);
                   alert("Failed to load books.");
               }
           }
 
-function updateBookTable(data) {
-    const tbody = document.querySelector(".bookTable tbody");
-    tbody.innerHTML = "";
+          function updateBookTable(books) {
+              const tbody = document.querySelector(".bookTable tbody");
+              tbody.innerHTML = "";
 
-    if (data && data.$values && Array.isArray(data.$values)) {
-        // First pass: Create a map of all objects by their $id
-        const allObjects = {};
+              if (Array.isArray(books)) {
+                  books.forEach(book => {
+                      const row = document.createElement("tr");
+                      const authorNames = book.authors.map(author => `${author.firstName} ${author.lastName}`).join(", ") || "N/A";
+                      const genreNames = book.genres.map(genre => genre.name).join(", ") || "N/A";
+                      const formattedPublicationDate = new Date(book.publicationDate).toLocaleDateString();
+                      const formattedSaleStartDate = book.saleStartDate !== '0001-01-01T00:00:00' ? new Date(book.saleStartDate).toLocaleDateString() : "N/A";
+                      const formattedSaleEndDate = book.saleEndDate !== '0001-01-01T00:00:00' ? new Date(book.saleEndDate).toLocaleDateString() : "N/A";
 
-        function flatten(obj) {
-            if (obj && typeof obj === 'object') {
-                if (obj.$id) {
-                    allObjects[obj.$id] = obj;
-                }
-                for (const key in obj) {
-                    if (Object.hasOwnProperty.call(obj, key)) {
-                        flatten(obj[key]);
-                    }
-                }
-            } else if (Array.isArray(obj)) {
-                obj.forEach(item => flatten(item));
-            }
-        }
+                      row.innerHTML = `
+        <td>${book.bookId}</td>
+        <td>${book.title}</td>
+        <td>${book.summary}</td>
+        <td>${book.isbn}</td>
+        <td>${book.price}</td>
+        <td>${book.language}</td>
+        <td>${book.format}</td>
+        <td>${formattedPublicationDate}</td>
+        <td>${book.quantity}</td>
+        <td>${book.onSale ? "Yes" : "No"}</td>
+        <td>${book.salePercntage || "N/A"}</td>
+        <td>${formattedSaleStartDate}</td>
+       <td>${formattedSaleEndDate}</td>
+        <td>${book.category || "N/A"}</td>
+        <td><img src="/${book.image}" alt="${book.title}" width="50" /></td>
+        <td>${book.publisher ? book.publisher.publisherName : "N/A"}</td>
+        <td>${authorNames}</td>
+        <td>${genreNames}</td>
+        <td class="actionBtns d-flex justify-content-between">
+          <button class="edit-Btn">${editSVG}</button>
+          <button onclick="deleteBook('${book.bookId}')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z" stroke-width="0" stroke="currentColor" />
+            </svg>
+          </button>
+        </td>
+      `;
+                      tbody.appendChild(row);
+                  });
+                  attachEditListeners();
+              } else {
+                  console.error("Error: Invalid book data received from the API", books);
+              }
+          }
 
-        flatten(data);
-        console.log("Flattened All Objects Map:", allObjects); // Inspect the flattened map
-
-        data.$values.forEach(book => {
-            const row = document.createElement("tr");
-            let authorNames = "N/A";
-
-            if (book.authors && book.authors.$values && Array.isArray(book.authors.$values)) {
-                const names = book.authors.$values.map(authorRef => {
-                    if (authorRef.$ref && allObjects[authorRef.$ref]) {
-                        const author = allObjects[authorRef.$ref];
-                        return `${author.firstName} ${author.lastName}`;
-                    } else if (authorRef.firstName && authorRef.lastName) {
-                        return `${authorRef.firstName} ${authorRef.lastName}`;
-                    }
-                    return "";
-                }).filter(name => name);
-
-                authorNames = names.length > 0 ? names.join(", ") : "N/A";
-            }
-
-
-            row.innerHTML = `
-                <td>${book.bookId}</td>
-                <td>${book.title}</td>
-                <td>${book.summary}</td>
-                <td>${book.isbn}</td>
-                <td>${book.price}</td>
-                <td>${book.language}</td>
-                <td>${book.format}</td>
-                <td>${new Date(book.publicationDate).toLocaleDateString()}</td>
-                <td>${book.quantity}</td>
-                <td>${book.onSale ? "Yes" : "No"}</td>
-                <td>${book.salePercntage || "N/A"}</td>
-                <td>${book.saleStartDate ? new Date(book.saleStartDate).toLocaleDateString() : "N/A"}</td>
-                <td>${book.category || "N/A"}</td>
-                <td><img src="/${book.image}" alt="${book.title}" width="50" ;" /></td>
-                <td>${book.publisher ? book.publisher.publisherName : "N/A"}</td>
-                <td>${authorNames}</td>
-                <td>${book.genres && book.genres.$values ? book.genres.$values.map(g => g.name).join(", ") : "N/A"}</td>
-                <td class="actionBtns d-flex justify-content-between">
-                    <button class="edit-Btn">${editSVG}</button>
-                    <button onclick="deleteBook('${book.bookId}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z" stroke-width="0" stroke="currentColor" />
-                        </svg>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-        attachEditListeners();
-    } else {
-        console.error("Error: Invalid book data received from the API", data);
-    }
-}
 
           // Delete book
           async function deleteBook(bookId) {
@@ -415,98 +387,173 @@ function updateBookTable(data) {
                       }
                   });
               });
+            }
 
-                function toggleEditMode(row, enable) {
-    const editBtn = row.querySelector(".edit-Btn");
-    row.classList.toggle("editing", enable);
+              function toggleEditMode(row, enable) {
+                  const editBtn = row.querySelector(".edit-Btn");
+                  row.classList.toggle("editing", enable);
 
-    Array.from(row.children).forEach((cell, index) => {
-        if (index !== 0 && index !== row.children.length - 1) { // Skip the first cell (ID) and the last (Actions)
-            const value = cell.innerText;
-            cell.setAttribute("data-original", value);
-            cell.innerHTML = enable
-                ? `<input type="text" class="form-control" value="${value}" />`
-                : value;
-        } else if (index === row.children.length - 1 && enable) {
-            // Replace Edit button with Save and Cancel buttons
-            cell.innerHTML = `
+                  Array.from(row.children).forEach((cell, index) => {
+                      if (index === 0 || index === row.children.length - 1) {
+                          return; // Skip ID and Actions column
+                      }
+
+                      const columnName = getColumnHeader(index); // Helper function to get column name
+                      const value = cell.innerText;
+                      cell.setAttribute("data-original", value);
+
+                      if (enable) {
+                          let inputElement;
+                          switch (columnName) {
+                              case "Image":
+                                  inputElement = `<input type="file" class="form-control" accept="image/*" />`;
+                                  break;
+                              case "On Sale":
+                                  const isChecked = value === "Yes";
+                                  inputElement = `
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="onSaleCheckbox_${row.rowIndex}" ${isChecked ? 'checked' : ''} style="margin-left: 0;">
+            <label class="form-check-label" for="onSaleCheckbox_${row.rowIndex}" style="margin-left: 0.5em;">On Sale</label>
+        </div>
+    `;
+                                  break;
+                              case "Publication Date":
+                              case "Sale Start Date":
+                              case "Sale End Date":
+                                  const dateValue = value === 'N/A' ? '' : new Date(value).toISOString().split('T')[0];
+                                  inputElement = `<input type="date" class="form-control" value="${dateValue}" />`;
+                                  break;
+                              case "Price":
+                              case "Quantity":
+                              case "Sale Percentage":
+                                  inputElement = `<input type="number" class="form-control" value="${value}" step="any" />`;
+                                  break;
+                              default:
+                                  inputElement = `<input type="text" class="form-control" value="${value}" />`;
+                                  break;
+                          }
+                          cell.innerHTML = inputElement;
+                      } else {
+                          cell.innerHTML = value;
+                      }
+                  });
+
+                  const actionCell = row.querySelector(".actionBtns");
+                  if (actionCell) {
+                      if (enable) {
+                          actionCell.innerHTML = `
                 <button class="save-Btn btn btn-sm btn-primary">${saveSVG}</button>
                 <button class="cancel-Btn btn btn-sm btn-secondary">${editSVG}</button>
             `;
-            const saveButton = cell.querySelector(".save-Btn");
-            const cancelButton = cell.querySelector(".cancel-Btn");
+                          const saveButton = actionCell.querySelector(".save-Btn");
+                          const cancelButton = actionCell.querySelector(".cancel-Btn");
 
-            saveButton.addEventListener("click", () => {
-    console.log("Save button clicked for row:", row);
-    const bookIdBeforeSave = row.querySelector("td:first-child").textContent;
-    console.log("Book ID extracted before save:", bookIdBeforeSave);
-    saveEditedRow(row);
-});
-            cancelButton.addEventListener("click", () => toggleEditMode(row, false));
-        } else if (index === row.children.length - 1 && !enable) {
-            cell.innerHTML = `<button class="edit-Btn">${editSVG}</button>
-                               <button onclick="deleteBook('${row.querySelector('td:first-child').textContent}')">
-                                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                       <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z" stroke-width="0" stroke="currentColor" />
-                                   </svg>
-                               </button>`;
-            attachEditListeners(); // Re-attach listener to the new edit button
-        }
-    });
-}
+                          saveButton.addEventListener("click", () => saveEditedRow(row));
+                          cancelButton.addEventListener("click", () => toggleEditMode(row, false));
+                      } else {
+                          actionCell.innerHTML = `<button class="edit-Btn">${editSVG}</button>
+                                   <button onclick="deleteBook('${row.querySelector('td:first-child').textContent}')">
+                                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                           <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z" stroke-width="0" stroke="currentColor" />
+                                       </svg>
+                                   </button>`;
+                          attachEditListeners(); // Re-attach listener to the new edit button
+                      }
+                  }
+              }
+
+              function getColumnHeader(index) {
+                  const headers = document.querySelectorAll(".bookTable th");
+                  return headers[index].textContent.trim();
+              }
+
+          
+          async function saveEditedRow(row) {
+              const bookId = row.querySelector("td:first-child").textContent;
+              const cells = Array.from(row.children);
+              const formData = new FormData();
+              formData.append('BookId', bookId);
+
+              // Helper function to safely get input value
+              const getInputValue = (cell) => {
+                  const input = cell.querySelector('input.form-control');
+                  return input ? input.value : cell.getAttribute('data-original');
+              };
+
+              // Helper function to safely get checkbox value
+              const getCheckboxValue = (cell) => {
+                  const checkbox = cell.querySelector('input[type="checkbox"]');
+                  return checkbox ? checkbox.checked : (cell.getAttribute('data-original') === 'Yes');
+              };
+
+              // Helper function to safely get file value
+              const getFileValue = (cell) => {
+                  const fileInput = cell.querySelector('input[type="file"]');
+                  return fileInput ? fileInput.files[0] : null;
+              };
+
+              const getValidDateISO = (dateString) => {
+                  if (!dateString || dateString.toLowerCase() === 'n/a' || dateString.trim() === '') {
+                      return null;
+                  }
+                  const date = new Date(dateString);
+                  return isNaN(date.getTime()) ? null : date.toISOString();
+              };
+
+              formData.append('Title', getInputValue(cells[1]));
+              formData.append('Summary', getInputValue(cells[2]));
+              formData.append('ISBN', getInputValue(cells[3]));
+              formData.append('Price', parseFloat(getInputValue(cells[4])));
+              formData.append('Language', getInputValue(cells[5]));
+              formData.append('Format', getInputValue(cells[6]));
+              formData.append('PublicationDate', getValidDateISO(getInputValue(cells[7])));
+              formData.append('Quantity', parseInt(getInputValue(cells[8])));
+              formData.append('OnSale', getCheckboxValue(cells[9]));
+              formData.append('SalePercntage', parseFloat(getInputValue(cells[10])) || 0);
+              const saleStartDate = getValidDateISO(getInputValue(cells[11]));
+              const saleEndDate = getValidDateISO(getInputValue(cells[12]));
+
+              if (saleStartDate) {
+                  formData.append('SaleStartDate', saleStartDate);
+              }
+              if (saleEndDate) {
+                  formData.append('SaleEndDate', saleEndDate);
+              }
+              formData.append('Category', getInputValue(cells[13]));
+              formData.append('ImageFile', getFileValue(cells[14])); // Append the image file
+              formData.append('PublisherName', getInputValue(cells[15]));
+
+              const authorsInputValue = getInputValue(cells[15]);
+              const authors = authorsInputValue.split(',').map(s => s.trim()).filter(s => s);
+              authors.forEach(author => formData.append('Authors', author));
+
+              const genresInputValue = getInputValue(cells[16]);
+              const genres = genresInputValue.split(',').map(s => s.trim()).filter(s => s);
+              genres.forEach(genre => formData.append('Genres', genre));
+
+              try {
+                  const response = await fetch(`https://localhost:44351/api/updateBooks/${bookId}`, {
+                      method: "PUT",
+                      headers: {
+                          "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
+                      },
+                      body: formData
+                  });
+
+                  if (!response.ok) {
+                      const errorText = await response.text();
+                      throw new Error(`Failed to update book: ${response.status} - ${errorText}`);
+                  }
+
+                  const updatedBook = await response.json();
+                  console.log("Book updated successfully:", updatedBook);
+                  toggleEditMode(row, false); // Exit edit mode
+                  fetchBooks(); // Refresh the book table
+              } catch (error) {
+                  console.error("Error updating book:", error);
+                  alert(error.message);
+              }
           }
-    async function saveEditedRow(row) {
-        const bookId = row.querySelector("td:first-child").textContent;
-        console.log("Book ID being sent:", bookId);
-        const inputFields = row.querySelectorAll("input.form-control");
-        const formData = new FormData();
-    formData.append('BookId', bookId);
-    formData.append('Title', inputFields[0].value);
-    formData.append('Summary', inputFields[1].value);
-    formData.append('ISBN', inputFields[2].value);
-    formData.append('Price', parseFloat(inputFields[3].value));
-    formData.append('Language', inputFields[4].value);
-    formData.append('Format', inputFields[5].value);
-    formData.append('PublicationDate', new Date(inputFields[6].value).toISOString());
-    formData.append('Quantity', parseInt(inputFields[7].value));
-    formData.append('OnSale', row.querySelector("td:nth-child(10)").textContent === "Yes");
-    formData.append('SalePercntage', parseFloat(inputFields[9].value) || 0);
-    formData.append('SaleStartDate', inputFields[10].value ? new Date(inputFields[10].value).toISOString() : null);
-    formData.append('Category', inputFields[11].value);
-    formData.append('PublisherName', inputFields[13].value);
-    const authors = inputFields[14].value.split(',').map(s => s.trim()).filter(s => s);
-    authors.forEach(author => formData.append('Authors', author));
-    const genres = inputFields[15].value.split(',').map(s => s.trim()).filter(s => s);
-    genres.forEach(genre => formData.append('Genres', genre));
-    // For image, you'd do: formData.append('ImageFile', yourImageFile);
-
-        
-
-        try {
-            const response = await fetch(`https://localhost:44351/api/updateBooks/${bookId}`, {
-                method: "PUT",
-                headers: {
-                    
-                    "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
-                },
-                body: formData
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to update book: ${response.status} - ${errorText}`);
-            }
-
-            const updatedBook = await response.json();
-            console.log("Book updated successfully:", updatedBook);
-            toggleEditMode(row, false); // Exit edit mode
-            fetchBooks(); // Refresh the book table
-        } catch (error) {
-            console.error("Error updating book:", error);
-            alert(error.message);
-        }
-    }
-
 
           
           // Initialize table on page load

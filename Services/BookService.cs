@@ -178,6 +178,9 @@ namespace BookBagaicha.Services
 
         public async Task<Book?> UpdateBookAsync(UpdateBookRequest request)
         {
+             Console.WriteLine($"UpdateBookAsync called for BookId: {request.BookId}");
+    Console.WriteLine($"ImageFile received: {request.ImageFile != null}, Name: {request.ImageFile?.FileName}, Length: {request.ImageFile?.Length}");
+
             var existingBook = await _context.Books
                 .Include(b => b.Publisher)
                 .Include(b => b.Authors)
