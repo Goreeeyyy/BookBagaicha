@@ -176,6 +176,19 @@ namespace BookBagaicha.Services
                     };
 
                     order.OrderItems.Add(orderItem);
+
+                    var book = await _context.Books.FindAsync(cartItem.BookId);
+                    if (book != null)
+                    {
+                        book.Quantity -= cartItem.Quantity;
+                        _context.Books.Update(book);
+                        _logger.LogInformation("Updated quantity for book {BookId}. New quantity: {NewQuantity}", book.BookId, book.Quantity);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Book with ID {BookId} not found while placing order.", cartItem.BookId);
+                        // Consider how to handle this scenario: maybe log a warning, skip the update, or throw an exception
+                    }
                 }
 
                 await using var transaction = await _context.Database.BeginTransactionAsync();
@@ -211,6 +224,7 @@ namespace BookBagaicha.Services
                 _logger.LogInformation("Cancelling order {OrderId} for user {UserId}", orderId, userId);
 
                 var order = await _context.Orders
+                    .Include(o => o.OrderItems) // Ensure OrderItems are loaded
                     .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
                 if (order == null)
@@ -231,18 +245,47 @@ namespace BookBagaicha.Services
                     return true;
                 }
 
-                order.Status = "Cancelled";
-                _context.Orders.Update(order);
-                await _context.SaveChangesAsync();
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    order.Status = "Cancelled";
+                    _context.Orders.Update(order);
 
-                _logger.LogInformation("Successfully cancelled order {OrderId}", orderId);
-                return true;
+                    // Add back the quantity of the books
+                    foreach (var orderItem in order.OrderItems)
+                    {
+                        var book = await _context.Books.FindAsync(orderItem.BookId);
+                        if (book != null)
+                        {
+                            book.Quantity += orderItem.Quantity;
+                            _context.Books.Update(book);
+                            _logger.LogInformation("Added back {Quantity} for book {BookId}. New quantity: {NewQuantity}", orderItem.Quantity, book.BookId, book.Quantity);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("Book with ID {BookId} not found while cancelling order {OrderId}.", orderItem.BookId, orderId);
+                            // Consider how to handle this scenario: log a warning, or potentially an error depending on your requirements
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    _logger.LogInformation("Successfully cancelled order {OrderId}", orderId);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError(ex, "Error cancelling order {OrderId}", orderId);
+                    return false;
+                }
             }
             catch (ArgumentException) { throw; }
             catch (UnauthorizedAccessException) { throw; }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cancelling order {OrderId}", orderId);
+                _logger.LogError(ex, "Unexpected error while cancelling order {OrderId}", orderId);
                 return false;
             }
         }
