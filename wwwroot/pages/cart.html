@@ -1,4 +1,5 @@
 ﻿<!DOCTYPE html>
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>My Cart - Book Bagaicha</title>
@@ -74,6 +75,59 @@
             border-radius: 5px;
             padding: 1.5rem;
         }
+
+        /* Confirmation dialog */
+        .confirmation-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+            .confirmation-dialog.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .confirmation-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .confirmation-dialog.active .confirmation-content {
+            transform: translateY(0);
+        }
+
+        .confirmation-content h4 {
+            margin-bottom: 1rem;
+        }
+
+        .confirmation-content p {
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -100,15 +154,15 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
                             <li><a class="dropdown-item" href="userHome.html">User Profile</a></li>
                             <li><a class="dropdown-item" href="Wishlist.html">My Wishlist</a></li>
-                            <li><a class="dropdown-item active" href="cart.html">Shopping Cart</a></li>
                             <li><a class="dropdown-item" href="orderHistory.html">Order History</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
                         </ul>
                     </div>
-                    <a href="cart.html" class="btn btn-outline-light btn-sm active">
+                    <a href="cart.html" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
+
                 </div>
             </div>
         </div>
@@ -135,6 +189,31 @@
         </div>
     </div>
 
+    <!-- Order Confirmation Dialog -->
+    <div class="confirmation-dialog" id="orderConfirmationDialog">
+        <div class="confirmation-content">
+            <i class="fas fa-shopping-bag fa-3x text-primary mb-3"></i>
+            <h4>Place Your Order</h4>
+            <p>Are you sure you want to place this order?</p>
+            <div class="confirmation-actions">
+                <button class="btn btn-secondary" id="cancelOrderBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmOrderBtn">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Success Dialog -->
+    <div class="confirmation-dialog" id="orderSuccessDialog">
+        <div class="confirmation-content">
+            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+            <h4>Order Placed Successfully!</h4>
+            <p>Your order has been confirmed. You can check your order status in Order History.</p>
+            <div class="confirmation-actions">
+                <a href="orderHistory.html" class="btn btn-primary">View Order History</a>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -154,6 +233,22 @@
 
             // Load cart items
             loadCartItems();
+
+            // Logout button event handler
+            $('#logoutBtn').on('click', function (e) {
+                e.preventDefault();
+
+                // Clear authentication token and other data
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('cartId');
+
+                showToastMessage("Logged out successfully!");
+
+                // Redirect to login page after a short delay
+                setTimeout(function () {
+                    window.location.href = 'login.html';
+                }, 1000);
+            });
 
             // Function to check if user is logged in
             function isUserLoggedIn() {
@@ -191,6 +286,9 @@
             // Function to load cart items
             async function loadCartItems() {
                 try {
+                    // Show loading spinner
+                    $('#loadingSpinner').show();
+
                     // Get cart ID
                     const cartId = await getCartId();
 
@@ -229,6 +327,44 @@
                 } catch (error) {
                     console.error('Error loading cart items:', error);
                     handleLoadError('An error occurred while loading your cart.');
+                } finally {
+                    // Hide loading spinner
+                    $('#loadingSpinner').hide();
+                }
+            }
+
+            // Function to check the user's successful order count
+            function checkSuccessfulOrderCount(callback) {
+                try {
+                    fetch('/api/order/getSuccessfulOrderCount', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            } else {
+                                console.warn(`Error getting successful order count: ${response.status}`);
+                                // If there's an error, assume 0 orders
+                                return { successfulOrderCount: 0 };
+                            }
+                        })
+                        .then(data => {
+                            console.log("Successful order count:", data.successfulOrderCount); // Debug log
+                            // Count only confirmed orders
+                            callback(data.successfulOrderCount);
+                        })
+                        .catch(error => {
+                            console.error('Error checking order count:', error);
+                            // Default to 0 orders in case of error
+                            callback(0);
+                        });
+                } catch (error) {
+                    console.error('Error checking order count:', error);
+                    // Default to 0 orders in case of error
+                    callback(0);
                 }
             }
 
@@ -240,18 +376,18 @@
                 // Adjust to handle .NET format where items might be in cartData.items.$values
                 const itemsArray = cartData.items && cartData.items.$values
                     ? cartData.items.$values
-                    : (Array.isArray(cartData) ? cartData : []);
+                    : (Array.isArray(cartData.items) ? cartData.items : []);
 
                 if (itemsArray.length === 0) {
                     // Display empty cart message
                     cartContainer.html(`
-                            <div class="empty-cart">
-                                <i class="fas fa-shopping-cart"></i>
-                                <h4>Your cart is empty</h4>
-                                <p class="text-muted">Browse our books and add items to your cart</p>
-                                <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
-                            </div>
-                        `);
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <h4>Your cart is empty</h4>
+                <p class="text-muted">Browse our books and add items to your cart</p>
+                <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
+            </div>
+        `);
                     return;
                 }
 
@@ -262,15 +398,15 @@
                 let cartItemsColumn = $('<div class="col-md-8 mb-4"></div>');
                 let cartItemsCard = $('<div class="card"></div>');
                 let cartItemsHeader = $(`
-                        <div class="card-header bg-light">
-                            <div class="row fw-bold">
-                                <div class="col-md-6">Product</div>
-                                <div class="col-md-2 text-center">Price</div>
-                                <div class="col-md-2 text-center">Quantity</div>
-                                <div class="col-md-2 text-center">Total</div>
-                            </div>
-                        </div>
-                    `);
+        <div class="card-header bg-light">
+            <div class="row fw-bold">
+                <div class="col-md-6">Product</div>
+                <div class="col-md-2 text-center">Price</div>
+                <div class="col-md-2 text-center">Quantity</div>
+                <div class="col-md-2 text-center">Total</div>
+            </div>
+        </div>
+    `);
                 let cartItemsBody = $('<div class="card-body p-0"></div>');
                 let cartItemsList = $('<div id="cartItemsList"></div>');
 
@@ -310,94 +446,127 @@
 
                     // Create cart item element
                     const cartItemElement = $(`
-                            <div class="cart-item p-3 border-bottom" data-cart-item-id="${cartItemId}" data-book-id="${bookId}">
-                                <div class="row align-items-center">
-                                    <div class="col-md-6 d-flex align-items-center">
-                                        <img src="../${image}" class="me-3" style="width: 80px; height: auto;" alt="${title}">
-                                        <div>
-                                            <h6 class="mb-1">${title}</h6>
-                                            <p class="text-muted small mb-0">${authors.length > 0 ? authors.join(', ') : 'No Author'}</p>
-                                        </div>
+                        <div class="cart-item p-3 border-bottom" data-cart-item-id="${cartItemId}" data-book-id="${bookId}">
+                            <div class="row align-items-center">
+                                <div class="col-md-6 d-flex align-items-center">
+                                    <img src="../${image}" class="me-3" style="width: 80px; height: auto;" alt="${title}">
+                                    <div>
+                                        <h6 class="mb-1">${title}</h6>
+                                        <p class="text-muted small mb-0">${authors.length > 0 ? authors.join(', ') : 'No Author'}</p>
                                     </div>
-                                    <div class="col-md-2 text-center">
-                                        <span class="fw-bold">Rs. ${price.toFixed(2)}</span>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <span class="fw-bold">Rs. ${price.toFixed(2)}</span>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="quantity-control">
+                                        <button class="quantity-btn decrease-btn" data-cart-item-id="${cartItemId}">-</button>
+                                        <input type="number" class="quantity-input" value="${quantity}" min="1" max="99" data-cart-item-id="${cartItemId}">
+                                        <button class="quantity-btn increase-btn" data-cart-item-id="${cartItemId}">+</button>
                                     </div>
-                                    <div class="col-md-2 text-center">
-                                        <div class="quantity-control">
-                                            <button class="quantity-btn decrease-btn" data-cart-item-id="${cartItemId}">-</button>
-                                            <input type="number" class="quantity-input" value="${quantity}" min="1" max="99" data-cart-item-id="${cartItemId}">
-                                            <button class="quantity-btn increase-btn" data-cart-item-id="${cartItemId}">+</button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 text-center">
-                                        <div class="d-flex flex-column align-items-center">
-                                            <span class="fw-bold">Rs. ${itemTotal.toFixed(2)}</span>
-                                            <button class="btn btn-sm btn-outline-danger mt-2 remove-btn" data-cart-item-id="${cartItemId}">
-                                                <i class="fas fa-trash"></i> Remove
-                                            </button>
-                                        </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <span class="fw-bold">Rs. ${itemTotal.toFixed(2)}</span>
+                                        <button class="btn btn-sm btn-outline-danger mt-2 remove-btn" data-cart-item-id="${cartItemId}">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        `);
+                        </div>
+                    `);
 
                     cartItemsList.append(cartItemElement);
                 });
 
-                // Add order summary to the page
-                let discount = 0;
-                const totalQuantity = itemsArray.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                // Check for loyalty discount based on order count
+                checkSuccessfulOrderCount(function (orderCount) {
+                    // Add order summary to the page
+                    let loyaltyDiscount = 0;
+                    let quantityDiscount = 0;
+                    let totalDiscount = 0;
+                    let discountMessage = '';
 
-                if (totalQuantity >= 5) {
-                    discount = totalPrice * 0.05; // 5% discount
-                }
+                    const totalQuantity = itemsArray.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                    const isLoyalCustomer = Number(orderCount) >= 10;
+                    const hasQuantityDiscount = totalQuantity >= 5;
 
-                const grandTotal = totalPrice - discount;
+                    console.log("Total quantity:", totalQuantity);
+                    console.log("Is loyal customer:", isLoyalCustomer);
+                    console.log("Has quantity discount:", hasQuantityDiscount);
 
-                                orderSummary.html(`
-                    <h4 class="mb-4">Order Summary</h4>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal:</span>
-                        <span>Rs. ${totalPrice.toFixed(2)}</span>
-                    </div>
-                    ${discount > 0 ? `
-                        <div class="d-flex justify-content-between mb-2 text-success">
-                            <span>Discount (5%):</span>
-                            <span>- Rs. ${discount.toFixed(2)}</span>
-                        </div>
-                    ` : ''}
-                    <hr>
-                    <div class="d-flex justify-content-between mb-4 fw-bold">
-                        <span>Grand Total:</span>
-                        <span>Rs. ${grandTotal.toFixed(2)}</span>
-                    </div>
-                    <button id="checkoutBtn" class="btn btn-primary w-100 mb-3">Proceed to Checkout</button>
-                    <button id="clearCartBtn" class="btn btn-outline-secondary w-100" data-cart-id="${cartId}">Clear Cart</button>
-                `);
+                    // Apply loyalty discount if eligible
+                    if (isLoyalCustomer) {
+                        loyaltyDiscount = totalPrice * 0.10;
+                                discountMessage += `<div class="d-flex justify-content-between mb-2 text-success">
+                        <span>Loyalty Discount (10%):</span>
+                        <span>- Rs. ${loyaltyDiscount.toFixed(2)}</span>
+                    </div>`;
+                        console.log("Applied 10% loyalty discount:", loyaltyDiscount);
+                    }
 
+                    // Apply quantity discount if eligible (stackable with loyalty)
+                    if (hasQuantityDiscount) {
+                        quantityDiscount = totalPrice * 0.05;
+                        discountMessage += `<div class="d-flex justify-content-between mb-2 text-success">
+                <span>Quantity Discount (5%):</span>
+                <span>- Rs. ${quantityDiscount.toFixed(2)}</span>
+            </div>`;
+                        console.log("Applied 5% quantity discount:", quantityDiscount);
+                    }
 
-                cartSummaryColumn.append(orderSummary);
+                    // Calculate total discount and final price
+                    totalDiscount = loyaltyDiscount + quantityDiscount;
+                    const grandTotal = totalPrice - totalDiscount;
 
-                // Append columns to the row and the row to the container
-                cartContent.append(cartItemsColumn, cartSummaryColumn);
-                cartContainer.append(cartContent);
+                    console.log("Total discount:", totalDiscount);
+                    console.log("Grand total:", grandTotal);
 
-                // Set up event listeners for buttons
-                setupEventListeners(cartId);
+                                    orderSummary.html(`
+                            <h4 class="mb-4">Order Summary</h4>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>Rs. ${totalPrice.toFixed(2)}</span>
+                            </div>
+                            ${discountMessage}
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4 fw-bold">
+                                <span>Grand Total:</span>
+                                <span>Rs. ${grandTotal.toFixed(2)}</span>
+                            </div>
+                            <button id="placeOrderBtn" class="btn btn-primary w-100 mb-3" data-discount="${totalDiscount}" data-cart-id="${cartId}">
+                                <i class="fas fa-shopping-bag me-2"></i>Place Order
+                            </button>
+                            <button id="clearCartBtn" class="btn btn-outline-secondary w-100" data-cart-id="${cartId}">
+                                <i class="fas fa-trash me-2"></i>Clear Cart
+                            </button>
+                        `);
+
+                    cartSummaryColumn.append(orderSummary);
+
+                    // Append columns to the row and the row to the container
+                    cartContent.append(cartItemsColumn, cartSummaryColumn);
+                    cartContainer.append(cartContent);
+
+                    // Set up event listeners for buttons
+                    setupEventListeners(cartId);
+                });
             }
+     
 
             // Function to handle loading errors
             function handleLoadError(message) {
                 const cartContainer = $('#cartContainer');
                 cartContainer.html(`
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            ${message}
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
-                        </div>
-                    `);
+                            <div class="alert alert-danger" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                ${message}
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
+                            </div>
+                        `);
             }
 
             // Function to display toast notifications
@@ -473,10 +642,85 @@
                     clearCart(cartId);
                 });
 
-                // Checkout button
-                $('#checkoutBtn').on('click', function () {
-                    // Redirect to checkout page
-                    window.location.href = 'checkout.html';
+                // Place Order button
+                $('#placeOrderBtn').on('click', function () {
+                    // Show confirmation dialog
+                    $('#orderConfirmationDialog').addClass('active');
+                });
+
+                // Cancel order confirmation button
+                $('#cancelOrderBtn').on('click', function () {
+                    $('#orderConfirmationDialog').removeClass('active');
+                });
+
+                // Confirm order button
+                $('#confirmOrderBtn').on('click', async function () {
+                    try {
+                        // Show loading state
+                        $(this).prop('disabled', true);
+                        $(this).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...');
+
+                        const cartId = $('#placeOrderBtn').data('cart-id');
+                        const discount = $('#placeOrderBtn').data('discount') || 0;
+
+                        // Call API to place order
+                        const response = await fetch('/api/order/placeOrder', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            },
+                            body: JSON.stringify({
+                                cartId: cartId,
+                                appliedDiscount: discount
+                            })
+                        });
+
+                        if (response.ok) {
+                            // Hide confirmation dialog
+                            $('#orderConfirmationDialog').removeClass('active');
+
+                            // Show success dialog
+                            setTimeout(() => {
+                                $('#orderSuccessDialog').addClass('active');
+                            }, 500);
+
+                            // Clear cart ID from localStorage
+                            localStorage.removeItem('cartId');
+
+                            if (window.updateCartBadge) {
+                                window.updateCartBadge();
+                            }
+                        } else if (response.status === 401) {
+                            // Unauthorized - token might be expired
+                            showToastMessage("Your session has expired. Please login again.", "error");
+
+                            // Clear token and redirect to login
+                            localStorage.removeItem('authToken');
+                            localStorage.setItem('redirectAfterLogin', window.location.href);
+
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 2000);
+                        } else {
+                            // Handle other errors
+                            try {
+                                const errorData = await response.json();
+                                showToastMessage(errorData.message || "Failed to place order", "error");
+                            } catch (e) {
+                                showToastMessage("Failed to place order", "error");
+                            }
+                            $('#orderConfirmationDialog').removeClass('active');
+                        }
+                    } catch (error) {
+                        console.error('Error placing order:', error);
+                        showToastMessage("An unexpected error occurred", "error");
+                        $('#orderConfirmationDialog').removeClass('active');
+                    } finally {
+                        // Reset button state
+                        $('#confirmOrderBtn').prop('disabled', false);
+                        $('#confirmOrderBtn').html('Place Order');
+                    }
                 });
             }
 
@@ -509,6 +753,9 @@
                         // Reload the entire cart to update totals
                         loadCartItems();
 
+                        if (window.updateCartBadge) {
+                            window.updateCartBadge();
+                        }
                         showToastMessage("Cart updated successfully");
                     } else {
                         showToastMessage("Failed to update cart", "error");
@@ -542,6 +789,10 @@
 
                             // Reload cart to update totals
                             loadCartItems();
+
+                            if (window.updateCartBadge) {
+                                window.updateCartBadge();
+                            }
                         });
                     } else {
                         showToastMessage("Failed to remove item from cart", "error");
@@ -568,6 +819,10 @@
 
                     if (response.ok) {
                         showToastMessage("Cart cleared successfully");
+
+                        if (window.updateCartBadge) {
+                            window.updateCartBadge();
+                        }
                         // Reload the page to show empty cart
                         setTimeout(() => {
                             window.location.reload();
@@ -598,5 +853,7 @@
             });
         });
     </script>
+    <script src="../js/cart.js"></script>
+
 </body>
 </html>

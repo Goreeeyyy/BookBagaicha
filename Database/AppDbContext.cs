@@ -116,6 +116,33 @@ namespace BookBagaicha.Database
                 .WithMany()
                 .HasForeignKey(ci => ci.BookId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Order relationships
+            builder.Entity<Order>()
+                .HasKey(o => o.OrderId);
+
+            builder.Entity<Order>()
+                .HasOne(o => o.User)
+                .WithMany()
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // Use Restrict instead of Cascade to prevent accidental deletion
+
+            // OrderItem relationships
+            builder.Entity<OrderItem>()
+                .HasKey(oi => oi.OrderItemId);
+
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Order)
+                .WithMany(o => o.OrderItems)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Book)
+                .WithMany()
+                .HasForeignKey(oi => oi.BookId)
+                .OnDelete(DeleteBehavior.Restrict); // Use Restrict to prevent deletion of books that have been ordered
+
         }
 
 
@@ -130,6 +157,9 @@ namespace BookBagaicha.Database
         public DbSet<WishlistItem> WishlistItems { get; set; }
          public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
 
 

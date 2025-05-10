@@ -74,7 +74,7 @@
                         </ul>
                     </div>
                     <a href="cart.html" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-shopping-basket"></i>
+                        <i class="fas fa-shopping-cart"></i>
                     </a>
                 </div>
             </div>
@@ -176,20 +176,20 @@
                 wishlistContainer.empty();
 
                 // Adjust to handle .NET format where items are in wishlistData.items.$values
-                const itemsArray = wishlistData.items && wishlistData.items.$values 
-                    ? wishlistData.items.$values 
+                const itemsArray = wishlistData.items && wishlistData.items.$values
+                    ? wishlistData.items.$values
                     : [];
 
                 if (itemsArray.length === 0) {
                     // Display empty wishlist message
                     wishlistContainer.html(`
-                        <div class="empty-wishlist">
-                            <i class="far fa-heart"></i>
-                            <h4>Your wishlist is empty</h4>
-                            <p class="text-muted">Browse our books and add your favorites to the wishlist</p>
-                            <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
-                        </div>
-                    `);
+                            <div class="empty-wishlist">
+                                <i class="far fa-heart"></i>
+                                <h4>Your wishlist is empty</h4>
+                                <p class="text-muted">Browse our books and add your favorites to the wishlist</p>
+                                <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
+                            </div>
+                        `);
                     return;
                 }
 
@@ -205,7 +205,7 @@
                     const price = item.price || (item.book ? item.book.price : 0);
                     const onSale = item.onSale || (item.book ? item.book.onSale : false);
                     const wishlistItemId = item.wishlistItemId || item.id || "unknown";
-                    
+
                     // Get authors array
                     let authors = [];
                     if (item.authors && Array.isArray(item.authors)) {
@@ -217,33 +217,33 @@
                             authors = item.book.authors.$values.map(a => a.firstName + ' ' + a.lastName);
                         }
                     }
-                    
+
                     const wishlistItem = `
-                        <div class="col">
-                            <div class="card h-100 text-center p-2 position-relative">
-                                <img src="../${image}" class="card-img-top book-img" alt="${bookTitle}" />
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">${bookTitle}</h6>
-                                    <p class="card-subtitle text-muted small mb-2">
-                                        ${authors.length > 0 ? authors.join(', ') : 'No Author'}
-                                    </p>
-                                    <p class="mb-2 text-dark fw-bold">Rs. ${price}/-</p>
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <a href="BookDetails.html?id=${bookId}" class="btn btn-sm btn-outline-secondary">
-                                            Details
-                                        </a>
-                                        <button class="btn btn-sm btn-primary add-to-cart-btn" data-book-id="${bookId}">
-                                            Add to Cart
-                                        </button>
-                                        <button class="btn btn-sm btn-danger remove-from-wishlist-btn" data-wishlist-item-id="${wishlistItemId}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                            <div class="col">
+                                <div class="card h-100 text-center p-2 position-relative">
+                                    <img src="../${image}" class="card-img-top book-img" alt="${bookTitle}" />
+                                    <div class="card-body">
+                                        <h6 class="card-title mb-1">${bookTitle}</h6>
+                                        <p class="card-subtitle text-muted small mb-2">
+                                            ${authors.length > 0 ? authors.join(', ') : 'No Author'}
+                                        </p>
+                                        <p class="mb-2 text-dark fw-bold">Rs. ${price}/-</p>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="BookDetails.html?id=${bookId}" class="btn btn-sm btn-outline-secondary">
+                                                Details
+                                            </a>
+                                            <button class="btn btn-sm btn-primary add-to-cart-btn" data-book-id="${bookId}">
+                                                Add to Cart
+                                            </button>
+                                            <button class="btn btn-sm btn-danger remove-from-wishlist-btn" data-wishlist-item-id="${wishlistItemId}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
+                                    ${onSale ? '<span class="on-sale">Sale!</span>' : ''}
                                 </div>
-                                ${onSale ? '<span class="on-sale">Sale!</span>' : ''}
                             </div>
-                        </div>
-                    `;
+                        `;
                     booksRow.append(wishlistItem);
                 });
 
@@ -255,14 +255,14 @@
             function handleLoadError(message) {
                 const wishlistContainer = $('#wishlistContainer');
                 wishlistContainer.html(`
-                    <div class="alert alert-danger" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        ${message}
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
-                    </div>
-                `);
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${message}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
+                        </div>
+                    `);
             }
 
             // Function to set up event listeners
@@ -355,7 +355,7 @@
                                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                             }
                         });
-                        
+
                         if (response.ok) {
                             const data = await response.json();
                             cartId = data.cartId;
@@ -378,7 +378,7 @@
                     if (!cartId) {
                         throw new Error('Could not determine cart ID');
                     }
-                    
+
                     // Add to cart using the correct endpoint
                     const response = await fetch(`/api/cart/addCartItem/${cartId}/cartItems/${bookId}`, {
                         method: 'POST',
@@ -416,6 +416,8 @@
                             if (wishlistItemId) {
                                 await removeFromWishlist(wishlistItemId);
                             }
+
+                            window.updateCartBadge();
                         }
                     } else {
                         const errorData = await response.json();
@@ -444,15 +446,15 @@
                     }).showToast();
                 }
             }
-            
+
             // Logout button
-            $('#logoutBtn').on('click', function(e) {
+            $('#logoutBtn').on('click', function (e) {
                 e.preventDefault();
-                
+
                 // Clear authentication token and other data
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('cartId');
-                
+
                 Toastify({
                     text: "Logged out successfully!",
                     duration: 3000,
@@ -463,13 +465,14 @@
                         background: "linear-gradient(to right, #00b09b, #96c93d)",
                     }
                 }).showToast();
-                
+
                 // Redirect to login page after a short delay
-                setTimeout(function() {
+                setTimeout(function () {
                     window.location.href = 'login.html';
                 }, 1000);
             });
         });
     </script>
+    <script src="../js/cart.js"></script>
 </body>
 </html>
