@@ -99,51 +99,53 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', () => {
             const apiUrl = '/api/allBooks';
+            const bookListContainer = document.getElementById('bookList'); // Assuming your container has the ID 'bookList'
 
-            $.ajax({
-                url: apiUrl,
-                type: 'GET',
-                dataType: 'json',
-                success: function (response) { // Changed 'data' to 'response' to be more descriptive
-                    if (response && response.$values && Array.isArray(response.$values)) {
-                        const bookListContainer = $('#bookList');
-                        bookListContainer.empty();
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(books => {
+                    if (Array.isArray(books)) {
+                        bookListContainer.innerHTML = ''; // Clear existing content
 
-                        response.$values.forEach(book => { // Access the books through response.$values
+                        books.forEach(book => {
                             const bookCard = `
-                                    <div class="col">
-                                        <div class="card h-100 text-center p-2 position-relative">
-                                            <a href="BookDetails.html?id=${book.bookId}" class="stretched-link"></a>
-                                            <img src="../${book.image}" class="card-img-top book-img" alt="${book.title}" />
-                                            <div class="card-body">
-                                                <h6 class="card-title mb-1">${book.title}</h6>
-                                                <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => author.name).join(', ') : 'No Author'}</p>
-                                                <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
-                                                <div class="d-flex justify-content-center gap-2">
-                                                    <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
-                                                    <button class="btn btn-sm btn-outline-secondary">
-                                                        <i class="far fa-heart"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
-                                        </div>
+                        <div class="col">
+                            <div class="card h-100 text-center p-2 position-relative">
+                                <a href="BookDetails.html?id=${book.bookId}" class="stretched-link"></a>
+                                <img src="../${book.image}" class="card-img-top book-img" alt="${book.title}" />
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">${book.title}</h6>
+                                    <p class="card-subtitle text-muted small mb-2">${book.authors && Array.isArray(book.authors) ? book.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ') : 'No Author'}</p>
+                                    <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-sm btn-outline-primary">Add to Cart</button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="far fa-heart"></i>
+                                        </button>
                                     </div>
-                                `;
-                            bookListContainer.append(bookCard);
+                                </div>
+                                ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                            bookListContainer.insertAdjacentHTML('beforeend', bookCard);
                         });
                     } else {
-                        $('#bookList').html('<p>No books found or invalid data format.</p>');
-                        console.error('Invalid API response format:', response);
+                        bookListContainer.innerHTML = '<p>No books found or invalid data format.</p>';
+                        console.error('Invalid API response format:', books);
                     }
-                },
-                error: function (error) {
+                })
+                .catch(error => {
                     console.error('Error fetching books:', error);
-                    $('#bookList').html('<p>Failed to load books.</p>');
-                }
-            });
+                    bookListContainer.innerHTML = '<p>Failed to load books.</p>';
+                });
         });
     </script>
 </body>

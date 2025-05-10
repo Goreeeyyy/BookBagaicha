@@ -163,7 +163,6 @@
                     })
                     .then(bookDetails => {
                         if (bookDetails) {
-                            // Update the HTML elements with the fetched book details
                             const bookImage = document.getElementById('book-image');
                             const bookTitle = document.getElementById('book-title');
                             const bookFormat = document.getElementById('book-format');
@@ -181,21 +180,29 @@
                             if (bookTitle) bookTitle.textContent = bookDetails.title;
                             if (bookFormat) bookFormat.textContent = bookDetails.format;
                             if (bookPrice) bookPrice.textContent = `Rs. ${bookDetails.price}/-`;
+
                             if (genreValue) {
-                                genreValue.textContent = bookDetails.genres && bookDetails.genres.$values && bookDetails.genres.$values[0] ? bookDetails.genres.$values[0].name : 'N/A';
+                                genreValue.textContent = bookDetails.genres && Array.isArray(bookDetails.genres) && bookDetails.genres[0] ? bookDetails.genres[0].name : 'N/A';
                             }
+
                             if (authorValue) {
-                                authorValue.textContent = bookDetails.authors && bookDetails.authors.$values ? bookDetails.authors.$values.map(a => `${a.firstName} ${a.lastName}`).join(', ') : 'N/A';
+                                authorValue.textContent = bookDetails.authors && Array.isArray(bookDetails.authors)
+                                    ? bookDetails.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ')
+                                    : 'N/A';
                             }
+
                             if (releaseDateValue) {
                                 releaseDateValue.textContent = new Date(bookDetails.publicationDate).toLocaleDateString();
                             }
+
                             if (publisherValue) {
                                 publisherValue.textContent = bookDetails.publisher ? bookDetails.publisher.publisherName : 'N/A';
                             }
+
                             if (editorValue) {
-                                editorValue.textContent = bookDetails.editor || 'N/A'; // Will be 'N/A' as per current API response
+                                editorValue.textContent = bookDetails.editor || 'N/A'; // Still 'N/A' as per current API response structure
                             }
+
                             if (summaryItem && bookDetails.summary) {
                                 summaryItem.textContent = bookDetails.summary;
                             }
