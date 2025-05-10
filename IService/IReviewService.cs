@@ -9,6 +9,7 @@ namespace BookBagaicha.IService
     public interface IReviewService
     {
         Task<List<ReviewDTO>> GetReviewsByBookId(Guid bookId);
-        // Add other methods like AddReview, UpdateReview, DeleteReview if needed
+        Task<ReviewDTO> AddReviewAsync(long userId, Guid bookId, int ratings, string? comments);
+
     }
 }
