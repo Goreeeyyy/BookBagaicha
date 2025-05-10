@@ -48,7 +48,7 @@
                 } else if (role === 'Staff') {
                     redirectUrl = 'staffHome.html'; // Replace with your staff dashboard URL
                 } else if (role === 'User') {
-                    redirectUrl = 'userHome.html'; // Replace with your customer dashboard URL
+                    redirectUrl = 'browseBooks.html'; // Replace with your customer dashboard URL
                 }
 
                 setTimeout(() => {

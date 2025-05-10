@@ -445,31 +445,31 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function (response) {
-                    if (response && response.$values && Array.isArray(response.$values)) {
+                    if (response && Array.isArray(response)) { // Corrected condition
                         const bookListContainer = $('#bookList');
                         bookListContainer.empty();
 
-                        response.$values.forEach(book => {
+                        response.forEach(book => {
                             const bookCard = `
-                                            <div class="col">
-                                                <div class="card h-100 text-center p-2 position-relative">
-                                                    <a href="BookDetails.html?id=${book.bookId}" class="book-link stretched-link"></a>
-                                                    <img src="../${book.image}" class="card-img-top book-img" alt="${book.title}" />
-                                                    <div class="card-body">
-                                                        <h6 class="card-title mb-1">${book.title}</h6>
-                                                        <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => author.firstName + ' ' + author.lastName).join(', ') : 'No Author'}</p>
-                                                        <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
-                                                        <div class="d-flex justify-content-center gap-2">
-                                                            <button class="btn btn-sm btn-outline-primary add-to-cart-btn" data-book-id="${book.bookId}">Add to Cart</button>
-                                                            <button class="btn btn-sm btn-outline-secondary add-to-wishlist-btn" data-book-id="${book.bookId}">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
-                                                </div>
+                                <div class="col">
+                                    <div class="card h-100 text-center p-2 position-relative">
+                                        <a href="BookDetails.html?id=${book.bookId}" class="book-link stretched-link"></a>
+                                        <img src="../${book.image}" class="card-img-top book-img" alt="${book.title}" />
+                                        <div class="card-body">
+                                            <h6 class="card-title mb-1">${book.title}</h6>
+                                            <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => author.firstName + ' ' + author.lastName).join(', ') : 'No Author'}</p>
+                                            <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <button class="btn btn-sm btn-outline-primary add-to-cart-btn" data-book-id="${book.bookId}">Add to Cart</button>
+                                                <button class="btn btn-sm btn-outline-secondary add-to-wishlist-btn" data-book-id="${book.bookId}">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
                                             </div>
-                                        `;
+                                        </div>
+                                        ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
+                                    </div>
+                                </div>
+                            `;
                             bookListContainer.append(bookCard);
                         });
 
