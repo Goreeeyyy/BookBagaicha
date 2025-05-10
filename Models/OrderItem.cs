@@ -2,15 +2,16 @@
 
 namespace BookBagaicha.Models
 {
-    public class CartItem
+    public class OrderItem
     {
-        public Guid CartItemId { get; set; }
-        public Guid CartId { get; set; }
+        public Guid OrderItemId { get; set; }
+        public Guid OrderId { get; set; }
         public Guid BookId { get; set; }
         public int Quantity { get; set; }
+        public decimal PriceAtPurchase { get; set; }
 
         // Navigation properties
-        public Cart Cart { get; set; }
+        public Order Order { get; set; }
         public Book Book { get; set; }
     }
 }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookBagaicha.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250509024242_Update")]
-    partial class Update
+    [Migration("20250510044716_AddOrderTables")]
+    partial class AddOrderTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -156,9 +156,6 @@ namespace BookBagaicha.Migrations
                     b.Property<Guid>("CartId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
@@ -166,7 +163,8 @@ namespace BookBagaicha.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("CartId");
+                    b.HasIndex("CartId", "BookId")
+                        .IsUnique();
 
                     b.ToTable("CartItems");
                 });
@@ -186,6 +184,69 @@ namespace BookBagaicha.Migrations
                     b.HasKey("GenreId");
 
                     b.ToTable("Genres");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Order", b =>
+                {
+                    b.Property<Guid>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("AppliedDiscount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("ClaimCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("ConfirmationEmailSent")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.OrderItem", b =>
+                {
+                    b.Property<Guid>("OrderItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("PriceAtPurchase")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("OrderItemId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("BookBagaicha.Models.Publisher", b =>
@@ -336,9 +397,6 @@ namespace BookBagaicha.Migrations
                     b.Property<Guid>("WishlistItemId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("AddedDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("BookId")
                         .HasColumnType("uuid");
@@ -581,6 +639,36 @@ namespace BookBagaicha.Migrations
                     b.Navigation("Cart");
                 });
 
+            modelBuilder.Entity("BookBagaicha.Models.Order", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.OrderItem", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BookBagaicha.Models.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("BookBagaicha.Models.Review", b =>
                 {
                     b.HasOne("BookBagaicha.Models.Book", "Book")
@@ -699,6 +787,11 @@ namespace BookBagaicha.Migrations
             modelBuilder.Entity("BookBagaicha.Models.Cart", b =>
                 {
                     b.Navigation("CartItems");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Order", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("BookBagaicha.Models.Publisher", b =>

@@ -1,5 +1,6 @@
 ﻿namespace BookBagaicha.Models.Dto
 {
+
     public class WishlistItemDto
     {
         public Guid WishlistItemId { get; set; }
@@ -14,4 +15,5 @@
         public string? Category { get; set; }
         public List<string> Authors { get; set; } = new List<string>();
     }
+
 }

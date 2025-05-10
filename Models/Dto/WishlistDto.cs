@@ -6,4 +6,5 @@
         public long UserId { get; set; }
         public List<WishlistItemDto> Items { get; set; } = new List<WishlistItemDto>();
     }
+
 }

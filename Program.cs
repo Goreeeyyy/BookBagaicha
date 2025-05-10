@@ -51,7 +51,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole<long>>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-
+builder.Services.AddLogging();
 
 // getting jwttokeninfo object from appsettings
 var jwtTokeInfo = builder.Configuration.GetSection("jwt").Get<JWTTokenInfo>();
@@ -105,6 +105,7 @@ builder.Services.AddScoped<IWishlistService, WishlistService>();
 
 builder.Services.AddScoped<ICartService, CartService>();
 
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IImageService, ImageService>();
 
@@ -139,12 +140,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors();
-
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseStaticFiles();
+app.UseAuthentication();
 app.UseCors();
 app.UseAuthorization();
 

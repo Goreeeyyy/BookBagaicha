@@ -1,10 +1,10 @@
-﻿namespace BookBagaicha.Models.Dto
-{
-    public class CartDto
+﻿ namespace BookBagaicha.Models.Dto
     {
-        public Guid CartId { get; set; }
-        public string UserId { get; set; } = null!;
-        public decimal CartTotal { get; set; }
-        public List<CartItemDto> Items { get; set; } = new List<CartItemDto>();
+        public class CartDto
+        {
+            public Guid CartId { get; set; }
+            public long UserId { get; set; }
+            public decimal CartTotal { get; set; }
+            public List<CartItemDto> Items { get; set; } = new List<CartItemDto>();
+        }
     }
-}

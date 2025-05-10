@@ -3,385 +3,399 @@ using BookBagaicha.IService;
 using BookBagaicha.Models;
 using BookBagaicha.Models.Dto;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BookBagaicha.Services
 {
     public class CartService : ICartService
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<CartService> _logger;
 
-        public CartService(AppDbContext context)
+        public CartService(AppDbContext context, ILogger<CartService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        public async Task<CartDto> GetCartByUserIdAsync(string userId)
+        public async Task<CartDto> GetCartByUserIdAsync(long userId)
         {
-            // Convert string userId to long
-            if (!long.TryParse(userId, out long userIdLong))
+            try
             {
-                throw new ArgumentException("Invalid user ID format");
-            }
+                _logger.LogInformation("Getting cart for user {UserId}", userId);
 
-            // Try to get the user's cart
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Book)
-                .ThenInclude(b => b.Authors)
-                .FirstOrDefaultAsync(c => c.UserId == userIdLong);
+                // Try to get the user's cart with all items
+                var cart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .ThenInclude(ci => ci.Book)
+                    .ThenInclude(b => b.Authors)
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            // If the user doesn't have a cart yet, create one
-            if (cart == null)
-            {
-                cart = new Cart
+                // If the user doesn't have a cart yet, create one
+                if (cart == null)
                 {
-                    CartId = Guid.NewGuid(),
-                    UserId = userIdLong,
-                    CartTotal = 0
-                };
-                _context.Carts.Add(cart);
-                await _context.SaveChangesAsync();
+                    _logger.LogInformation("Creating new cart for user {UserId}", userId);
 
-                return new CartDto
-                {
-                    CartId = cart.CartId,
-                    UserId = userId,
-                    CartTotal = 0,
-                    Items = new List<CartItemDto>()
-                };
-            }
+                    cart = new Cart
+                    {
+                        CartId = Guid.NewGuid(),
+                        UserId = userId,
+                        CartTotal = 0
+                    };
 
-            // Calculate the cart total
-            decimal cartTotal = 0;
-            var cartItemDtos = new List<CartItemDto>();
+                    _context.Carts.Add(cart);
 
-            foreach (var item in cart.CartItems)
-            {
-                decimal itemPrice = item.Price;
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        _logger.LogInformation("Created new cart with ID {CartId}", cart.CartId);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error creating cart for user {UserId}", userId);
+                        throw new Exception($"Failed to create cart: {ex.Message}", ex);
+                    }
 
-                // If the book is on sale, apply the discount
-                if (item.Book.OnSale && item.Book.SalePercntage > 0)
-                {
-                    decimal discountAmount = (item.Price * item.Book.SalePercntage) / 100;
-                    itemPrice = item.Price - discountAmount;
+                    return new CartDto
+                    {
+                        CartId = cart.CartId,
+                        UserId = cart.UserId,
+                        Items = new List<CartItemDto>(),
+                        CartTotal = 0
+                    };
                 }
 
-                cartTotal += itemPrice * item.Quantity;
-
-                cartItemDtos.Add(new CartItemDto
-                {
-                    CartItemId = item.CartItemId,
-                    BookId = item.BookId,
-                    BookTitle = item.Book.Title,
-                    ISBN = item.Book.ISBN,
-                    Price = item.Price,
-                    Image = item.Book.Image,
-                    Quantity = item.Quantity,
-                    OnSale = item.Book.OnSale,
-                    SalePercentage = item.Book.SalePercntage,
-                    Category = item.Book.Category,
-                    // Combine first and last name of authors
-                    Authors = item.Book.Authors.Select(a => $"{a.FirstName} {a.LastName}").ToList()
-                });
-            }
-
-            // Update cart total if it has changed
-            if (cart.CartTotal != cartTotal)
-            {
-                cart.CartTotal = cartTotal;
+                // Recalculate cart total
+                cart.CartTotal = cart.CartItems.Sum(ci => ci.Book.Price * ci.Quantity);
                 await _context.SaveChangesAsync();
+
+                // Map the cart to DTO
+                var cartDto = MapCartToDto(cart);
+                return cartDto;
             }
-
-            // Map the cart to DTO
-            var cartDto = new CartDto
+            catch (Exception ex)
             {
-                CartId = cart.CartId,
-                UserId = userId,
-                CartTotal = cartTotal,
-                Items = cartItemDtos
-            };
-
-            return cartDto;
+                _logger.LogError(ex, "Error retrieving cart for user {UserId}", userId);
+                throw new Exception($"Failed to retrieve cart: {ex.Message}", ex);
+            }
         }
 
-        public async Task<CartItemDto> AddToCartAsync(string userId, Guid bookId, int quantity = 1)
+        public async Task<CartDto> GetCartByIdAsync(Guid cartId)
         {
-            if (quantity <= 0)
+            try
             {
-                throw new ArgumentException("Quantity must be greater than zero");
-            }
+                _logger.LogInformation("Getting cart with ID {CartId}", cartId);
 
-            // Convert string userId to long
-            if (!long.TryParse(userId, out long userIdLong))
-            {
-                throw new ArgumentException("Invalid user ID format");
-            }
+                var cart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .ThenInclude(ci => ci.Book)
+                    .ThenInclude(b => b.Authors)
+                    .FirstOrDefaultAsync(c => c.CartId == cartId);
 
-            // Check if the book exists
-            var book = await _context.Books
-                .Include(b => b.Authors)
-                .FirstOrDefaultAsync(b => b.BookId == bookId);
-
-            if (book == null)
-            {
-                throw new ArgumentException($"Book with ID {bookId} not found.");
-            }
-
-            // Get or create the user's cart
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .FirstOrDefaultAsync(c => c.UserId == userIdLong);
-
-            if (cart == null)
-            {
-                cart = new Cart
+                if (cart == null)
                 {
-                    CartId = Guid.NewGuid(),
-                    UserId = userIdLong,
-                    CartTotal = 0
-                };
-                _context.Carts.Add(cart);
-                await _context.SaveChangesAsync();
-            }
-
-            // Check if the book is already in the cart
-            var existingItem = await _context.CartItems
-                .FirstOrDefaultAsync(ci => ci.CartId == cart.CartId && ci.BookId == bookId);
-
-            if (existingItem != null)
-            {
-                // Update the quantity if the book is already in the cart
-                existingItem.Quantity += quantity;
-                _context.CartItems.Update(existingItem);
+                    _logger.LogWarning("Cart with ID {CartId} not found", cartId);
+                    throw new ArgumentException($"Cart with ID {cartId} not found.");
+                }
 
                 // Recalculate cart total
-                await CalculateCartTotalAsync(userId);
+                cart.CartTotal = cart.CartItems.Sum(ci => ci.Book.Price * ci.Quantity);
+                await _context.SaveChangesAsync();
+
+                // Map the cart to DTO
+                var cartDto = MapCartToDto(cart);
+                return cartDto;
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving cart with ID {CartId}", cartId);
+                throw new Exception($"Failed to retrieve cart: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<CartItemDto> AddToCartAsync(Guid cartId, Guid bookId, int quantity)
+        {
+            try
+            {
+                _logger.LogInformation("Adding book {BookId} to cart {CartId} with quantity {Quantity}", bookId, cartId, quantity);
+
+                // Verify the cart exists
+                var cart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .FirstOrDefaultAsync(c => c.CartId == cartId);
+
+                if (cart == null)
+                {
+                    _logger.LogWarning("Cart with ID {CartId} not found", cartId);
+                    throw new ArgumentException($"Cart with ID {cartId} not found.");
+                }
+
+                // Verify the book exists
+                var book = await _context.Books
+                    .Include(b => b.Authors)
+                    .FirstOrDefaultAsync(b => b.BookId == bookId);
+
+                if (book == null)
+                {
+                    _logger.LogWarning("Book with ID {BookId} not found", bookId);
+                    throw new ArgumentException($"Book with ID {bookId} not found.");
+                }
+
+                // Check if the book is already in the cart
+                var existingItem = await _context.CartItems
+                    .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.BookId == bookId);
+
+                if (existingItem != null)
+                {
+                    // Update quantity if the book is already in the cart
+                    existingItem.Quantity += quantity;
+                    _context.CartItems.Update(existingItem);
+                    _logger.LogInformation("Updated quantity for book {BookId} in cart {CartId} to {Quantity}",
+                        bookId, cartId, existingItem.Quantity);
+                }
+                else
+                {
+                    // Add new cart item
+                    var cartItem = new CartItem
+                    {
+                        CartItemId = Guid.NewGuid(),
+                        CartId = cartId,
+                        BookId = bookId,
+                        Quantity = quantity
+                    };
+
+                    _context.CartItems.Add(cartItem);
+                    existingItem = cartItem;
+                    _logger.LogInformation("Added new cart item for book {BookId} to cart {CartId}", bookId, cartId);
+                }
+
+                // Update cart total
+                cart.CartTotal = cart.CartItems.Sum(ci => ci.Book.Price * ci.Quantity) + (book.Price * quantity);
+                _logger.LogInformation("Updated cart total to {CartTotal}", cart.CartTotal);
 
                 await _context.SaveChangesAsync();
 
-                // Return the updated item
-                return new CartItemDto
+                // Return the DTO
+                var cartItemDto = new CartItemDto
                 {
                     CartItemId = existingItem.CartItemId,
-                    BookId = existingItem.BookId,
+                    BookId = bookId,
                     BookTitle = book.Title,
                     ISBN = book.ISBN,
-                    Price = existingItem.Price,
+                    Price = book.Price,
                     Image = book.Image,
                     Quantity = existingItem.Quantity,
                     OnSale = book.OnSale,
                     SalePercentage = book.SalePercntage,
-                    Category = book.Category,
-                    // Combine first and last name of authors
                     Authors = book.Authors.Select(a => $"{a.FirstName} {a.LastName}").ToList()
                 };
+
+                return cartItemDto;
             }
-
-            // Create a new cart item
-            var cartItem = new CartItem
+            catch (ArgumentException)
             {
-                CartItemId = Guid.NewGuid(),
-                CartId = cart.CartId,
-                BookId = bookId,
-                Quantity = quantity,
-                Price = book.Price // Store current book price
-            };
-
-            _context.CartItems.Add(cartItem);
-
-            // Recalculate cart total
-            await CalculateCartTotalAsync(userId);
-
-            await _context.SaveChangesAsync();
-
-            // Return the DTO
-            var cartItemDto = new CartItemDto
+                throw;
+            }
+            catch (Exception ex)
             {
-                CartItemId = cartItem.CartItemId,
-                BookId = cartItem.BookId,
-                BookTitle = book.Title,
-                ISBN = book.ISBN,
-                Price = cartItem.Price,
-                Image = book.Image,
-                Quantity = cartItem.Quantity,
-                OnSale = book.OnSale,
-                SalePercentage = book.SalePercntage,
-                Category = book.Category,
-                // Combine first and last name of authors
-                Authors = book.Authors.Select(a => $"{a.FirstName} {a.LastName}").ToList()
-            };
-
-            return cartItemDto;
+                _logger.LogError(ex, "Error adding book {BookId} to cart {CartId}: {Message}", bookId, cartId, ex.Message);
+                throw new Exception($"Failed to add book to cart: {ex.Message}", ex);
+            }
         }
 
-        public async Task<CartItemDto> UpdateCartItemAsync(string userId, Guid cartItemId, int quantity)
+        public async Task<CartItemDto> UpdateCartItemQuantityAsync(Guid cartId, Guid bookId, int quantity)
         {
-            if (quantity <= 0)
+            try
             {
-                // If quantity is 0 or negative, remove the item
-                await RemoveFromCartAsync(userId, cartItemId);
-                return null;
-            }
+                _logger.LogInformation("Updating quantity of book {BookId} in cart {CartId} to {Quantity}",
+                    bookId, cartId, quantity);
 
-            // Convert string userId to long
-            if (!long.TryParse(userId, out long userIdLong))
-            {
-                throw new ArgumentException("Invalid user ID format");
-            }
+                // Verify the cart exists
+                var cart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .FirstOrDefaultAsync(c => c.CartId == cartId);
 
-            // Get the user's cart
-            var cart = await _context.Carts
-                .FirstOrDefaultAsync(c => c.UserId == userIdLong);
-
-            if (cart == null)
-            {
-                throw new ArgumentException("Cart not found for this user.");
-            }
-
-            // Find the cart item
-            var cartItem = await _context.CartItems
-                .Include(ci => ci.Book)
-                .ThenInclude(b => b.Authors)
-                .FirstOrDefaultAsync(ci => ci.CartItemId == cartItemId && ci.CartId == cart.CartId);
-
-            if (cartItem == null)
-            {
-                throw new ArgumentException("Cart item not found.");
-            }
-
-            // Update the quantity
-            cartItem.Quantity = quantity;
-            _context.CartItems.Update(cartItem);
-
-            // Recalculate cart total
-            await CalculateCartTotalAsync(userId);
-
-            await _context.SaveChangesAsync();
-
-            // Return the updated item
-            return new CartItemDto
-            {
-                CartItemId = cartItem.CartItemId,
-                BookId = cartItem.BookId,
-                BookTitle = cartItem.Book.Title,
-                ISBN = cartItem.Book.ISBN,
-                Price = cartItem.Price,
-                Image = cartItem.Book.Image,
-                Quantity = cartItem.Quantity,
-                OnSale = cartItem.Book.OnSale,
-                SalePercentage = cartItem.Book.SalePercntage,
-                Category = cartItem.Book.Category,
-                // Combine first and last name of authors
-                Authors = cartItem.Book.Authors.Select(a => $"{a.FirstName} {a.LastName}").ToList()
-            };
-        }
-
-        public async Task<bool> RemoveFromCartAsync(string userId, Guid cartItemId)
-        {
-            // Convert string userId to long
-            if (!long.TryParse(userId, out long userIdLong))
-            {
-                throw new ArgumentException("Invalid user ID format");
-            }
-
-            // Get the user's cart
-            var cart = await _context.Carts
-                .FirstOrDefaultAsync(c => c.UserId == userIdLong);
-
-            if (cart == null)
-            {
-                return false;
-            }
-
-            // Find the cart item
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(ci => ci.CartItemId == cartItemId && ci.CartId == cart.CartId);
-
-            if (cartItem == null)
-            {
-                return false;
-            }
-
-            // Remove the item
-            _context.CartItems.Remove(cartItem);
-
-            // Recalculate cart total
-            await CalculateCartTotalAsync(userId);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task<bool> ClearCartAsync(string userId)
-        {
-            // Convert string userId to long
-            if (!long.TryParse(userId, out long userIdLong))
-            {
-                throw new ArgumentException("Invalid user ID format");
-            }
-
-            // Get the user's cart
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .FirstOrDefaultAsync(c => c.UserId == userIdLong);
-
-            if (cart == null)
-            {
-                return false;
-            }
-
-            // Remove all items from the cart
-            _context.CartItems.RemoveRange(cart.CartItems);
-
-            // Reset the cart total
-            cart.CartTotal = 0;
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task<decimal> CalculateCartTotalAsync(string userId)
-        {
-            // Convert string userId to long
-            if (!long.TryParse(userId, out long userIdLong))
-            {
-                throw new ArgumentException("Invalid user ID format");
-            }
-
-            // Get the user's cart with items
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Book)
-                .FirstOrDefaultAsync(c => c.UserId == userIdLong);
-
-            if (cart == null)
-            {
-                return 0;
-            }
-
-            // Calculate the total
-            decimal total = 0;
-            foreach (var item in cart.CartItems)
-            {
-                decimal itemPrice = item.Price;
-
-                // Apply discount if the book is on sale
-                if (item.Book.OnSale && item.Book.SalePercntage > 0)
+                if (cart == null)
                 {
-                    decimal discountAmount = (item.Price * item.Book.SalePercntage) / 100;
-                    itemPrice = item.Price - discountAmount;
+                    _logger.LogWarning("Cart with ID {CartId} not found", cartId);
+                    throw new ArgumentException($"Cart with ID {cartId} not found.");
                 }
 
-                total += itemPrice * item.Quantity;
+                // Verify the book exists
+                var book = await _context.Books
+                    .Include(b => b.Authors)
+                    .FirstOrDefaultAsync(b => b.BookId == bookId);
+
+                if (book == null)
+                {
+                    _logger.LogWarning("Book with ID {BookId} not found", bookId);
+                    throw new ArgumentException($"Book with ID {bookId} not found.");
+                }
+
+                // Find the cart item
+                var cartItem = await _context.CartItems
+                    .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.BookId == bookId);
+
+                if (cartItem == null)
+                {
+                    _logger.LogWarning("Book {BookId} not found in cart {CartId}", bookId, cartId);
+                    throw new ArgumentException($"Book with ID {bookId} not found in cart.");
+                }
+
+                // Update quantity
+                cartItem.Quantity = quantity;
+                _context.CartItems.Update(cartItem);
+
+                // Recalculate cart total
+                cart.CartTotal = cart.CartItems.Sum(ci => ci.Book.Price * ci.Quantity);
+                _logger.LogInformation("Updated cart total to {CartTotal}", cart.CartTotal);
+
+                await _context.SaveChangesAsync();
+
+                // Return the DTO
+                var cartItemDto = new CartItemDto
+                {
+                    CartItemId = cartItem.CartItemId,
+                    BookId = bookId,
+                    BookTitle = book.Title,
+                    ISBN = book.ISBN,
+                    Price = book.Price,
+                    Image = book.Image,
+                    Quantity = quantity,
+                    OnSale = book.OnSale,
+                    SalePercentage = book.SalePercntage,
+                    Authors = book.Authors.Select(a => $"{a.FirstName} {a.LastName}").ToList()
+                };
+
+                return cartItemDto;
             }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating cart item: {Message}", ex.Message);
+                throw new Exception($"Failed to update cart item: {ex.Message}", ex);
+            }
+        }
 
-            // Update the cart total
-            cart.CartTotal = total;
-            await _context.SaveChangesAsync();
+        public async Task<bool> RemoveFromCartAsync(Guid cartId, Guid bookId)
+        {
+            try
+            {
+                _logger.LogInformation("Removing book {BookId} from cart {CartId}", bookId, cartId);
 
-            return total;
+                // Verify the cart exists
+                var cart = await _context.Carts
+                    .Include(c => c.CartItems)
+                    .ThenInclude(ci => ci.Book)
+                    .FirstOrDefaultAsync(c => c.CartId == cartId);
+
+                if (cart == null)
+                {
+                    _logger.LogWarning("Cart with ID {CartId} not found", cartId);
+                    return false;
+                }
+
+                // Find the cart item
+                var cartItem = await _context.CartItems
+                    .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.BookId == bookId);
+
+                if (cartItem == null)
+                {
+                    _logger.LogWarning("Book {BookId} not found in cart {CartId}", bookId, cartId);
+                    return false;
+                }
+
+                // Remove the item
+                _context.CartItems.Remove(cartItem);
+
+                // Recalculate cart total
+                cart.CartTotal = cart.CartItems
+                    .Where(ci => ci.BookId != bookId)
+                    .Sum(ci => ci.Book.Price * ci.Quantity);
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Successfully removed book {BookId} from cart {CartId}", bookId, cartId);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing book {BookId} from cart {CartId}: {Message}",
+                    bookId, cartId, ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> ClearCartAsync(Guid cartId)
+        {
+            try
+            {
+                _logger.LogInformation("Clearing cart {CartId}", cartId);
+
+                // Verify the cart exists
+                var cart = await _context.Carts
+                    .FirstOrDefaultAsync(c => c.CartId == cartId);
+
+                if (cart == null)
+                {
+                    _logger.LogWarning("Cart with ID {CartId} not found", cartId);
+                    return false;
+                }
+
+                // Get all cart items
+                var cartItems = await _context.CartItems
+                    .Where(ci => ci.CartId == cartId)
+                    .ToListAsync();
+
+                // Remove all items
+                _context.CartItems.RemoveRange(cartItems);
+
+                // Reset cart total
+                cart.CartTotal = 0;
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Successfully cleared cart {CartId}", cartId);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error clearing cart {CartId}: {Message}", cartId, ex.Message);
+                return false;
+            }
+        }
+
+        // Helper method to map Cart to CartDto
+        private CartDto MapCartToDto(Cart cart)
+        {
+            var cartDto = new CartDto
+            {
+                CartId = cart.CartId,
+                UserId = cart.UserId,
+                CartTotal = cart.CartTotal,
+                Items = cart.CartItems.Select(ci => new CartItemDto
+                {
+                    CartItemId = ci.CartItemId,
+                    BookId = ci.BookId,
+                    BookTitle = ci.Book.Title,
+                    ISBN = ci.Book.ISBN,
+                    Price = ci.Book.Price,
+                    Image = ci.Book.Image,
+                    Quantity = ci.Quantity,
+                    OnSale = ci.Book.OnSale,
+                    SalePercentage = ci.Book.SalePercntage,
+                    Authors = ci.Book.Authors.Select(a => $"{a.FirstName} {a.LastName}").ToList()
+                }).ToList()
+            };
+
+            return cartDto;
         }
     }
 }
