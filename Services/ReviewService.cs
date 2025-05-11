@@ -14,7 +14,7 @@ namespace BookBagaicha.Services
         private readonly ILogger<OrderService> _logger;
 
 
-        public ReviewService(AppDbContext dbContext, , ILogger<OrderService> logger)
+        public ReviewService(AppDbContext dbContext, ILogger<OrderService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
