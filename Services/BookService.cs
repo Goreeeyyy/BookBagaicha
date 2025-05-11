@@ -165,6 +165,7 @@ namespace BookBagaicha.Services
                 .Include(b => b.Authors)
                 .Include(b => b.Genres)
                 .Include(b => b.Reviews)
+                .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(b => b.BookId == id);
         }
 

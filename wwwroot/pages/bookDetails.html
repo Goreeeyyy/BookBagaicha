@@ -149,15 +149,32 @@
         document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             const bookId = urlParams.get('id');
+            const reviewsContainer = document.querySelector('.ratings-section');
+
+            function displayStarRating(rating) {
+                const maxRating = 5;
+                const fullStarClass = 'fas fa-star text-warning';
+                const emptyStarClass = 'far fa-star text-warning';
+                let stars = '';
+                const roundedRating = Math.round(rating);
+
+                for (let i = 1; i <= maxRating; i++) {
+                    if (i <= roundedRating) {
+                        stars += `<i class="${fullStarClass}"></i>`;
+                    } else {
+                        stars += `<i class="${emptyStarClass}"></i>`;
+                    }
+                }
+                return stars;
+            }
 
             if (bookId) {
-                const apiUrl = `/api/getBooksByID/${bookId}`; // Your API endpoint
+                const apiUrl = `/api/getBooksByID/${bookId}`;
 
                 fetch(apiUrl, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-                        // Add other headers if needed, e.g., Authorization
                     }
                 })
                     .then(response => {
@@ -168,6 +185,7 @@
                     })
                     .then(bookDetails => {
                         if (bookDetails) {
+                            // Update book details on the page (your existing code for this)
                             const bookImage = document.getElementById('book-image');
                             const bookTitle = document.getElementById('book-title');
                             const bookFormat = document.getElementById('book-format');
@@ -178,40 +196,70 @@
                             const publisherValue = document.getElementById('publisher-value');
                             const editorValue = document.getElementById('editor-value');
                             const summaryItem = document.getElementById('summary-item');
-                            const reviewCount = document.getElementById('review-count'); // Assuming you might want to add this later
+                            const reviewCountElement = document.getElementById('review-count');
 
                             if (bookImage) bookImage.src = `/${bookDetails.image}`;
                             if (bookImage) bookImage.alt = bookDetails.title;
                             if (bookTitle) bookTitle.textContent = bookDetails.title;
                             if (bookFormat) bookFormat.textContent = bookDetails.format;
                             if (bookPrice) bookPrice.textContent = `Rs. ${bookDetails.price}/-`;
+                            if (genreValue) genreValue.textContent = bookDetails.genres && Array.isArray(bookDetails.genres) && bookDetails.genres[0] ? bookDetails.genres[0].name : 'N/A';
+                            if (authorValue) authorValue.textContent = bookDetails.authors && Array.isArray(bookDetails.authors) ? bookDetails.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ') : 'N/A';
+                            if (releaseDateValue) releaseDateValue.textContent = new Date(bookDetails.publicationDate).toLocaleDateString();
+                            if (publisherValue) publisherValue.textContent = bookDetails.publisher ? bookDetails.publisher.publisherName : 'N/A';
+                            if (editorValue) editorValue.textContent = bookDetails.editor || 'N/A';
+                            if (summaryItem && bookDetails.summary) summaryItem.textContent = bookDetails.summary;
+                            if (reviewCountElement) reviewCountElement.textContent = `${bookDetails.reviews ? bookDetails.reviews.length : 0} reviews`;
 
-                            if (genreValue) {
-                                genreValue.textContent = bookDetails.genres && Array.isArray(bookDetails.genres) && bookDetails.genres[0] ? bookDetails.genres[0].name : 'N/A';
+                            // Dynamically display reviews
+                            if (bookDetails.reviews && bookDetails.reviews.length > 0) {
+                                // Clear any existing review content
+                                reviewsContainer.innerHTML = '<h4 class="mb-4 pb-2 border-bottom">RATINGS & REVIEWS (' + bookDetails.reviews.length + ')</h4>';
+
+                                bookDetails.reviews.forEach(review => {
+                                    const reviewCard = document.createElement('div');
+                                    reviewCard.classList.add('card', 'mb-4', 'border-1', 'shadow-sm', 'highlight-review', 'bg-light');
+
+                                    const cardBody = document.createElement('div');
+                                    cardBody.classList.add('card-body');
+
+                                    const headerDiv = document.createElement('div');
+                                    headerDiv.classList.add('d-flex', 'justify-content-between', 'mb-3');
+
+                                    const userDiv = document.createElement('div');
+                                    const userNameHeading = document.createElement('h6');
+                                    userNameHeading.classList.add('mb-0');
+                                    userNameHeading.textContent = review.user ? review.user.userName : 'Anonymous User';
+                                    const reviewDateSmall = document.createElement('small');
+                                    reviewDateSmall.classList.add('text-muted');
+                                    reviewDateSmall.textContent = new Date(review.reviewDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+                                    userDiv.appendChild(userNameHeading);
+                                    userDiv.appendChild(reviewDateSmall);
+
+                                    const ratingDiv = document.createElement('div');
+                                    ratingDiv.classList.add('star-rating', 'text-warning');
+                                    ratingDiv.innerHTML = displayStarRating(review.ratings);
+
+                                    headerDiv.appendChild(userDiv);
+                                    headerDiv.appendChild(ratingDiv);
+
+                                    const commentParagraph = document.createElement('p');
+                                    commentParagraph.classList.add('mb-0', 'review-text');
+                                    commentParagraph.textContent = review.comments || 'No comment provided.';
+
+                                    cardBody.appendChild(headerDiv);
+                                    cardBody.appendChild(commentParagraph);
+                                    reviewCard.appendChild(cardBody);
+                                    reviewsContainer.appendChild(reviewCard);
+                                });
+                            } else {
+                                // Display a message if there are no reviews
+                                const noReviewsMessage = document.createElement('p');
+                                noReviewsMessage.textContent = 'No reviews yet for this book.';
+                                reviewsContainer.appendChild(noReviewsMessage);
                             }
 
-                            if (authorValue) {
-                                authorValue.textContent = bookDetails.authors && Array.isArray(bookDetails.authors)
-                                    ? bookDetails.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ')
-                                    : 'N/A';
-                            }
-
-                            if (releaseDateValue) {
-                                releaseDateValue.textContent = new Date(bookDetails.publicationDate).toLocaleDateString();
-                            }
-
-                            if (publisherValue) {
-                                publisherValue.textContent = bookDetails.publisher ? bookDetails.publisher.publisherName : 'N/A';
-                            }
-
-                            if (editorValue) {
-                                editorValue.textContent = bookDetails.editor || 'N/A'; // Still 'N/A' as per current API response structure
-                            }
-
-                            if (summaryItem && bookDetails.summary) {
-                                summaryItem.textContent = bookDetails.summary;
-                            }
-                            // You can add logic to update reviewCount here if your API provides it
                         } else {
                             const detailsContainer = document.querySelector('.container.my-5');
                             if (detailsContainer) detailsContainer.innerHTML = '<p class="alert alert-danger">Book not found.</p>';
