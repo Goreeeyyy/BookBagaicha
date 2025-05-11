@@ -186,6 +186,7 @@
 
             // Initialize modal
             const orderDetailsModal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            const addReviewModal = new bootstrap.Modal(document.getElementById('addReviewModal'));
 
             // Load orders
             loadOrders();
@@ -516,11 +517,16 @@
 
                         orderItemsContainer.append(itemElement);
                         itemElement.find('.add-review-btn').on('click', function () {
-                            console.log('Button clicked!');
+                            console.log('Add Review button clicked!');
                             const bookId = $(this).data('book-id');
                             const orderItemId = $(this).data('order-item-id');
-                            console.log(`Add review clicked for Book ID: ${bookId}, Order Item ID: ${orderItemId}`);
-                            showToastMessage(`Feature to add review for Book ID ${bookId} is under development.`, 'info');
+
+                            // Store bookId and orderItemId in hidden input fields of the modal
+                            $('#reviewBookId').val(bookId);
+                            $('#reviewOrderItemId').val(orderItemId);
+
+                            // Open the add review modal
+                            addReviewModal.show();
                         });
                     });
 
@@ -545,6 +551,48 @@
                     $('#cancelOrderBtn').hide();
                 }
             }
+            $('#submitReviewBtn').on('click', async function () {
+                const bookId = $('#reviewBookId').val();
+                const orderItemId = $('#reviewOrderItemId').val();
+                const rating = $('#rating').val();
+                const comment = $('#comment').val();
+
+                const reviewData = {
+                    bookId: bookId,
+                    ratings: parseInt(rating),
+                    comments: comment
+                };
+
+                try {
+                    const response = await fetch('/api/Review/addReview', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify(reviewData)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Review submitted successfully:", data);
+                        showToastMessage("Review submitted successfully!", "success");
+                        addReviewModal.hide();
+                    } else if (response.status === 409) {
+                        const errorData = await response.json();
+                        console.warn("Review submission conflict:", errorData);
+                        showToastMessage(errorData?.message || "You have already reviewed this book.", "warning");
+                        addReviewModal.hide();
+                    } else {
+                        const errorData = await response.json();
+                        console.error("Error submitting review:", errorData);
+                        showToastMessage(`Failed to submit review: ${errorData?.message || response.statusText}`, "error");
+                    }
+                } catch (error) {
+                    console.error("Error submitting review:", error);
+                    showToastMessage("Failed to submit review. Please try again later.", "error");
+                }
+            });
 
             // Function to show error dialog
             function showErrorDialog(title, message) {

@@ -443,6 +443,34 @@
         // This script loads books and handles the logout functionality
         $(document).ready(function () {
             const apiUrl = '/api/allBooks';
+            function displayStarRating(averageRating) {
+                const maxRating = 5;
+                const fullStarClass = 'fas fa-star text-warning';
+                const emptyStarClass = 'far fa-star text-warning';
+                let stars = '';
+
+                const roundedRating = Math.round(averageRating); // Round to the nearest whole number for filled stars
+
+                for (let i = 1; i <= maxRating; i++) {
+                    if (i <= roundedRating) {
+                        stars += `<i class="${fullStarClass}"></i>`;
+                    } else {
+                        stars += `<i class="${emptyStarClass}"></i>`;
+                    }
+                }
+                return stars;
+            }
+
+            // Function to calculate the average rating for a book
+            function calculateAverageRating(reviews) {
+                if (!reviews || reviews.length === 0) {
+                    return displayStarRating(0) + '( 0.0)';
+                }
+                const totalRating = reviews.reduce((sum, review) => sum + review.ratings, 0);
+                const average = totalRating / reviews.length;
+                return displayStarRating(average) + ` (${average.toFixed(1)})`;
+            }
+
 
             // Load books
             $.ajax({
@@ -454,7 +482,10 @@
                         const bookListContainer = $('#bookList');
                         bookListContainer.empty();
 
+
                         response.forEach(book => {
+                            const averageRatingDisplay = calculateAverageRating(book.reviews);
+
                             const bookCard = `
                                 <div class="col">
                                     <div class="card h-100 text-center p-2 position-relative">
@@ -464,6 +495,9 @@
                                             <h6 class="card-title mb-1">${book.title}</h6>
                                             <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => author.firstName + ' ' + author.lastName).join(', ') : 'No Author'}</p>
                                             <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
+                                            <div class="mb-2">
+                                        <span class="small">${averageRatingDisplay}</span>
+                                    </div>
                                             <div class="d-flex justify-content-center gap-2">
                                                 <button class="btn btn-sm btn-outline-primary add-to-cart-btn" data-book-id="${book.bookId}">Add to Cart</button>
                                                 <button class="btn btn-sm btn-outline-secondary add-to-wishlist-btn" data-book-id="${book.bookId}">

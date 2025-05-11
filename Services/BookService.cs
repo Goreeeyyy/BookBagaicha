@@ -163,7 +163,8 @@ namespace BookBagaicha.Services
             return await _context.Books
                 .Include(b => b.Publisher)
                 .Include(b => b.Authors)
-                .Include(b => b.Genres) // Include Genres
+                .Include(b => b.Genres)
+                .Include(b => b.Reviews)
                 .FirstOrDefaultAsync(b => b.BookId == id);
         }
 
@@ -173,6 +174,7 @@ namespace BookBagaicha.Services
             .Include(b => b.Publisher)
             .Include(b => b.Authors)
             .Include(b => b.Genres)
+            .Include(b => b.Reviews)
             .ToListAsync(); // Include Genres
         }
 
