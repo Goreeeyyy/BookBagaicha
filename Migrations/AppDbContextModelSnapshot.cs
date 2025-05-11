@@ -670,6 +670,36 @@ namespace BookBagaicha.Migrations
                     b.Navigation("Cart");
                 });
 
+            modelBuilder.Entity("BookBagaicha.Models.Order", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.OrderItem", b =>
+                {
+                    b.HasOne("BookBagaicha.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BookBagaicha.Models.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("BookBagaicha.Models.Review", b =>
                 {
                     b.HasOne("BookBagaicha.Models.Book", "Book")

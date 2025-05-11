@@ -104,6 +104,7 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddAuthorization();
 
