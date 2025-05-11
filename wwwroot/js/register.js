@@ -11,7 +11,11 @@
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
 
         if (password !== confirmPassword) {
             errorMessageDiv.textContent = "Passwords do not match.";
@@ -26,8 +30,12 @@
             password: password,
             confirmPassword: confirmPassword,
             address: "Default Address", // You might want to add an address field in the form
+<<<<<<< HEAD
             role: "User"
         };
+=======
+            role:"User"        };
+>>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
 
         try {
             const response = await fetch('https://localhost:44351/api/Auth/register', {
@@ -55,7 +63,11 @@
                 // Redirect to login page after a delay
                 setTimeout(() => {
                     window.location.href = 'login.html';
+<<<<<<< HEAD
                 }, 3500);
+=======
+                }, 3500); 
+>>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
             } else {
                 Toastify({
                     text: data.error || (data.errors && data.errors[0]?.description) || "Registration failed.",
@@ -67,7 +79,11 @@
                         background: "#dc3545", // Red color for error
                     }
                 }).showToast();
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
                 console.error('Registration failed:', data);
             }
         } catch (error) {
@@ -84,4 +100,8 @@
             console.error('Fetch error:', error);
         }
     });
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 8038316159458e3cb8f7572d15de896b075839a8

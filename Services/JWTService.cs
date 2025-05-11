@@ -3,6 +3,8 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using BookBagaicha.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace BookBagaicha.Services
 {
@@ -10,44 +12,49 @@ namespace BookBagaicha.Services
     {
 
         private readonly JWTTokenInfo jwtTokenInfo;
+        private readonly UserManager<User> _userManager; // ADDED
 
-        public JWTService(IOptions<JWTTokenInfo> jwtTokenInfo)
+        
+        public JWTService(IOptions<JWTTokenInfo> jwtTokenInfo, UserManager<User> userManager)
         {
             this.jwtTokenInfo = jwtTokenInfo.Value;
+            _userManager = userManager; // ADDED
         }
 
-
-        public string GenerateToken()
-
+        
+        public string GenerateToken(User user)
         {
             string key = jwtTokenInfo.Key;
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-
-            // signing credentials object needs security key and an algorithm
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            // ADD CLAIMS - USER ID AND EMAIL
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email!)
+            };
 
+            // ADD USER ROLES AS CLAIMS
+            var roles = _userManager.GetRolesAsync(user).Result;
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
-            // this is the object which stores token values. 
-            var tokenObj = new JwtSecurityToken(
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims), // Set the claims here
+                Expires = DateTime.UtcNow.AddMinutes(jwtTokenInfo.ExpiresInMinutes),
+                Issuer = jwtTokenInfo.Issuer,
+                Audience = jwtTokenInfo.Audience,
+                SigningCredentials = signingCredentials
+            };
 
-                issuer: jwtTokenInfo.Audience,
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor); // Create token from the descriptor
 
-                audience: jwtTokenInfo.Issuer,
-
-                expires: DateTime.UtcNow.AddMinutes(jwtTokenInfo.ExpiresInMinutes),
-
-                // we need to pass object of signing credentials 
-                signingCredentials: signingCredentials
-
-                );
-
-
-            //Token Generation 
-            var token = new JwtSecurityTokenHandler().WriteToken(tokenObj);
-
-            return token;
-
+            return tokenHandler.WriteToken(token);
         }
     }
 }

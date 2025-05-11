@@ -23,5 +23,6 @@ namespace BookBagaicha.Models.Dto
 
         [Compare(nameof(Password), ErrorMessage = "Comfirm Password doesn't match Password")]
         public string? ConfirmPassword { get; set; }
+        public string? Role { get; set; }
     }
 }

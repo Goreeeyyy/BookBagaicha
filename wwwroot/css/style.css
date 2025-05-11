@@ -1,0 +1,167 @@
+﻿/* ==============================
+   CSS Variables & Base Styles
+   ============================== */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --text-dark: #2c3e50;
+    --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', sans-serif;
+    line-height: 1.6;
+}
+
+/* ==============================
+   Component-Specific Styles
+   ============================== */
+/* Navigation */
+.navbar {
+    padding: 0.5rem 1rem;
+    box-shadow: var(--shadow-light);
+    z-index: 1020;
+}
+
+/* Image Styling */
+.fixed-size-img {
+    height: 280px;
+    width: 100%;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+/* Card System */
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-dark);
+}
+
+/* Buttons & Interactions */
+.btn {
+    transition: var(--transition-base);
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-outline-primary:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5);
+    }
+
+/* Profile Page Components */
+.profile-sidebar {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.profile-details .form-control {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    transition: var(--transition-base);
+}
+
+    .profile-details .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: none;
+    }
+
+/* Carousel System */
+.carousel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.carousel-btn {
+    background-color: #fff;
+    border: none;
+    box-shadow: var(--shadow-light);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+}
+
+/* ==============================
+   Utility Classes
+   ============================== */
+.text-primary {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.text-muted s {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+/* ==============================
+   Responsive Design
+   ============================== */
+@media (max-width: 992px) {
+    .fixed-size-img {
+        height: 200px;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-sidebar {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+
+    .subscribe-section input,
+    .subscribe-section button {
+        border-radius: 6px;
+        margin: 5px 0;
+    }
+
+    .fixed-size-img {
+        height: 160px;
+    }
+}
+
+/* ==============================
+   Temporary Development Helpers
+   ============================== */
+/* Remove before production */
+.dev-outline * {
+    outline: 1px solid red;
+}

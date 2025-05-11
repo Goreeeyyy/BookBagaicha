@@ -14,15 +14,19 @@ namespace BookBagaicha.Controllers
 
         private readonly SignInManager<User> _signInManager;
 
+        private readonly RoleManager<IdentityRole<long>> _roleManager;
+
         private readonly JWTService _jwtService;
 
-        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, JWTService jwtService)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, JWTService jwtService, RoleManager<IdentityRole<long>> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtService = jwtService;
-        }
+            _roleManager = roleManager;
 
+
+        }
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser(UserRegisterDto userdto)
@@ -40,15 +44,30 @@ namespace BookBagaicha.Controllers
 
             if (result.Succeeded)
             {
-                var roleResult = await _userManager.AddToRoleAsync(user, "User");
+                string roleToAssign = string.IsNullOrEmpty(userdto.Role) ? "User" : userdto.Role;
+
+                var roleExists = await _roleManager.RoleExistsAsync(roleToAssign);
+                if (!roleExists)
+                {
+                    return BadRequest(new { Error = $"Role '{roleToAssign}' does not exist." });
+                }
+                if ((roleToAssign.ToLower() == "staff" || roleToAssign.ToLower() == "admin") && !User.IsInRole("Admin"))
+                {
+                    return Unauthorized(new { Error = "Only administrators can register new staff or admin users." });
+                }
+
+
+
+                var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
 
                 if (!roleResult.Succeeded)
                 {
                     return BadRequest(roleResult.Errors);
                 }
 
-                return Ok("Successful Registration with assigned roles");
+                return Ok(new { Message = "Successful Registration with assigned roles", Role = roleToAssign });
             }
+
 
             return BadRequest(result.Errors);
         }
@@ -65,15 +84,18 @@ namespace BookBagaicha.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(
+                // Get the user's roles
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault(); // Assuming a user has one primary role
 
+                return Ok(
                     new
                     {
                         Message = "Login Success",
-                        Token = _jwtService.GenerateToken()
+                        Token = _jwtService.GenerateToken(user), // Pass user to generate token with claims
+                        Role = role // Include the user's role in the response
                     }
-
-                    );
+                );
             }
 
             return Unauthorized("Password is not valid");

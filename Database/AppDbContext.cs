@@ -1,4 +1,5 @@
-﻿using BookBagaicha.Models;
+﻿
+using BookBagaicha.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -44,9 +45,146 @@ namespace BookBagaicha.Database
 
 
                 );
+            builder.Entity<Book>()
+      .HasMany(b => b.Authors)
+      .WithMany(a => a.Books)
+      .UsingEntity(j => j.ToTable("BookAuthors"));
+
+
+            builder.Entity<Book>()
+             .HasOne(b => b.Publisher)
+             .WithMany(p => p.Books)
+             .HasForeignKey(b => b.PublisherId);
+
+
+           // WishlistItem relationships
+    builder.Entity<WishlistItem>()
+        .HasKey(wi => wi.WishlistItemId);
+        
+    builder.Entity<WishlistItem>()
+        .HasOne(wi => wi.Wishlist)
+        .WithMany(w => w.WishlistItems)
+        .HasForeignKey(wi => wi.WishlistId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    builder.Entity<WishlistItem>()
+        .HasOne(wi => wi.Book)
+        .WithMany()
+        .HasForeignKey(wi => wi.BookId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    // Wishlist relationships
+    builder.Entity<Wishlist>()
+        .HasKey(w => w.WishlistId);
+        
+    builder.Entity<Wishlist>()
+        .HasOne(w => w.User)
+        .WithMany()
+        .HasForeignKey(w => w.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+            // Cart relationships
+            builder.Entity<Cart>()
+                .HasKey(c => c.CartId);
+
+            // Configure one-to-one relationship between User and Cart
+            builder.Entity<Cart>()
+                .HasOne(c => c.User)
+                .WithOne()
+                .HasForeignKey<Cart>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // CartItem relationships
+            builder.Entity<CartItem>()
+                .HasKey(ci => ci.CartItemId);
+
+            // Ensure a book can only appear once in a cart
+            builder.Entity<CartItem>()
+                .HasIndex(ci => new { ci.CartId, ci.BookId })
+                .IsUnique();
+
+            // Configure one-to-many relationship between Cart and CartItems
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.Cart)
+                .WithMany(c => c.CartItems)
+                .HasForeignKey(ci => ci.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationship between CartItem and Book
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.Book)
+                .WithMany()
+                .HasForeignKey(ci => ci.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Order relationships
+            builder.Entity<Order>()
+                .HasKey(o => o.OrderId);
+
+            builder.Entity<Order>()
+                .HasOne(o => o.User)
+                .WithMany()
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // Use Restrict instead of Cascade to prevent accidental deletion
+
+            // OrderItem relationships
+            builder.Entity<OrderItem>()
+                .HasKey(oi => oi.OrderItemId);
+
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Order)
+                .WithMany(o => o.OrderItems)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Book)
+                .WithMany()
+                .HasForeignKey(oi => oi.BookId)
+                .OnDelete(DeleteBehavior.Restrict); // Use Restrict to prevent deletion of books that have been ordered
+
+            // Configure announcement entity
+            builder.Entity<Announcement>(entity =>
+            {
+                entity.ToTable("Announcements");
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.Id).ValueGeneratedOnAdd();
+                entity.Property(a => a.Title).IsRequired().HasMaxLength(200);
+                entity.Property(a => a.Message).IsRequired().HasMaxLength(1000);
+                entity.Property(a => a.StartDateTime)
+                    .HasColumnType("timestamp with time zone")
+                    .HasConversion(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                entity.Property(a => a.EndDateTime)
+                    .HasColumnType("timestamp with time zone")
+                    .HasConversion(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                entity.Property(a => a.IsActive).HasDefaultValue(true);
+            });
         }
 
+<<<<<<< HEAD
         // Write DB sets here
+=======
+
+        public DbSet<Book> Books { get; set; }
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Genre> Genres { get; set; }
+        public DbSet<Publisher> Publishers { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<WishlistItem> WishlistItems { get; set; }
+         public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<Announcement> Announcements { get; set; }
+
+>>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
 
     }
 }
