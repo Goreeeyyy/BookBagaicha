@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
+#nullable disable
 
 namespace BookBagaicha.Migrations
 {
@@ -14,6 +15,7 @@ namespace BookBagaicha.Migrations
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
+#pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
@@ -433,8 +435,7 @@ namespace BookBagaicha.Migrations
                     b.Property<Guid>("WishlistId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("WishlistItemId" +
-                        "");
+                    b.HasKey("WishlistItemId");
 
                     b.HasIndex("BookId");
 
@@ -833,7 +834,7 @@ namespace BookBagaicha.Migrations
                 {
                     b.Navigation("WishlistItems");
                 });
-
+#pragma warning restore 612, 618
         }
     }
 }
