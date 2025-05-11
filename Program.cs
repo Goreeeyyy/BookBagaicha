@@ -35,6 +35,8 @@ builder.Services.AddIdentity<User, IdentityRole<long>>()
 // getting jwttokeninfo object from appsettings
 var jwtTokeInfo = builder.Configuration.GetSection("jwt").Get<JWTTokenInfo>();
 
+
+
 // JWT Registration
 builder.Services.AddAuthentication(
 
@@ -90,6 +92,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Enable static file serving
+app.UseStaticFiles();
 
 app.MapControllers();
 

@@ -46,5 +46,7 @@ namespace BookBagaicha.Database
                 );
         }
 
+        // Write DB sets here
+
     }
 }
