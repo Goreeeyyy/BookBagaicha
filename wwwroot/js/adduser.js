@@ -28,19 +28,49 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchStaffUsers();
 });
 function fetchStaffUsers() {
-    fetch('/api/User/add') // Correct API endpoint
+    const token = localStorage.getItem('authToken');
+    fetch('/api/User/add', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
         .then(response => {
+            console.log('[STAFF] API response status:', response.status);
             if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'login.html';
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(staffUsersResponse => {
+            console.log('[STAFF] API response data:', staffUsersResponse);
+            loadingSpinner.style.display = "none";
+            errorMessage.style.display = "none";
+
+            // Handle response as a direct array or $values
+            const staffUsersArray = Array.isArray(staffUsersResponse)
+                ? staffUsersResponse
+                : (staffUsersResponse.$values && Array.isArray(staffUsersResponse.$values)
+                    ? staffUsersResponse.$values
+                    : []);
+            console.log('[STAFF] Processed users array:', staffUsersArray);
+
             // Clear the existing table rows
             staffTableBody.innerHTML = '';
 
-            // Access the array of staff users from the $values property
-            const staffUsersArray = staffUsersResponse.$values;
+            if (staffUsersArray.length === 0) {
+                staffTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center">No staff users found.</td>
+                    </tr>
+                `;
+                return;
+            }
 
             // Populate the table with the fetched data
             staffUsersArray.forEach(user => {
@@ -58,23 +88,24 @@ function fetchStaffUsers() {
                 editButton.classList.add('edit-Btn');
                 editButton.innerHTML = editSVG;
                 editButton.addEventListener('click', function () {
-                    handleEdit(this.closest('tr'), user); // Pass the user data for editing
+                    handleEdit(this.closest('tr'), user);
                 });
                 actionsCell.appendChild(editButton);
 
                 const deleteButton = document.createElement('button');
                 deleteButton.innerHTML = deleteSVG;
                 deleteButton.addEventListener('click', function () {
-                    handleDelete(user.id); // Implement your delete functionality
+                    handleDelete(user.id);
                 });
                 actionsCell.appendChild(deleteButton);
             });
         })
         .catch(error => {
-            console.error('Error fetching staff users:', error);
-            alert('Failed to load staff users.');
+            console.error('[STAFF] Error fetching staff users:', error);
+            loadingSpinner.style.display = "none";
+            errorMessage.style.display = "block";
+            errorMessage.textContent = `Failed to load staff users: ${error.message}`;
         });
-
 }
 function toggleEditMode(row, enable) {
     const editBtn = row.querySelector(".edit-Btn");
