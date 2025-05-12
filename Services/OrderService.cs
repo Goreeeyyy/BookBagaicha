@@ -120,7 +120,7 @@ namespace BookBagaicha.Services
             }
         }
 
-        public async Task<OrderDto> PlaceOrderAsync(long userId, PlaceOrderRequest request, string claimCode)
+        public async Task<OrderDto> PlaceOrderAsync(long userId, PlaceOrderRequest request)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace BookBagaicha.Services
                     OrderDate = DateTime.UtcNow,
                     Status = "Confirmed",
                     TotalPrice = cart.CartTotal,
-                    ClaimCode = claimCode,
+                    ClaimCode = "ORDER-" + Guid.NewGuid().ToString().Substring(0, 8),
                     AppliedDiscount = request.AppliedDiscount ?? 0,
                     ConfirmationEmailSent = false,
                     OrderItems = new List<OrderItem>()

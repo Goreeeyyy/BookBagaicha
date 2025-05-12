@@ -57,31 +57,31 @@ namespace BookBagaicha.Database
              .HasForeignKey(b => b.PublisherId);
 
 
-            // WishlistItem relationships
-            builder.Entity<WishlistItem>()
-                .HasKey(wi => wi.WishlistItemId);
+           // WishlistItem relationships
+    builder.Entity<WishlistItem>()
+        .HasKey(wi => wi.WishlistItemId);
+        
+    builder.Entity<WishlistItem>()
+        .HasOne(wi => wi.Wishlist)
+        .WithMany(w => w.WishlistItems)
+        .HasForeignKey(wi => wi.WishlistId)
+        .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<WishlistItem>()
-                .HasOne(wi => wi.Wishlist)
-                .WithMany(w => w.WishlistItems)
-                .HasForeignKey(wi => wi.WishlistId)
-                .OnDelete(DeleteBehavior.Cascade);
+    builder.Entity<WishlistItem>()
+        .HasOne(wi => wi.Book)
+        .WithMany()
+        .HasForeignKey(wi => wi.BookId)
+        .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<WishlistItem>()
-                .HasOne(wi => wi.Book)
-                .WithMany()
-                .HasForeignKey(wi => wi.BookId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Wishlist relationships
-            builder.Entity<Wishlist>()
-                .HasKey(w => w.WishlistId);
-
-            builder.Entity<Wishlist>()
-                .HasOne(w => w.User)
-                .WithMany()
-                .HasForeignKey(w => w.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+    // Wishlist relationships
+    builder.Entity<Wishlist>()
+        .HasKey(w => w.WishlistId);
+        
+    builder.Entity<Wishlist>()
+        .HasOne(w => w.User)
+        .WithMany()
+        .HasForeignKey(w => w.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
 
             // Cart relationships
             builder.Entity<Cart>()
@@ -165,6 +165,9 @@ namespace BookBagaicha.Database
             });
         }
 
+<<<<<<< HEAD
+        // Write DB sets here
+=======
 
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
@@ -173,7 +176,7 @@ namespace BookBagaicha.Database
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
-        public DbSet<Cart> Carts { get; set; }
+         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
 
         public DbSet<Order> Orders { get; set; }
@@ -181,6 +184,7 @@ namespace BookBagaicha.Database
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
 
+>>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
 
     }
 }
