@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-          crossorigin="anonymous" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&display=swap"
-          rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../css/adminNav.css" />
     <title>Add book</title>
   </head>
@@ -360,19 +364,19 @@
               }
           }
 
-        // Attach edit button listeners
-        function attachEditListeners() {
-            let currentlyEditingRow = null;
+          // Attach edit button listeners
+          function attachEditListeners() {
+              let currentlyEditingRow = null;
 
-            document.querySelectorAll(".edit-Btn").forEach((editBtn) => {
-                editBtn.addEventListener("click", function () {
-                    const row = this.closest("tr");
+              document.querySelectorAll(".edit-Btn").forEach((editBtn) => {
+                  editBtn.addEventListener("click", function () {
+                      const row = this.closest("tr");
 
-                    if (currentlyEditingRow && currentlyEditingRow !== row) {
-                        toggleEditMode(currentlyEditingRow, false);
-                    }
+                      if (currentlyEditingRow && currentlyEditingRow !== row) {
+                          toggleEditMode(currentlyEditingRow, false);
+                      }
 
-                    const isEditing = row.classList.contains("editing");
+                      const isEditing = row.classList.contains("editing");
 
                       if (!isEditing) {
                           toggleEditMode(row, true);
@@ -385,9 +389,9 @@
               });
             }
 
-            function toggleEditMode(row, enable) {
-                const editBtn = row.querySelector(".edit-Btn");
-                row.classList.toggle("editing", enable);
+              function toggleEditMode(row, enable) {
+                  const editBtn = row.querySelector(".edit-Btn");
+                  row.classList.toggle("editing", enable);
 
                   Array.from(row.children).forEach((cell, index) => {
                       if (index === 0 || index === row.children.length - 1) {
@@ -592,32 +596,24 @@
                         });
                     }
 
-                formData.append("Category", document.getElementById("category").value);
-                formData.append("OnSale", document.getElementById("onSaleCheckbox").checked);
+                  const genreInput = document.getElementById("genre").value;
+                  if (genreInput) {
+                      genreInput.split(",").forEach(genre => formData.append("Genres", genre.trim()));
+                  }
 
-                const publisherSelect = document.querySelector('select[for="Publisher"]');
-                if (publisherSelect && publisherSelect.value) {
-                    formData.append("PublisherId", publisherSelect.value);
-                }
-                formData.append("PublisherName", document.getElementById("PublisherName").value);
+                  if (document.getElementById("onSaleCheckbox").checked) {
+                      formData.append("SalePercentage", document.getElementById("salePercentage").value);
+                      formData.append("SaleStartDate", document.getElementById("saleStartDate").value);
+                      formData.append("SaleEndDate", document.getElementById("saleEndDate").value);
+                  }
 
-                const authorSelect = document.querySelector('#AuthorSelect');
-                if (authorSelect && authorSelect.selectedOptions) {
-                    const authorIds = Array.from(authorSelect.selectedOptions).map(option => option.value);
-                    authorIds.forEach(authorId => {
-                        formData.append("Authors", authorId); // Append each selected ID
-                    });
-                }
+                  const imageInput = document.getElementById("ImageFile");
+                  if (imageInput.files.length > 0) {
+                      formData.append("ImageFile", imageInput.files[0]);
+                  }
 
-                const genreInput = document.getElementById("genre").value;
-                if (genreInput) {
-                    genreInput.split(",").forEach(genre => formData.append("Genres", genre.trim()));
-                }
-                if (document.getElementById("onSaleCheckbox").checked) {
-                    formData.append("SalePercentage", document.getElementById("salePercentage").value);
-                    formData.append("SaleStartDate", document.getElementById("saleStartDate").value);
-                    formData.append("SaleEndDate", document.getElementById("saleEndDate").value);
-                }
+                  console.log("Book Data:", Object.fromEntries(formData));
+
                   try {
                       const response = await fetch("https://localhost:44351/api/addBooks", {
                           method: "POST",
@@ -627,53 +623,36 @@
                           body: formData
                       });
 
+                      if (response.ok) {
+                          const result = await response.json();
+                          alert("Book added successfully!");
+                          $("#bookModal").modal("hide");
+                          this.reset();
+                          fetchBooks(); // Refresh table
+                      } else {
+                          const error = await response.json();
+                          alert(`Failed to add book: ${error.message || "Unknown error"}`);
+                      }
+                  } catch (error) {
+                      console.error("Error:", error);
+                      alert("An error occurred while adding the book.");
+                  }
+              });
 
-                const imageInput = document.getElementById("ImageFile");
-                if (imageInput.files.length > 0) {
-                    formData.append("ImageFile", imageInput.files[0]);
-                }
-
-                console.log("Book Data:", Object.fromEntries(formData));
-
-                try {
-                    const response = await fetch("https://localhost:44351/api/addBooks", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
-                        },
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        alert("Book added successfully!");
-                        $("#bookModal").modal("hide");
-                        this.reset();
-                        fetchBooks(); // Refresh table
-                    } else {
-                        const error = await response.json();
-                        alert(`Failed to add book: ${error.message || "Unknown error"}`);
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("An error occurred while adding the book.");
-                }
-            });
-
-            document.getElementById("onSaleCheckbox").addEventListener("change", function () {
-                const saleFields = document.getElementById("saleFields");
-                if (this.checked) {
-                    saleFields.style.display = "flex";
-                    saleFields.style.alignItems = "center";
-                    saleFields.classList.add("form-row");
-                } else {
-                    saleFields.style.display = "none";
-                    document.getElementById("salePercentage").value = "";
-                    document.getElementById("saleStartDate").value = "";
-                    document.getElementById("saleEndDate").value = "";
-                }
-            });
-        });
-    </script>
-</body>
+              document.getElementById("onSaleCheckbox").addEventListener("change", function () {
+                  const saleFields = document.getElementById("saleFields");
+                  if (this.checked) {
+                      saleFields.style.display = "flex";
+                      saleFields.style.alignItems = "center";
+                      saleFields.classList.add("form-row");
+                  } else {
+                      saleFields.style.display = "none";
+                      document.getElementById("salePercentage").value = "";
+                      document.getElementById("saleStartDate").value = "";
+                      document.getElementById("saleEndDate").value = "";
+                  }
+              });
+          });
+      </script>
+  </body>
 </html>

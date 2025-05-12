@@ -1,10 +1,346 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&display=swap"
+          rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="../css/adminNav.css" />
+    <title>Add book</title>
+    <style>
+        .order-details {
+            margin-top: 20px;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+
+        .notification-modal .modal-content 
+        {
+             border-radius: 10px;
+             right:-17vw;
+             box-shadow: -1px 1px 5px #0584f962 ;
+
+         }
+        .notification-modal .modal-body{
+            gap:5vw;
+        }
+    
+.notification-modal .modal-header .close:hover {
+    opacity: 1;
+}
+
+.notification-modal .modal-body .bell-icon {
+    position: absolute;
+    top: -10px;
+    right: -3vw; 
+    font-size: 1.8em;
+    color: #0584f9;
+    z-index: 5; /* Keep it below the close button if they overlap */
+}
+
+        .order-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+            .order-card .card-header {
+                background-color: white;
+                font-weight: bold;
+                border-bottom: none;
+            }
+
+            .order-card .item-row {
+                border-top: 1px solid #e0e0e0; /* Separator between summary and items */
+                margin-top: 10px;
+                padding-top: 10px;
+                border-radius: 12px;
+            }
+
+                .order-card .item-row .card-header {
+                    background-color: white;
+                    font-size: 1.1rem;
+                    padding: 0.75rem 1.25rem;
+                    border-bottom: 1px solid #e0e0e0;
+                    border-radius: 7px 7px 0 0;
+                    margin-bottom: 0; /* Remove default margin for cleaner look */
+                }
+
+                .order-card .item-row .card-body {
+                    padding: 0.75rem 1.25rem;
+                }
+
+                    .order-card .item-row .card-body p {
+                        margin-bottom: 0.3rem;
+                    }
+
+        .card-body p {
+            margin-bottom: 0.5rem;
+        }
+
+        fas fa-bell bell-icon {
+            z-index: 999;
+        }
+    </style>
 </head>
 <body>
+    <div class="container-fluid">
+        <div class="row">
 
+            <div class="col-md-12 p-3">
+                <div class="page-header d-flex mb-3 justify-items-center">
+                    <div class="greet pl-3">
+                        <h3>Hello Admin!</h3>
+                        <span class="text-muted"> Have a nice day</span>
+                    </div>
+                    <div class="profileSection d-flex align-items-center">
+                        <div class="profileImage"></div>
+                        <div class="profileDetails">
+                            <h6>UserName</h6>
+                            <span class="text-muted">Book Bagaicha</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="claim-code-section mb-4">
+                    <h4>Check Order by Claim Code</h4>
+                    <div class="form-group">
+                        <label for="claimCode">Claim Code:</label>
+                        <input type="text" class="form-control" id="claimCode" placeholder="Enter claim code (e.g., ORDER-XXXXXXXX)">
+                        <button class="btn btn-primary mt-2" onclick="fetchOrder()">Check Order</button>
+                    </div>
+                    <div id="errorMessage" class="error-message"></div>
+                    <div id="successMessage" class="success-message"></div>
+                </div>
+
+                <!-- Order Details Section -->
+                <div id="orderDetails" class="order-details" style="display: none;">
+                    
+                    <div id="orderInfo"></div>
+                    <button id="completeOrderBtn" class="btn btn-success mt-3" onclick="completeOrder()">Complete Order</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade notification-modal" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-body d-flex align-items-center">
+                    <i class="fas fa-bell bell-icon mr-2"></i>
+
+                    <div id="notificationMessage" class="flex-grow-1"></div>
+
+                    
+                    <div>
+
+                        <button type="button" class="btn " data-dismiss="modal">Close</button>
+                    </div>
+                
+                
+                 </div>
+             </div>
+            </div>
+        </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    
+    <script>
+        const editSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M15.748 2.947a2 2 0 0 1 2.828 0l2.475 2.475a2 2 0 0 1 0 2.829L9.158 20.144l-6.38 1.076l1.077-6.38zm-.229 3.057l2.475 2.475l1.643-1.643l-2.475-2.474zm1.06 3.89l-2.474-2.475l-8.384 8.384l-.503 2.977l2.977-.502z"/>
+                </svg>`;
+
+        const saveSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M20.285 6.709l-11.2 11.2l-5.657-5.657L5.8 10.88l3.286 3.285L18.17 5.08z"/>
+                </svg>`;
+
+        let currentOrderId = null;
+        const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
+
+        const notificationSocket = new WebSocket(`wss://localhost:44351/ws/notifications?token=${token}`);
+
+        notificationSocket.onopen = () => {
+            console.log('[ADMIN] WebSocket connection established.');
+        };
+
+        notificationSocket.onmessage = (event) => {
+            try {
+                const notification = JSON.parse(event.data);
+                console.log('[ADMIN] Received message:', notification);
+                showNotification(notification);
+            } catch (error) {
+                console.error('[ADMIN] Error parsing notification:', error);
+            }
+        };
+
+        notificationSocket.onclose = (event) => {
+            console.log('[ADMIN] WebSocket connection closed:', event);
+        };
+
+        notificationSocket.onerror = (error) => {
+            console.error('[ADMIN] WebSocket error:', error);
+        };
+
+        function showNotification(notification) {
+            const notificationMessage = document.getElementById('notificationMessage');
+            let message = '';
+
+            switch(notification.type) {
+                case 'order_completed':
+                message = `Order ${notification.claimCode} has been completed successfully! Total: $${notification.totalPrice.toFixed(2)}`;
+                break;
+                case 'new_order':
+                message = `New order ${notification.orderId} received! Total: $${notification.totalPrice.toFixed(2)}`;
+                break;
+                case 'order_confirmed':
+                message = `Order ${notification.claimCode} has been confirmed! Total: $${notification.totalPrice.toFixed(2)}`;
+                    break;
+                
+                default:
+                return; // Ignore non-order-related notifications
+            }
+
+            notificationMessage.textContent = message;
+            $('#notificationModal').modal({
+                backdrop: false,
+                keyboard: true
+            });
+        }
+
+        async function fetchOrder() {
+            const claimCode = document.getElementById('claimCode').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const orderDetails = document.getElementById('orderDetails');
+            const orderInfo = document.getElementById('orderInfo');
+            const token = localStorage.getItem('authToken');
+
+            if (!claimCode) {
+                errorMessage.textContent = 'Please enter a claim code';
+                return;
+            }
+
+            if (!token) {
+                errorMessage.textContent = 'Authentication token missing. Please log in again.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/order/claim/${claimCode}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Unauthorized: Please log in again');
+                    } else if (response.status === 404) {
+                        throw new Error('Order not found');
+                    } else {
+                        throw new Error('Error fetching order');
+                    }
+                }
+
+                const order = await response.json();
+                currentOrderId = order.orderId;
+
+                errorMessage.textContent = '';
+                successMessage.textContent = '';
+
+                let orderDetailsHTML = `
+                    <div class="card order-card">
+                        <div class="card-header">Order Details</div>
+                        <div class="card-body">
+                            <p><strong>Order ID:</strong> ${order.orderId}</p>
+                            <p><strong>Claim Code:</strong> ${order.claimCode}</p>
+                            <p><strong>Order Date:</strong> ${new Date(order.orderDate).toLocaleString()}</p>
+                            <p><strong>Status:</strong> ${order.status}</p>
+                            <p><strong>Total Price:</strong> $${order.totalPrice.toFixed(2)}</p>
+                            <h5 class="mt-3">Order Items</h5>
+                `;
+
+                order.items.forEach(item => {
+                    orderDetailsHTML += `
+                            <div class="card item-row">
+                                <div class="card-header">${item.bookTitle}</div>
+                                <div class="card-body">
+                                    <p><strong>ISBN:</strong> ${item.isbn}</p>
+                                    <p><strong>Authors:</strong> ${item.authors.join(', ')}</p>
+                                    <p><strong>Quantity:</strong> ${item.quantity}</p>
+                                    <p><strong>Price:</strong> $${item.priceAtPurchase.toFixed(2)}</p>
+                                </div>
+                            </div>
+                    `;
+                });
+
+                orderDetailsHTML += `
+                        </div>
+                    </div>
+                `;
+
+                orderInfo.innerHTML = orderDetailsHTML;
+                orderDetails.style.display = 'block';
+            } catch (error) {
+                errorMessage.textContent = error.message || 'Error fetching order';
+                orderDetails.style.display = 'none';
+            }
+        }
+
+        async function completeOrder() {
+            if (!currentOrderId) {
+                document.getElementById('errorMessage').textContent = 'No order selected';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/order/${currentOrderId}/complete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Unauthorized: Please log in again');
+                    } else {
+                        throw new Error('Failed to complete order');
+                    }
+                }
+
+                document.getElementById('successMessage').textContent = 'Order completed successfully';
+                document.getElementById('orderDetails').style.display = 'none';
+                document.getElementById('claimCode').value = '';
+                currentOrderId = null;
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = error.message || 'Error completing order';
+            }
+        }
+    </script>
 </body>
 </html>

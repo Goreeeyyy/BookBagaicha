@@ -57,6 +57,16 @@ namespace BookBagaicha.Services
                     throw new ArgumentException($"User with ID {userId} not found.");
                 }
 
+                // Check if a review already exists for this user and book
+                var existingReview = await _dbContext.Reviews
+                    .FirstOrDefaultAsync(r => r.UserId == userId && r.BookId == bookId);
+
+                if (existingReview != null)
+                {
+                    _logger.LogWarning("User {UserId} has already reviewed book {BookId}.", userId, bookId);
+                    throw new InvalidOperationException("You have already reviewed this book.");
+                }
+
                 var newReview = new Review
                 {
                     BookId = bookId,
@@ -89,13 +99,21 @@ namespace BookBagaicha.Services
 
                 return addedReview;
             }
+            catch (InvalidOperationException ex)
+            {
+                throw; // Let the controller handle the "already reviewed" case
+            }
+            catch (ArgumentException ex)
+            {
+                throw; // Let the controller handle the argument exceptions
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding review for book {BookId} by user {UserId}.", bookId, userId);
-                throw;
+                _logger.LogError(ex, "Unexpected error adding review for book {BookId} by user {UserId}.", bookId, userId);
+                // Optionally, throw a custom exception or return null/error DTO
+                throw; // For now, re-throwing the unexpected exception
             }
         }
-
 
     }
 }

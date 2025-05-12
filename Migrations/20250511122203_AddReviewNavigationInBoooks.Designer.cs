@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookBagaicha.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250511034918_BannerTablesIntegrate")]
-    partial class BannerTablesIntegrate
+    [Migration("20250511122203_AddReviewNavigationInBoooks")]
+    partial class AddReviewNavigationInBoooks
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -706,7 +706,7 @@ namespace BookBagaicha.Migrations
             modelBuilder.Entity("BookBagaicha.Models.Review", b =>
                 {
                     b.HasOne("BookBagaicha.Models.Book", "Book")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -816,6 +816,11 @@ namespace BookBagaicha.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BookBagaicha.Models.Book", b =>
+                {
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("BookBagaicha.Models.Cart", b =>

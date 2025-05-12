@@ -19,5 +19,8 @@ namespace BookBagaicha.IService
 
         // Cancel an existing order
         Task<bool> CancelOrderAsync(Guid orderId, long userId);
+
+        Task<OrderDto> GetOrderByClaimCodeAsync(string claimCode);
+        Task<bool> CompleteOrderAsync(Guid orderId);
     }
 }

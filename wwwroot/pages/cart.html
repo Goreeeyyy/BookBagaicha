@@ -140,7 +140,7 @@
                         <a class="nav-link" href="HomePage.html">HOME</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="browseBooks.html">BOOKS</a>
+                        <a class="nav-link active" href="browseBooks.html">BOOKS</a>
                     </li>
                 </ul>
                 <div class="d-flex me-3">
@@ -167,7 +167,6 @@
                             <path fill="currentColor" d="M12 21q-3.15 0-5.575-1.912T3.275 14.2q-.1-.375.15-.687t.675-.363q.4-.05.725.15t.45.6q.6 2.25 2.475 3.675T12 19q2.925 0 4.963-2.037T19 12t-2.037-4.962T12 5q-1.725 0-3.225.8T6.25 8H8q.425 0 .713.288T9 9t-.288.713T8 10H4q-.425 0-.712-.288T3 9V5q0-.425.288-.712T4 4t.713.288T5 5v1.35q1.275-1.6 3.113-2.475T12 3q1.875 0 3.513.713t2.85 1.924t1.925 2.85T21 12t-.712 3.513t-1.925 2.85t-2.85 1.925T12 21m1-9.4l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T11 11.975V8q0-.425.288-.712T12 7t.713.288T13 8z" />
                         </svg>
                     </a>
-
                 </div>
             </div>
         </div>
@@ -218,6 +217,7 @@
             </div>
         </div>
     </div>
+    <div id="notification-area"></div>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -386,13 +386,13 @@
                 if (itemsArray.length === 0) {
                     // Display empty cart message
                     cartContainer.html(`
-            <div class="empty-cart">
-                <i class="fas fa-shopping-cart"></i>
-                <h4>Your cart is empty</h4>
-                <p class="text-muted">Browse our books and add items to your cart</p>
-                <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
-            </div>
-        `);
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h4>Your cart is empty</h4>
+                    <p class="text-muted">Browse our books and add items to your cart</p>
+                    <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
+                </div>
+            `);
                     return;
                 }
 
@@ -403,15 +403,15 @@
                 let cartItemsColumn = $('<div class="col-md-8 mb-4"></div>');
                 let cartItemsCard = $('<div class="card"></div>');
                 let cartItemsHeader = $(`
-        <div class="card-header bg-light">
-            <div class="row fw-bold">
-                <div class="col-md-6">Product</div>
-                <div class="col-md-2 text-center">Price</div>
-                <div class="col-md-2 text-center">Quantity</div>
-                <div class="col-md-2 text-center">Total</div>
+            <div class="card-header bg-light">
+                <div class="row fw-bold">
+                    <div class="col-md-6">Product</div>
+                    <div class="col-md-2 text-center">Price</div>
+                    <div class="col-md-2 text-center">Quantity</div>
+                    <div class="col-md-2 text-center">Total</div>
+                </div>
             </div>
-        </div>
-    `);
+        `);
                 let cartItemsBody = $('<div class="card-body p-0"></div>');
                 let cartItemsList = $('<div id="cartItemsList"></div>');
 
@@ -451,36 +451,36 @@
 
                     // Create cart item element
                     const cartItemElement = $(`
-                        <div class="cart-item p-3 border-bottom" data-cart-item-id="${cartItemId}" data-book-id="${bookId}">
-                            <div class="row align-items-center">
-                                <div class="col-md-6 d-flex align-items-center">
-                                    <img src="../${image}" class="me-3" style="width: 80px; height: auto;" alt="${title}">
-                                    <div>
-                                        <h6 class="mb-1">${title}</h6>
-                                        <p class="text-muted small mb-0">${authors.length > 0 ? authors.join(', ') : 'No Author'}</p>
+                            <div class="cart-item p-3 border-bottom" data-cart-item-id="${cartItemId}" data-book-id="${bookId}">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <img src="../${image}" class="me-3" style="width: 80px; height: auto;" alt="${title}">
+                                        <div>
+                                            <h6 class="mb-1">${title}</h6>
+                                            <p class="text-muted small mb-0">${authors.length > 0 ? authors.join(', ') : 'No Author'}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-2 text-center">
-                                    <span class="fw-bold">Rs. ${price.toFixed(2)}</span>
-                                </div>
-                                <div class="col-md-2 text-center">
-                                    <div class="quantity-control">
-                                        <button class="quantity-btn decrease-btn" data-cart-item-id="${cartItemId}">-</button>
-                                        <input type="number" class="quantity-input" value="${quantity}" min="1" max="99" data-cart-item-id="${cartItemId}">
-                                        <button class="quantity-btn increase-btn" data-cart-item-id="${cartItemId}">+</button>
+                                    <div class="col-md-2 text-center">
+                                        <span class="fw-bold">Rs. ${price.toFixed(2)}</span>
                                     </div>
-                                </div>
-                                <div class="col-md-2 text-center">
-                                    <div class="d-flex flex-column align-items-center">
-                                        <span class="fw-bold">Rs. ${itemTotal.toFixed(2)}</span>
-                                        <button class="btn btn-sm btn-outline-danger mt-2 remove-btn" data-cart-item-id="${cartItemId}">
-                                            <i class="fas fa-trash"></i> Remove
-                                        </button>
+                                    <div class="col-md-2 text-center">
+                                        <div class="quantity-control">
+                                            <button class="quantity-btn decrease-btn" data-cart-item-id="${cartItemId}">-</button>
+                                            <input type="number" class="quantity-input" value="${quantity}" min="1" max="99" data-cart-item-id="${cartItemId}">
+                                            <button class="quantity-btn increase-btn" data-cart-item-id="${cartItemId}">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <span class="fw-bold">Rs. ${itemTotal.toFixed(2)}</span>
+                                            <button class="btn btn-sm btn-outline-danger mt-2 remove-btn" data-cart-item-id="${cartItemId}">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    `);
+                        `);
 
                     cartItemsList.append(cartItemElement);
                 });
@@ -504,10 +504,10 @@
                     // Apply loyalty discount if eligible
                     if (isLoyalCustomer) {
                         loyaltyDiscount = totalPrice * 0.10;
-                                discountMessage += `<div class="d-flex justify-content-between mb-2 text-success">
-                        <span>Loyalty Discount (10%):</span>
-                        <span>- Rs. ${loyaltyDiscount.toFixed(2)}</span>
-                    </div>`;
+                        discountMessage += `<div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Loyalty Discount (10%):</span>
+                            <span>- Rs. ${loyaltyDiscount.toFixed(2)}</span>
+                        </div>`;
                         console.log("Applied 10% loyalty discount:", loyaltyDiscount);
                     }
 
@@ -515,9 +515,9 @@
                     if (hasQuantityDiscount) {
                         quantityDiscount = totalPrice * 0.05;
                         discountMessage += `<div class="d-flex justify-content-between mb-2 text-success">
-                <span>Quantity Discount (5%):</span>
-                <span>- Rs. ${quantityDiscount.toFixed(2)}</span>
-            </div>`;
+                    <span>Quantity Discount (5%):</span>
+                    <span>- Rs. ${quantityDiscount.toFixed(2)}</span>
+                </div>`;
                         console.log("Applied 5% quantity discount:", quantityDiscount);
                     }
 
@@ -528,25 +528,25 @@
                     console.log("Total discount:", totalDiscount);
                     console.log("Grand total:", grandTotal);
 
-                                    orderSummary.html(`
-                            <h4 class="mb-4">Order Summary</h4>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Subtotal:</span>
-                                <span>Rs. ${totalPrice.toFixed(2)}</span>
-                            </div>
-                            ${discountMessage}
-                            <hr>
-                            <div class="d-flex justify-content-between mb-4 fw-bold">
-                                <span>Grand Total:</span>
-                                <span>Rs. ${grandTotal.toFixed(2)}</span>
-                            </div>
-                            <button id="placeOrderBtn" class="btn btn-primary w-100 mb-3" data-discount="${totalDiscount}" data-cart-id="${cartId}">
-                                <i class="fas fa-shopping-bag me-2"></i>Place Order
-                            </button>
-                            <button id="clearCartBtn" class="btn btn-outline-secondary w-100" data-cart-id="${cartId}">
-                                <i class="fas fa-trash me-2"></i>Clear Cart
-                            </button>
-                        `);
+                    orderSummary.html(`
+                                <h4 class="mb-4">Order Summary</h4>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Subtotal:</span>
+                                    <span>Rs. ${totalPrice.toFixed(2)}</span>
+                                </div>
+                                ${discountMessage}
+                                <hr>
+                                <div class="d-flex justify-content-between mb-4 fw-bold">
+                                    <span>Grand Total:</span>
+                                    <span>Rs. ${grandTotal.toFixed(2)}</span>
+                                </div>
+                                <button id="placeOrderBtn" class="btn btn-primary w-100 mb-3" data-discount="${totalDiscount}" data-cart-id="${cartId}">
+                                    <i class="fas fa-shopping-bag me-2"></i>Place Order
+                                </button>
+                                <button id="clearCartBtn" class="btn btn-outline-secondary w-100" data-cart-id="${cartId}">
+                                    <i class="fas fa-trash me-2"></i>Clear Cart
+                                </button>
+                            `);
 
                     cartSummaryColumn.append(orderSummary);
 
@@ -558,20 +558,20 @@
                     setupEventListeners(cartId);
                 });
             }
-     
+
 
             // Function to handle loading errors
             function handleLoadError(message) {
                 const cartContainer = $('#cartContainer');
                 cartContainer.html(`
-                            <div class="alert alert-danger" role="alert">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                ${message}
-                            </div>
-                            <div class="text-center mt-3">
-                                <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
-                            </div>
-                        `);
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    ${message}
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
+                                </div>
+                            `);
             }
 
             // Function to display toast notifications
@@ -859,6 +859,7 @@
         });
     </script>
     <script src="../js/cart.js"></script>
+    <script src="../js/webSocketCustomer.js"></script>
 
 </body>
 </html>

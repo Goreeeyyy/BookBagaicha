@@ -5,7 +5,7 @@
 namespace BookBagaicha.Migrations
 {
     /// <inheritdoc />
-    public partial class UpateOrdeRelatedTablesLijala : Migration
+    public partial class AddReviewNavigationInBoooks : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
