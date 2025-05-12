@@ -1,5 +1,6 @@
 ﻿using BookBagaicha.Models;
 using BookBagaicha.Models.Dto;
+using BookBagaicha.Services;
 
 namespace BookBagaicha.IService
 {
@@ -15,9 +16,10 @@ namespace BookBagaicha.IService
         Task<OrderDto> GetOrderDetailsAsync(Guid orderId);
 
         // Place a new order based on cart contents
-        Task<OrderDto> PlaceOrderAsync(long userId, PlaceOrderRequest request);
+        Task<OrderDto> PlaceOrderAsync(long userId, PlaceOrderRequest request, string claimCode);
 
         // Cancel an existing order
         Task<bool> CancelOrderAsync(Guid orderId, long userId);
+
     }
 }
