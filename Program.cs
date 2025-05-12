@@ -108,6 +108,8 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+builder.Services.AddScoped<IEmailService, EmailService>(); // Registering Email Service and it's Interface Service
+
 builder.Services.AddAuthorization();
 
 builder.Services.Configure<JsonOptions>(options =>
