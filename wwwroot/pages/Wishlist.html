@@ -54,7 +54,7 @@
                         <a class="nav-link" href="HomePage.html">HOME</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="browseBooks.html">BOOKS</a>
+                        <a class="nav-link active" href="browseBooks.html">BOOKS</a>
                     </li>
                 </ul>
                 <div class="d-flex me-3">
@@ -67,7 +67,7 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
                             <li><a class="dropdown-item" href="userHome.html">User Profile</a></li>
-                            <li><a class="dropdown-item active" href="Wishlist.html">My Wishlist</a></li>
+                            <li><a class="dropdown-item" href="Wishlist.html">My Wishlist</a></li>
                             <li><a class="dropdown-item" href="orderHistory.html">Order History</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
@@ -75,6 +75,11 @@
                     </div>
                     <a href="cart.html" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-shopping-cart"></i>
+                    </a>
+                    <a href="orderHistory.html" class="btn btn-outline-light btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12 21q-3.15 0-5.575-1.912T3.275 14.2q-.1-.375.15-.687t.675-.363q.4-.05.725.15t.45.6q.6 2.25 2.475 3.675T12 19q2.925 0 4.963-2.037T19 12t-2.037-4.962T12 5q-1.725 0-3.225.8T6.25 8H8q.425 0 .713.288T9 9t-.288.713T8 10H4q-.425 0-.712-.288T3 9V5q0-.425.288-.712T4 4t.713.288T5 5v1.35q1.275-1.6 3.113-2.475T12 3q1.875 0 3.513.713t2.85 1.924t1.925 2.85T21 12t-.712 3.513t-1.925 2.85t-2.85 1.925T12 21m1-9.4l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T11 11.975V8q0-.425.288-.712T12 7t.713.288T13 8z" />
+                        </svg>
                     </a>
                 </div>
             </div>
@@ -99,6 +104,7 @@
             </div>
         </div>
     </div>
+    <div id="notification-area"></div>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -183,13 +189,13 @@
                 if (itemsArray.length === 0) {
                     // Display empty wishlist message
                     wishlistContainer.html(`
-                            <div class="empty-wishlist">
-                                <i class="far fa-heart"></i>
-                                <h4>Your wishlist is empty</h4>
-                                <p class="text-muted">Browse our books and add your favorites to the wishlist</p>
-                                <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
-                            </div>
-                        `);
+                                    <div class="empty-wishlist">
+                                        <i class="far fa-heart"></i>
+                                        <h4>Your wishlist is empty</h4>
+                                        <p class="text-muted">Browse our books and add your favorites to the wishlist</p>
+                                        <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
+                                    </div>
+                                `);
                     return;
                 }
 
@@ -219,31 +225,31 @@
                     }
 
                     const wishlistItem = `
-                            <div class="col">
-                                <div class="card h-100 text-center p-2 position-relative">
-                                    <img src="../${image}" class="card-img-top book-img" alt="${bookTitle}" />
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-1">${bookTitle}</h6>
-                                        <p class="card-subtitle text-muted small mb-2">
-                                            ${authors.length > 0 ? authors.join(', ') : 'No Author'}
-                                        </p>
-                                        <p class="mb-2 text-dark fw-bold">Rs. ${price}/-</p>
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <a href="BookDetails.html?id=${bookId}" class="btn btn-sm btn-outline-secondary">
-                                                Details
-                                            </a>
-                                            <button class="btn btn-sm btn-primary add-to-cart-btn" data-book-id="${bookId}">
-                                                Add to Cart
-                                            </button>
-                                            <button class="btn btn-sm btn-danger remove-from-wishlist-btn" data-wishlist-item-id="${wishlistItemId}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                    <div class="col">
+                                        <div class="card h-100 text-center p-2 position-relative">
+                                            <img src="../${image}" class="card-img-top book-img" alt="${bookTitle}" />
+                                            <div class="card-body">
+                                                <h6 class="card-title mb-1">${bookTitle}</h6>
+                                                <p class="card-subtitle text-muted small mb-2">
+                                                    ${authors.length > 0 ? authors.join(', ') : 'No Author'}
+                                                </p>
+                                                <p class="mb-2 text-dark fw-bold">Rs. ${price}/-</p>
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <a href="BookDetails.html?id=${bookId}" class="btn btn-sm btn-outline-secondary">
+                                                        Details
+                                                    </a>
+                                                    <button class="btn btn-sm btn-primary add-to-cart-btn" data-book-id="${bookId}">
+                                                        Add to Cart
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger remove-from-wishlist-btn" data-wishlist-item-id="${wishlistItemId}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            ${onSale ? '<span class="on-sale">Sale!</span>' : ''}
                                         </div>
                                     </div>
-                                    ${onSale ? '<span class="on-sale">Sale!</span>' : ''}
-                                </div>
-                            </div>
-                        `;
+                                `;
                     booksRow.append(wishlistItem);
                 });
 
@@ -255,14 +261,14 @@
             function handleLoadError(message) {
                 const wishlistContainer = $('#wishlistContainer');
                 wishlistContainer.html(`
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            ${message}
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
-                        </div>
-                    `);
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    ${message}
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
+                                </div>
+                            `);
             }
 
             // Function to set up event listeners
@@ -474,5 +480,7 @@
         });
     </script>
     <script src="../js/cart.js"></script>
+    <script src="../js/webSocketCustomer.js"></script>
+
 </body>
 </html>
