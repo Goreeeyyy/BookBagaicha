@@ -29,6 +29,8 @@ namespace BookBagaicha.Models
         
 
         public ICollection<Author> Authors { get; set; } = new List<Author>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
         public ICollection<Genre> Genres { get; set; } = new List<Genre>(); // Added Genres navigation property
 
 

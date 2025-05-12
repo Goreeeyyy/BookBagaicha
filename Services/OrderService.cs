@@ -2,6 +2,7 @@
 using BookBagaicha.IService;
 using BookBagaicha.Models;
 using BookBagaicha.Models.Dto;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,12 +17,18 @@ namespace BookBagaicha.Services
         private readonly AppDbContext _context;
         private readonly ICartService _cartService;
         private readonly ILogger<OrderService> _logger;
+        private readonly NotificationWebSocketHandler _notificationHandler; // Inject the WebSocket handler
+        private readonly UserManager<User> _userManager; // Inject UserManager
 
-        public OrderService(AppDbContext context, ICartService cartService, ILogger<OrderService> logger)
+
+
+        public OrderService(AppDbContext context, ICartService cartService, ILogger<OrderService> logger, NotificationWebSocketHandler notificationHandler, UserManager<User> userManager)
         {
             _context = context;
             _cartService = cartService;
             _logger = logger;
+            _notificationHandler = notificationHandler;
+            _userManager = userManager;
         }
 
         public async Task<List<OrderSummaryDto>> GetAllOrdersAsync(long userId)
@@ -200,6 +207,39 @@ namespace BookBagaicha.Services
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
+                    var staffUsers = await _userManager.GetUsersInRoleAsync("Admin");
+                    foreach (var staffUser in staffUsers)
+                    {
+                        
+                            _logger.LogInformation("Sending 'new_order' notification to staff user {StaffUserId} for order {OrderId}.", staffUser.Id, order.OrderId);
+                            await _notificationHandler.SendNotificationToUserAsync(
+                                staffUser.Id,
+                                new
+                                {
+                                    type = "new_order",
+                                    orderId = order.OrderId,
+                                    orderDate = order.OrderDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                                    customerUserId = userId,
+                                    totalPrice = order.TotalPrice
+                                });
+                            _logger.LogInformation("'new_order' notification sent successfully to staff user {StaffUserId} for order {OrderId}.", staffUser.Id, order.OrderId);
+                        
+                        
+                    }
+
+                    // Optionally, send a confirmation to the customer
+                    _logger.LogInformation("Sending 'order_confirmed' notification to customer {CustomerId} for order {OrderId}.", userId, order.OrderId);
+                    await _notificationHandler.SendNotificationToUserAsync(
+                        userId,
+                        new
+                        {
+                            type = "order_confirmed",
+                            orderId = order.OrderId,
+                            orderDate = order.OrderDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                            claimCode = order.ClaimCode,
+                            totalPrice = order.TotalPrice
+                        });
+                    _logger.LogInformation("'order_confirmed' notification sent successfully to customer {CustomerId} for order {OrderId}.", userId, order.OrderId);
                 }
                 catch (Exception ex)
                 {
