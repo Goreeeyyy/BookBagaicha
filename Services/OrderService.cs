@@ -329,5 +329,142 @@ namespace BookBagaicha.Services
                 return false;
             }
         }
+
+        public async Task<OrderDto> GetOrderByClaimCodeAsync(string claimCode)
+        {
+            try
+            {
+                _logger.LogInformation("Getting order details for claim code {ClaimCode}", claimCode);
+
+                var order = await _context.Orders
+                    .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Book)
+                    .ThenInclude(b => b.Authors)
+                    .FirstOrDefaultAsync(o => o.ClaimCode == claimCode);
+
+                if (order == null)
+                {
+                    _logger.LogWarning("Order with claim code {ClaimCode} not found", claimCode);
+                    throw new ArgumentException($"Order with claim code {claimCode} not found.");
+                }
+
+                return new OrderDto
+                {
+                    OrderId = order.OrderId,
+                    UserId = order.UserId,
+                    OrderDate = order.OrderDate,
+                    Status = order.Status,
+                    TotalPrice = order.TotalPrice,
+                    ClaimCode = order.ClaimCode,
+                    AppliedDiscount = order.AppliedDiscount,
+                    Items = order.OrderItems.Select(oi => new OrderItemDto
+                    {
+                        OrderItemId = oi.OrderItemId,
+                        BookId = oi.BookId,
+                        BookTitle = oi.Book.Title,
+                        ISBN = oi.Book.ISBN,
+                        Image = oi.Book.Image,
+                        Quantity = oi.Quantity,
+                        PriceAtPurchase = oi.PriceAtPurchase,
+                        Authors = oi.Book.Authors.Select(a => $"{a.FirstName} {a.LastName}").ToList()
+                    }).ToList()
+                };
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving order details for claim code {ClaimCode}", claimCode);
+                throw;
+            }
+        }
+
+        public async Task<bool> CompleteOrderAsync(Guid orderId)
+        {
+            try
+            {
+                _logger.LogInformation("Completing order {OrderId}", orderId);
+
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+                if (order == null)
+                {
+                    _logger.LogWarning("Order with ID {OrderId} not found", orderId);
+                    throw new ArgumentException($"Order with ID {orderId} not found.");
+                }
+
+                if (order.Status == "Completed")
+                {
+                    _logger.LogInformation("Order {OrderId} is already completed", orderId);
+                    return true;
+                }
+
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    order.Status = "Completed";
+                    _context.Orders.Update(order);
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    // Notify customer
+                    await _notificationHandler.SendNotificationToUserAsync(
+                        order.UserId,
+                        new
+                        {
+                            type = "order_completed",
+                            orderId = order.OrderId,
+                            orderDate = order.OrderDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                            claimCode = order.ClaimCode,
+                            totalPrice = order.TotalPrice
+                        });
+
+                    // Notify all staff users
+                    var staffUsers = await _userManager.GetUsersInRoleAsync("Staff");
+                    var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+                    var allStaffUsers = staffUsers.Concat(adminUsers).Distinct().ToList();
+
+                    foreach (var staffUser in allStaffUsers)
+                    {
+                        _logger.LogInformation("Sending 'order_completed' notification to staff user {StaffUserId} for order {OrderId}", staffUser.Id, order.OrderId);
+                        await _notificationHandler.SendNotificationToUserAsync(
+                            (staffUser.Id),
+                            new
+                            {
+                                type = "order_completed",
+                                orderId = order.OrderId,
+                                orderDate = order.OrderDate.ToString("yyyy-MM-dd HH:mm:ss"),
+                                claimCode = order.ClaimCode,
+                                totalPrice = order.TotalPrice
+                            });
+                    }
+
+                    
+
+                    _logger.LogInformation("Successfully completed order {OrderId}", orderId);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError(ex, "Error completing order {OrderId}", orderId);
+                    return false;
+                }
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while completing order {OrderId}", orderId);
+                return false;
+            }
+        }
+
     }
 }
