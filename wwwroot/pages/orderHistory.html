@@ -508,7 +508,7 @@
                                                         </div>
                                                         <div class="col-md-4 text-md-end">
                                                             <h6 class="mt-3 mt-md-0">Rs. ${(price * quantity).toFixed(2)}</h6>
-                                                            ${order.status === 'Confirmed' ? `<button class="btn btn-sm btn-outline-success mt-2 add-review-btn" data-book-id="${item.bookId}" data-order-item-id="${item.orderItemId}">Add Review</button>` : ''}
+                                                            ${order.status === 'Completed' ? `<button class="btn btn-sm btn-outline-success mt-2 add-review-btn" data-book-id="${item.bookId}" data-order-item-id="${item.orderItemId}">Add Review</button>` : ''}
 
                                                         </div>
                                                     </div>
