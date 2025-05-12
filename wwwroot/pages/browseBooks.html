@@ -37,6 +37,13 @@
                 transform: translateY(-5px);
                 box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
+
+        /* Pagination styling */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -71,16 +78,15 @@
                     <a href="cart.html" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
-                <a href="orderHistory.html" class="btn btn-outline-light btn-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M12 21q-3.15 0-5.575-1.912T3.275 14.2q-.1-.375.15-.687t.675-.363q.4-.05.725.15t.45.6q.6 2.25 2.475 3.675T12 19q2.925 0 4.963-2.037T19 12t-2.037-4.962T12 5q-1.725 0-3.225.8T6.25 8H8q.425 0 .713.288T9 9t-.288.713T8 10H4q-.425 0-.712-.288T3 9V5q0-.425.288-.712T4 4t.713.288T5 5v1.35q1.275-1.6 3.113-2.475T12 3q1.875 0 3.513.713t2.85 1.924t1.925 2.85T21 12t-.712 3.513t-1.925 2.85t-2.85 1.925T12 21m1-9.4l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T11 11.975V8q0-.425.288-.712T12 7t.713.288T13 8z" />
-                    </svg>
+                    <a href="orderHistory.html" class="btn btn-outline-light btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12 21q-3.15 0-5.575-1.912T3.275 14.2q-.1-.375.15-.687t.675-.363q.4-.05.725.15t.45.6q.6 2.25 2.475 3.675T12 19q2.925 0 4.963-2.037T19 12t-2.037-4.962T12 5q-1.725 0-3.225.8T6.25 8H8q.425 0 .713.288T9 9t-.288.713T8 10H4q-.425 0-.712-.288T3 9V5q0-.425.288-.712T4 4t.713.288T5 5v1.35q1.275-1.6 3.113-2.475T12 3q1.875 0 3.513.713t2.85 1.924t1.925 2.85T21 12t-.712 3.513t-1.925 2.85t-2.85 1.925T12 21m1-9.4l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T11 11.975V8q0-.425.288-.712T12 7t.713.288T13 8z" />
+                        </svg>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
-
 
     <div class="container mt-4">
         <div class="filter-bar mb-4 d-flex gap-2">
@@ -131,10 +137,20 @@
                 <p>Loading books...</p>
             </div>
         </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-container" id="pagination">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item" id="prevPage"><a class="page-link" href="#">Previous</a></li>
+                    <!-- Page numbers will be inserted here -->
+                    <li class="page-item" id="nextPage"><a class="page-link" href="#">Next</a></li>
+                </ul>
+            </nav>
+        </div>
     </div>
 
     <!-- Scripts -->
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Add Toastify JS -->
@@ -144,13 +160,11 @@
         // This script contains only the cart and wishlist functionality
         // Function to check if user is logged in
         function isUserLoggedIn() {
-            // Check for auth token in localStorage
             return localStorage.getItem('authToken') !== null;
         }
 
         // Function to redirect to login page
         function redirectToLogin() {
-            // Store the current page URL to redirect back after login
             localStorage.setItem('redirectAfterLogin', window.location.href);
             window.location.href = 'login.html';
         }
@@ -158,14 +172,12 @@
         // Function to add item to cart
         async function addToCart(bookId) {
             try {
-                // First get the cart ID
                 const cartId = await getCartId();
 
                 if (!cartId) {
                     throw new Error('Could not determine cart ID');
                 }
 
-                // Add to cart using the correct endpoint
                 const response = await fetch(`/api/cart/addCartItem/${cartId}/cartItems/${bookId}`, {
                     method: 'POST',
                     headers: {
@@ -178,7 +190,6 @@
                 });
 
                 if (response.ok) {
-                    // If Toastify is available, use it, otherwise use alert
                     if (typeof Toastify !== 'undefined') {
                         Toastify({
                             text: "Book added to cart successfully!",
@@ -202,7 +213,6 @@
                         errorMessage = errorData.message || errorMessage;
                     } catch (parseError) {
                         console.error("Error parsing error response:", parseError);
-                        // Try to get the text instead
                         const errorText = await response.text();
                         if (errorText) {
                             errorMessage = errorText;
@@ -245,10 +255,8 @@
 
         // Function to get current user's cart ID
         async function getCartId() {
-            // If you store cartId in localStorage
             let cartId = localStorage.getItem('cartId');
 
-            // If not stored, you might need to fetch it from the server
             if (!cartId) {
                 try {
                     const response = await fetch('/api/cart/getUserCart', {
@@ -278,7 +286,6 @@
                 console.log("Auth token:", localStorage.getItem('authToken') ?
                     localStorage.getItem('authToken').substring(0, 20) + "..." : "No token found");
 
-                // Use the correct endpoint as defined in your WishlistController
                 const response = await fetch('/api/wishlist/add', {
                     method: 'POST',
                     headers: {
@@ -292,12 +299,10 @@
 
                 console.log("Wishlist response status:", response.status);
 
-                // Get response content as text first
                 const responseText = await response.text();
                 console.log("Raw response:", responseText);
 
                 if (response.ok) {
-                    // If Toastify is available, use it, otherwise use alert
                     if (typeof Toastify !== 'undefined') {
                         Toastify({
                             text: "Book added to wishlist successfully!",
@@ -313,19 +318,16 @@
                         alert("Book added to wishlist successfully!");
                     }
 
-                    // Update heart icon to show it's in wishlist
                     $(`.add-to-wishlist-btn[data-book-id="${bookId}"] i`).removeClass('far').addClass('fas text-danger');
                 } else {
                     let errorMessage = "Failed to add book to wishlist.";
 
                     if (responseText) {
-                        // Try to parse as JSON, if it fails just use the text
                         try {
                             const errorData = JSON.parse(responseText);
                             errorMessage = errorData.message || errorMessage;
                         } catch (e) {
-                            // Not JSON, use the text directly
-                            errorMessage = responseText.substring(0, 100) + "..."; // Limit length
+                            errorMessage = responseText.substring(0, 100) + "...";
                         }
                     }
 
@@ -392,9 +394,8 @@
             }
         }
 
-        // Set up the cart and wishlist button event handlers
+        // Function to set up the cart and wishlist button event handlers
         function setupCartWishlistButtons() {
-            // Add to cart button
             $('.add-to-cart-btn').on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -404,12 +405,10 @@
                     return;
                 }
 
-                // If user is logged in, proceed with adding to cart
                 const bookId = $(this).data('book-id');
                 addToCart(bookId);
             });
 
-            // Add to wishlist button
             $('.add-to-wishlist-btn').on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -419,30 +418,17 @@
                     return;
                 }
 
-                // If user is logged in, proceed with adding to wishlist
                 const bookId = $(this).data('book-id');
                 addToWishlist(bookId);
             });
         }
-
-        // When the document is ready, set up the buttons
-        $(document).ready(function () {
-            // If buttons already exist on the page, set them up
-            if ($('.add-to-cart-btn').length > 0 || $('.add-to-wishlist-btn').length > 0) {
-                setupCartWishlistButtons();
-            }
-
-            // If user is logged in, check wishlist status
-            if (isUserLoggedIn()) {
-                checkWishlistStatus();
-            }
-        });
     </script>
 
     <script>
-        // This script loads books and handles the logout functionality
+        // This script loads books and handles the logout functionality with pagination
         $(document).ready(function () {
             const apiUrl = '/api/allBooks';
+
             function displayStarRating(averageRating) {
                 const maxRating = 5;
                 const fullStarClass = 'fas fa-star text-warning';
@@ -472,67 +458,137 @@
             }
 
 
+            let currentPage = 1;
+            const booksPerPage = 10;
+            let allBooks = [];
+
             // Load books
+            function loadBooks(page) {
+                const startIndex = (page - 1) * booksPerPage;
+                const endIndex = startIndex + booksPerPage;
+                const paginatedBooks = allBooks.slice(startIndex, endIndex);
+
+                const bookListContainer = $('#bookList');
+                bookListContainer.empty();
+
+                if (paginatedBooks.length > 0) {
+                    paginatedBooks.forEach(book => {
+                        const averageRatingDisplay = calculateAverageRating(book.reviews);
+                        const bookCard = `
+                <div class="col">
+                    <div class="card h-100 text-center p-2 position-relative">
+                        <a href="BookDetails.html?id=${book.bookId}" class="book-link stretched-link"></a>
+                        <img src="../${book.image}" class="card-img-top book-img" alt="${book.title}" />
+                        <div class="card-body">
+                            <h6 class="card-title mb-1">${book.title}</h6>
+                            <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => author.firstName + ' ' + author.lastName).join(', ') : 'No Author'}</p>
+                            <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
+                            <div class="mb-2">
+                                <span class="small">${averageRatingDisplay}</span>
+                            </div>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn btn-sm btn-outline-primary add-to-cart-btn" data-book-id="${book.bookId}">Add to Cart</button>
+                                <button class="btn btn-sm btn-outline-secondary add-to-wishlist-btn" data-book-id="${book.bookId}">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
+                    </div>
+                </div>`;
+                        bookListContainer.append(bookCard);
+                    });
+
+                    // Remove the stretched-link class from cards to allow button clicks
+                    $('.book-link').removeClass('stretched-link');
+
+                    // Make the card clickable to go to book details
+                    $('.card').on('click', function (e) {
+                        if ($(e.target).closest('button').length === 0) {
+                            const href = $(this).find('.book-link').attr('href');
+                            window.location.href = href;
+                        }
+                    });
+
+                    // Set up the button event handlers
+                    if (typeof setupCartWishlistButtons === 'function') {
+                        setupCartWishlistButtons();
+                    }
+
+                    // Check if books are in wishlist and update UI
+                    if (typeof checkWishlistStatus === 'function' && isUserLoggedIn()) {
+                        checkWishlistStatus();
+                    }
+                } else {
+                    bookListContainer.html('<p>No more books to display.</p>');
+                }
+
+                // Update pagination controls
+                updatePagination();
+            }
+
+            // Update pagination UI
+            function updatePagination() {
+                const totalPages = Math.ceil(allBooks.length / booksPerPage);
+                const paginationContainer = $('#pagination ul');
+                paginationContainer.empty();
+
+                // Previous button
+                paginationContainer.append(`
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}" id="prevPage">
+                            <a class="page-link" href="#">Previous</a>
+                        </li>
+                    `);
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationContainer.append(`
+                            <li class="page-item ${currentPage === i ? 'active' : ''}">
+                                <a class="page-link" href="#" data-page="${i}">${i}</a>
+                            </li>
+                        `);
+                }
+
+                // Next button
+                paginationContainer.append(`
+                        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}" id="nextPage">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    `);
+
+                // Add click event handlers
+                $('#prevPage a').on('click', function (e) {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        currentPage--;
+                        loadBooks(currentPage);
+                    }
+                });
+
+                $('#nextPage a').on('click', function (e) {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        loadBooks(currentPage);
+                    }
+                });
+
+                $('.page-link[data-page]').on('click', function (e) {
+                    e.preventDefault();
+                    currentPage = parseInt($(this).data('page'));
+                    loadBooks(currentPage);
+                });
+            }
+
+            // Initial AJAX call to fetch all books
             $.ajax({
                 url: apiUrl,
                 type: 'GET',
                 dataType: 'json',
                 success: function (response) {
-                    if (response && Array.isArray(response)) { // Corrected condition
-                        const bookListContainer = $('#bookList');
-                        bookListContainer.empty();
-
-
-                        response.forEach(book => {
-                            const averageRatingDisplay = calculateAverageRating(book.reviews);
-
-                            const bookCard = `
-                                <div class="col">
-                                    <div class="card h-100 text-center p-2 position-relative">
-                                        <a href="BookDetails.html?id=${book.bookId}" class="book-link stretched-link"></a>
-                                        <img src="../${book.image}" class="card-img-top book-img" alt="${book.title}" />
-                                        <div class="card-body">
-                                            <h6 class="card-title mb-1">${book.title}</h6>
-                                            <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => author.firstName + ' ' + author.lastName).join(', ') : 'No Author'}</p>
-                                            <p class="mb-2 text-dark fw-bold">Rs. ${book.price}/-</p>
-                                            <div class="mb-2">
-                                        <span class="small">${averageRatingDisplay}</span>
-                                    </div>
-                                            <div class="d-flex justify-content-center gap-2">
-                                                <button class="btn btn-sm btn-outline-primary add-to-cart-btn" data-book-id="${book.bookId}">Add to Cart</button>
-                                                <button class="btn btn-sm btn-outline-secondary add-to-wishlist-btn" data-book-id="${book.bookId}">
-                                                    <i class="far fa-heart"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
-                                    </div>
-                                </div>
-                            `;
-                            bookListContainer.append(bookCard);
-                        });
-
-                        // Remove the stretched-link class from cards to allow button clicks
-                        $('.book-link').removeClass('stretched-link');
-
-                        // Make the card clickable to go to book details
-                        $('.card').on('click', function (e) {
-                            // Don't navigate if clicking on a button
-                            if ($(e.target).closest('button').length === 0) {
-                                const href = $(this).find('.book-link').attr('href');
-                                window.location.href = href;
-                            }
-                        });
-
-                        // Set up the button event handlers from books.js (will be defined there)
-                        if (typeof setupCartWishlistButtons === 'function') {
-                            setupCartWishlistButtons();
-                        }
-
-                        // Check if books are in wishlist and update UI
-                        if (typeof checkWishlistStatus === 'function' && isUserLoggedIn()) {
-                            checkWishlistStatus();
-                        }
+                    if (response && Array.isArray(response)) {
+                        allBooks = response; // Store all books
+                        loadBooks(currentPage); // Load the first page
                     } else {
                         $('#bookList').html('<p>No books found or invalid data format.</p>');
                         console.error('Invalid API response format:', response);
@@ -548,11 +604,9 @@
             $('#logoutBtn').on('click', function (e) {
                 e.preventDefault();
 
-                // Clear authentication token and other data
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('cartId');
 
-                // If Toastify is available, use it, otherwise use alert
                 if (typeof Toastify !== 'undefined') {
                     Toastify({
                         text: "Logged out successfully!",
@@ -568,19 +622,17 @@
                     alert("Logged out successfully!");
                 }
 
-                // Redirect to login page after a short delay
                 setTimeout(function () {
                     window.location.href = 'login.html';
                 }, 1000);
             });
 
-            // Function to check if user is logged in - needed for conditional UI elements
+            // Function to check if user is logged in
             function isUserLoggedIn() {
                 return localStorage.getItem('authToken') !== null;
             }
         });
     </script>
     <script src="../js/cart.js"></script>
-
 </body>
 </html>
