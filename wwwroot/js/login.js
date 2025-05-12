@@ -36,7 +36,7 @@
                     }
                 }).showToast();
 
-<<<<<<< HEAD
+
                 // Store the token (you might want to use localStorage or sessionStorage)
                 const token = data.token;
                 console.log('Login successful, Token:', token);
@@ -50,7 +50,7 @@
                 const errorData = await response.text(); // Or response.json() if your backend sends JSON error
                 Toastify({
                     text: errorData || "Invalid credentials.",
-=======
+
                 const token = data.token;
                 const role = data.role; // Get the role from the response
                 console.log('Login successful, Token:', token, 'Role:', role);
@@ -74,7 +74,7 @@
                 const errorData = await response.json(); // Expect JSON error for unauthorized
                 Toastify({
                     text: errorData.message || "Invalid credentials.",
->>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
+
                     duration: 5000,
                     close: true,
                     gravity: "top",
@@ -85,14 +85,14 @@
                 }).showToast();
                 console.error('Login failed:', errorData);
             } else {
-<<<<<<< HEAD
+
                 Toastify({
                     text: `Login failed with status: ${response.status}`,
-=======
+
                 const errorText = await response.text();
                 Toastify({
                     text: `Login failed with status: ${response.status} - ${errorText}`,
->>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
+
                     duration: 5000,
                     close: true,
                     gravity: "top",
@@ -101,11 +101,11 @@
                         background: "#dc3545",
                     }
                 }).showToast();
-<<<<<<< HEAD
+
                 console.error('Login failed with status:', response.status);
-=======
+
                 console.error('Login failed with status:', response.status, errorText);
->>>>>>> 8038316159458e3cb8f7572d15de896b075839a8
+
             }
         } catch (error) {
             Toastify({
