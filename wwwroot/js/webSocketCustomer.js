@@ -51,7 +51,7 @@ notificationSocket.onerror = (error) => {
                 message = `<strong>Order Confirmed!</strong><br>Order ID: ${notification.orderId}<br>Order Date: ${new Date(notification.orderDate).toLocaleString()}<br>Claim Code: ${notification.claimCode}<br>Total Price: $${notification.totalPrice.toFixed(2)}`;
                 break;
             case 'order_completed':
-                message = `<strong>Order Completed!</strong><br>Order ID: ${notification.orderId}<br>Claim Code: ${notification.claimCode}<br>Total Price: $${notification.totalPrice.toFixed(2)}`;
+                message = `<strong>Order Completed!</strong><br>Order ID: ${notification.orderId}<br>Claim Code: ${notification.claimCode}<br>Total Price: ${notification.totalPrice.toFixed(2)}`;
                 break;
             case 'connection_success':
                 message = `WebSocket connection established for user ID: ${notification.userId}`;
