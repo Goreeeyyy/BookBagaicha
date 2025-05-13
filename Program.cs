@@ -129,6 +129,8 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+// In ConfigureServices method
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<NotificationWebSocketHandler>();
 
 builder.Services.AddAuthorization();

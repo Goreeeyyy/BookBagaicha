@@ -211,7 +211,7 @@
         <div class="confirmation-content">
             <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
             <h4>Order Placed Successfully!</h4>
-            <p>Your order has been confirmed. You can check your order status in Order History.</p>
+            <p>Your order has been confirmed. You can check your order status in Order History and get invoice in your registered email account.</p>
             <div class="confirmation-actions">
                 <a href="orderHistory.html" class="btn btn-primary">View Order History</a>
             </div>
@@ -659,16 +659,20 @@
                 });
 
                 // Confirm order button
+                // Confirm order button
+                let isOrderProcessing = false;
+
                 $('#confirmOrderBtn').on('click', async function () {
+                    if (isOrderProcessing) return;  // Prevent duplicate execution
+                    isOrderProcessing = true;
+
                     try {
-                        // Show loading state
                         $(this).prop('disabled', true);
                         $(this).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...');
 
                         const cartId = $('#placeOrderBtn').data('cart-id');
                         const discount = $('#placeOrderBtn').data('discount') || 0;
 
-                        // Call API to place order
                         const response = await fetch('/api/order/placeOrder', {
                             method: 'POST',
                             headers: {
@@ -682,33 +686,16 @@
                         });
 
                         if (response.ok) {
-                            // Hide confirmation dialog
                             $('#orderConfirmationDialog').removeClass('active');
-
-                            // Show success dialog
-                            setTimeout(() => {
-                                $('#orderSuccessDialog').addClass('active');
-                            }, 500);
-
-                            // Clear cart ID from localStorage
+                            setTimeout(() => $('#orderSuccessDialog').addClass('active'), 500);
                             localStorage.removeItem('cartId');
-
-                            if (window.updateCartBadge) {
-                                window.updateCartBadge();
-                            }
+                            if (window.updateCartBadge) window.updateCartBadge();
                         } else if (response.status === 401) {
-                            // Unauthorized - token might be expired
                             showToastMessage("Your session has expired. Please login again.", "error");
-
-                            // Clear token and redirect to login
                             localStorage.removeItem('authToken');
                             localStorage.setItem('redirectAfterLogin', window.location.href);
-
-                            setTimeout(() => {
-                                window.location.href = 'login.html';
-                            }, 2000);
+                            setTimeout(() => window.location.href = 'login.html', 2000);
                         } else {
-                            // Handle other errors
                             try {
                                 const errorData = await response.json();
                                 showToastMessage(errorData.message || "Failed to place order", "error");
@@ -722,13 +709,13 @@
                         showToastMessage("An unexpected error occurred", "error");
                         $('#orderConfirmationDialog').removeClass('active');
                     } finally {
-                        // Reset button state
                         $('#confirmOrderBtn').prop('disabled', false);
                         $('#confirmOrderBtn').html('Place Order');
+                        isOrderProcessing = false;
                     }
+                
                 });
             }
-
             // Function to update cart item quantity
             async function updateCartItemQuantity(cartId, cartItemId, quantity) {
                 try {
@@ -855,8 +842,10 @@
                 setTimeout(function () {
                     window.location.href = 'login.html';
                 }, 1000);
+
             });
         });
+        
     </script>
     <script src="../js/cart.js"></script>
     <script src="../js/webSocketCustomer.js"></script>
