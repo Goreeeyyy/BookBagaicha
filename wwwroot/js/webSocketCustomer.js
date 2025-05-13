@@ -13,33 +13,33 @@
         console.log('[CUSTOMER] Auth token:', token);
         notificationSocket = new WebSocket(`wss://localhost:44351/ws/notifications?token=${token}`);
 
-        notificationSocket.onopen = () => {
-            console.log('[CUSTOMER] WebSocket connection established.');
-        };
+notificationSocket.onopen = () => {
+    console.log('[CUSTOMER] WebSocket connection established.');
+};
 
-        notificationSocket.onmessage = (event) => {
-            try {
-                const notification = JSON.parse(event.data);
-                console.log('[CUSTOMER] Received message:', notification);
+notificationSocket.onmessage = (event) => {
+    try {
+        const notification = JSON.parse(event.data);
+        console.log('[CUSTOMER] Received message:', notification);
                 displayNotification(notification);
-            } catch (error) {
-                console.error('[CUSTOMER] Error parsing notification:', error);
-            }
-        };
+    } catch (error) {
+        console.error('[CUSTOMER] Error parsing notification:', error);
+    }
+};
 
-        notificationSocket.onclose = (event) => {
-            console.log('[CUSTOMER] WebSocket connection closed:', event);
+notificationSocket.onclose = (event) => {
+    console.log('[CUSTOMER] WebSocket connection closed:', event);
             setTimeout(connectWebSocket, 5000); // Reconnect after 5 seconds
-        };
+};
 
-        notificationSocket.onerror = (error) => {
-            console.error('[CUSTOMER] WebSocket error:', error);
-        };
+notificationSocket.onerror = (error) => {
+    console.error('[CUSTOMER] WebSocket error:', error);
+};
     }
 
     // Function to display notifications
     function displayNotification(notification) {
-        const notificationArea = document.getElementById('notification-area');
+    const notificationArea = document.getElementById('notification-area');
         if (!notificationArea) {
             console.warn('[CUSTOMER] Notification area not found on this page');
             return;
@@ -97,11 +97,11 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             font-size: 0.9rem;
-        }
+    }
         .notification .close {
             padding: 0.5rem;
             opacity: 0.7;
-        }
+}
     `;
     document.head.appendChild(style);
 });

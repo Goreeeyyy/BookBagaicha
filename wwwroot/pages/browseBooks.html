@@ -4,7 +4,6 @@
     <title>Book Bagaicha</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <!-- Add Toastify CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         .book-img {
@@ -38,11 +37,14 @@
                 box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
 
-        /* Pagination styling */
         .pagination-container {
             display: flex;
             justify-content: center;
             margin-top: 20px;
+        }
+
+        .search-bar {
+            max-width: 200px; 
         }
     </style>
 </head>
@@ -51,7 +53,7 @@
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagaicha</a>
             <div class="d-flex align-items-center ms-auto">
-                <ul class="navbar-nav me-4">
+                <ul class="navbar-nav me-auto me-lg-2">
                     <li class="nav-item">
                         <a class="nav-link" href="HomePage.html">HOME</a>
                     </li>
@@ -60,7 +62,7 @@
                     </li>
                 </ul>
                 <div class="d-flex me-3">
-                    <input class="form-control form-control-sm" type="search" placeholder="Search for products..." aria-label="Search" />
+                    <input class="form-control form-control-sm search-bar" type="search" id="searchInput" placeholder="Search by book title..." aria-label="Search" />
                 </div>
                 <div class="d-flex gap-2">
                     <div class="dropdown">
@@ -91,45 +93,37 @@
     <div class="container mt-4">
         <div class="filter-bar mb-4 d-flex gap-2">
             <div class="dropdown">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    All
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="categoryFilter">
+                    All Categories
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item small" href="#">All</a></li>
-                    <li><a class="dropdown-item small" href="#">Award Winners</a></li>
-                    <li><a class="dropdown-item small" href="#">Best Sellers</a></li>
-                    <li><a class="dropdown-item small" href="#">New Releases</a></li>
-                    <li><a class="dropdown-item small" href="#">Coming Soon</a></li>
-                    <li><a class="dropdown-item small" href="#">On Sale</a></li>
+                <ul class="dropdown-menu" id="categoryDropdown">
+                    <li><a class="dropdown-item small" href="#" data-value="">All</a></li>
                 </ul>
             </div>
 
             <div class="dropdown">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="genreFilter">
+                    All Genres
+                </button>
+                <ul class="dropdown-menu" id="genreDropdown">
+                    <li><a class="dropdown-item small" href="#" data-value="">All</a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="sortFilter">
                     Sort
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item small" href="#">Price high to low</a></li>
-                    <li><a class="dropdown-item small" href="#">Price low to high</a></li>
-                </ul>
-            </div>
-
-            <div class="dropdown">
-                <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    Genre
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item small" href="#">Adventure</a></li>
-                    <li><a class="dropdown-item small" href="#">Romance</a></li>
-                    <li><a class="dropdown-item small" href="#">Mystery</a></li>
-                    <li><a class="dropdown-item small" href="#">Science Fiction</a></li>
+                <ul class="dropdown-menu" id="sortDropdown">
+                    <li><a class="dropdown-item small" href="#" data-sort="">Sort By</a></li>
+                    <li><a class="dropdown-item small" href="#" data-sort="price-desc">Price high to low</a></li>
+                    <li><a class="dropdown-item small" href="#" data-sort="price-asc">Price low to high</a></li>
                 </ul>
             </div>
         </div>
 
         <h3 class="mb-4">Explore All Books Here</h3>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="bookList">
-            <!-- Books will be loaded here -->
             <div class="text-center w-100">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
@@ -138,12 +132,10 @@
             </div>
         </div>
 
-        <!-- Pagination Controls -->
         <div class="pagination-container" id="pagination">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
                     <li class="page-item" id="prevPage"><a class="page-link" href="#">Previous</a></li>
-                    <!-- Page numbers will be inserted here -->
                     <li class="page-item" id="nextPage"><a class="page-link" href="#">Next</a></li>
                 </ul>
             </nav>
@@ -151,30 +143,23 @@
     </div>
     <div id="notification-area"></div>
 
-    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Add Toastify JS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <!-- Cart and Wishlist functionality -->
     <script>
-        // This script contains only the cart and wishlist functionality
-        // Function to check if user is logged in
+        // Cart and Wishlist functionality (unchanged from original)
         function isUserLoggedIn() {
             return localStorage.getItem('authToken') !== null;
         }
 
-        // Function to redirect to login page
         function redirectToLogin() {
             localStorage.setItem('redirectAfterLogin', window.location.href);
             window.location.href = 'login.html';
         }
 
-        // Function to add item to cart
         async function addToCart(bookId) {
             try {
                 const cartId = await getCartId();
-
                 if (!cartId) {
                     throw new Error('Could not determine cart ID');
                 }
@@ -185,27 +170,18 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                     },
-                    body: JSON.stringify({
-                        quantity: 1
-                    })
+                    body: JSON.stringify({ quantity: 1 })
                 });
 
                 if (response.ok) {
-                    if (typeof Toastify !== 'undefined') {
-                        Toastify({
-                            text: "Book added to cart successfully!",
-                            duration: 3000,
-                            close: true,
-                            gravity: "top",
-                            position: "right",
-                            style: {
-                                background: "linear-gradient(to right, #00b09b, #96c93d)",
-                            }
-                        }).showToast();
-                    } else {
-                        alert("Book added to cart successfully!");
-                    }
-
+                    Toastify({
+                        text: "Book added to cart successfully!",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: { background: "linear-gradient(to right, #00b09b, #96c93d)" }
+                    }).showToast();
                     window.updateCartBadge();
                 } else {
                     let errorMessage = "Failed to add book to cart.";
@@ -213,60 +189,39 @@
                         const errorData = await response.json();
                         errorMessage = errorData.message || errorMessage;
                     } catch (parseError) {
-                        console.error("Error parsing error response:", parseError);
                         const errorText = await response.text();
-                        if (errorText) {
-                            errorMessage = errorText;
-                        }
+                        if (errorText) errorMessage = errorText;
                     }
-
-                    if (typeof Toastify !== 'undefined') {
-                        Toastify({
-                            text: errorMessage,
-                            duration: 5000,
-                            close: true,
-                            gravity: "top",
-                            position: "right",
-                            style: {
-                                background: "#dc3545",
-                            }
-                        }).showToast();
-                    } else {
-                        alert(errorMessage);
-                    }
-                }
-            } catch (error) {
-                console.error('Error adding to cart:', error);
-                if (typeof Toastify !== 'undefined') {
                     Toastify({
-                        text: "An unexpected error occurred.",
+                        text: errorMessage,
                         duration: 5000,
                         close: true,
                         gravity: "top",
                         position: "right",
-                        style: {
-                            background: "#dc3545",
-                        }
+                        style: { background: "#dc3545" }
                     }).showToast();
-                } else {
-                    alert("An error occurred while adding to cart.");
                 }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                Toastify({
+                    text: "An unexpected error occurred.",
+                    duration: 5000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "#dc3545" }
+                }).showToast();
             }
         }
 
-        // Function to get current user's cart ID
         async function getCartId() {
             let cartId = localStorage.getItem('cartId');
-
             if (!cartId) {
                 try {
                     const response = await fetch('/api/cart/getUserCart', {
                         method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                        }
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
                     });
-
                     if (response.ok) {
                         const data = await response.json();
                         cartId = data.cartId;
@@ -276,53 +231,33 @@
                     console.error('Error fetching cart ID:', error);
                 }
             }
-
             return cartId;
         }
 
-        // Function to add item to wishlist
         async function addToWishlist(bookId) {
             try {
-                console.log("Adding to wishlist, book ID:", bookId);
-                console.log("Auth token:", localStorage.getItem('authToken') ?
-                    localStorage.getItem('authToken').substring(0, 20) + "..." : "No token found");
-
                 const response = await fetch('/api/wishlist/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
                     },
-                    body: JSON.stringify({
-                        bookId: bookId
-                    })
+                    body: JSON.stringify({ bookId: bookId })
                 });
 
-                console.log("Wishlist response status:", response.status);
-
-                const responseText = await response.text();
-                console.log("Raw response:", responseText);
-
                 if (response.ok) {
-                    if (typeof Toastify !== 'undefined') {
-                        Toastify({
-                            text: "Book added to wishlist successfully!",
-                            duration: 3000,
-                            close: true,
-                            gravity: "top",
-                            position: "right",
-                            style: {
-                                background: "linear-gradient(to right, #00b09b, #96c93d)",
-                            }
-                        }).showToast();
-                    } else {
-                        alert("Book added to wishlist successfully!");
-                    }
-
+                    Toastify({
+                        text: "Book added to wishlist successfully!",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: { background: "linear-gradient(to right, #00b09b, #96c93d)" }
+                    }).showToast();
                     $(`.add-to-wishlist-btn[data-book-id="${bookId}"] i`).removeClass('far').addClass('fas text-danger');
                 } else {
                     let errorMessage = "Failed to add book to wishlist.";
-
+                    const responseText = await response.text();
                     if (responseText) {
                         try {
                             const errorData = JSON.parse(responseText);
@@ -331,45 +266,30 @@
                             errorMessage = responseText.substring(0, 100) + "...";
                         }
                     }
-
-                    if (typeof Toastify !== 'undefined') {
-                        Toastify({
-                            text: errorMessage,
-                            duration: 5000,
-                            close: true,
-                            gravity: "top",
-                            position: "right",
-                            style: {
-                                background: "#dc3545",
-                            }
-                        }).showToast();
-                    } else {
-                        alert(errorMessage);
-                    }
-                }
-            } catch (error) {
-                console.error('Error adding to wishlist:', error);
-                if (typeof Toastify !== 'undefined') {
                     Toastify({
-                        text: "An unexpected error occurred: " + error.message,
+                        text: errorMessage,
                         duration: 5000,
                         close: true,
                         gravity: "top",
                         position: "right",
-                        style: {
-                            background: "#dc3545",
-                        }
+                        style: { background: "#dc3545" }
                     }).showToast();
-                } else {
-                    alert("An error occurred while adding to wishlist: " + error.message);
                 }
+            } catch (error) {
+                console.error('Error adding to wishlist:', error);
+                Toastify({
+                    text: "An unexpected error occurred: " + error.message,
+                    duration: 5000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "#dc3545" }
+                }).showToast();
             }
         }
 
-        // Function to check if books are in wishlist and update UI
         async function checkWishlistStatus() {
             if (!isUserLoggedIn()) return;
-
             try {
                 const bookIds = $('.add-to-wishlist-btn').map(function () {
                     return $(this).data('book-id');
@@ -378,11 +298,8 @@
                 for (const bookId of bookIds) {
                     const response = await fetch(`/api/wishlist/check/${bookId}`, {
                         method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                        }
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
                     });
-
                     if (response.ok) {
                         const data = await response.json();
                         if (data.isInWishlist) {
@@ -395,17 +312,14 @@
             }
         }
 
-        // Function to set up the cart and wishlist button event handlers
         function setupCartWishlistButtons() {
             $('.add-to-cart-btn').on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-
                 if (!isUserLoggedIn()) {
                     redirectToLogin();
                     return;
                 }
-
                 const bookId = $(this).data('book-id');
                 addToCart(bookId);
             });
@@ -413,20 +327,16 @@
             $('.add-to-wishlist-btn').on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-
                 if (!isUserLoggedIn()) {
                     redirectToLogin();
                     return;
                 }
-
                 const bookId = $(this).data('book-id');
                 addToWishlist(bookId);
             });
         }
-    </script>
 
-    <script>
-        // This script loads books and handles the logout functionality with pagination
+        // Modified book loading with filtering, sorting, and searching
         $(document).ready(function () {
             const apiUrl = '/api/allBooks';
 
@@ -459,15 +369,42 @@
             }
 
 
+            const filterApiUrl = '/api/bookFilters';
             let currentPage = 1;
             const booksPerPage = 10;
             let allBooks = [];
 
-            // Load books
+            function applyFiltersAndSort() {
+                filteredBooks = allBooks.filter(book => {
+                    const bookCategory = book.category || '';
+                    const bookGenres = (book.genres && book.genres.$values) ? book.genres.$values.map(g => g.name || '') : [];
+                    const bookTitle = book.title || '';
+                    const bookAuthors = (book.authors && book.authors.$values) ?
+                        book.authors.$values.map(a => `${a.firstName || ''} ${a.lastName || ''}`.trim()) : [];
+
+                    const matchesCategory = !selectedCategory ||
+                        bookCategory.toLowerCase() === selectedCategory.toLowerCase();
+                    const matchesGenre = !selectedGenre ||
+                        bookGenres.some(g => g.toLowerCase() === selectedGenre.toLowerCase());
+                    const matchesSearch = !searchQuery ||
+                        bookTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        bookAuthors.some(a => a.toLowerCase().includes(searchQuery.toLowerCase()));
+
+                    return matchesCategory && matchesGenre && matchesSearch;
+                });
+
+                if (sortOrder === 'price-asc') {
+                    filteredBooks.sort((a, b) => (a.price || 0) - (b.price || 0));
+                } else if (sortOrder === 'price-desc') {
+                    filteredBooks.sort((a, b) => (b.price || 0) - (a.price || 0));
+                }
+            }
+
             function loadBooks(page) {
+                applyFiltersAndSort();
                 const startIndex = (page - 1) * booksPerPage;
                 const endIndex = startIndex + booksPerPage;
-                const paginatedBooks = allBooks.slice(startIndex, endIndex);
+                const paginatedBooks = filteredBooks.slice(startIndex, endIndex);
 
                 const bookListContainer = $('#bookList');
                 bookListContainer.empty();
@@ -497,13 +434,31 @@
                             ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
                         </div>
                     </div>`;
+                                        <div class="col">
+                                            <div class="card h-100 text-center p-2 position-relative">
+                                                <a href="BookDetails.html?id=${book.bookId}" class="book-link stretched-link"></a>
+                                                <img src="../${book.image || 'images/placeholder.jpg'}" class="card-img-top book-img" alt="${book.title || 'No Title'}" />
+                                                <div class="card-body">
+                                                    <h6 class="card-title mb-1">${book.title || 'No Title'}</h6>
+                                                    <p class="card-subtitle text-muted small mb-2">${book.authors && book.authors.$values ? book.authors.$values.map(author => `${author.firstName || ''} ${author.lastName || ''}`.trim()).join(', ') : 'No Author'}</p>
+                                                    <p class="mb-2 text-dark fw-bold">Rs. ${book.price || 0}/-</p>
+                                                    <div class="mb-2">
+                                                        <span class="small">${averageRatingDisplay}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-center gap-2">
+                                                        <button class="btn btn-sm btn-outline-primary add-to-cart-btn" data-book-id="${book.bookId}">Add to Cart</button>
+                                                        <button class="btn btn-sm btn-outline-secondary add-to-wishlist-btn" data-book-id="${book.bookId}">
+                                                            <i class="far fa-heart"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                ${book.onSale ? '<span class="on-sale">Sale!</span>' : ''}
+                                            </div>
+                                        </div>`;
                         bookListContainer.append(bookCard);
                     });
 
-                    // Remove the stretched-link class from cards to allow button clicks
                     $('.book-link').removeClass('stretched-link');
-
-                    // Make the card clickable to go to book details
                     $('.card').on('click', function (e) {
                         if ($(e.target).closest('button').length === 0) {
                             const href = $(this).find('.book-link').attr('href');
@@ -511,53 +466,54 @@
                         }
                     });
 
-                    // Set up the button event handlers
-                    if (typeof setupCartWishlistButtons === 'function') {
-                        setupCartWishlistButtons();
-                    }
-
-                    // Check if books are in wishlist and update UI
-                    if (typeof checkWishlistStatus === 'function' && isUserLoggedIn()) {
+                    setupCartWishlistButtons();
+                    if (isUserLoggedIn()) {
                         checkWishlistStatus();
                     }
                 } else {
-                    bookListContainer.html('<p>No more books to display.</p>');
+                    bookListContainer.html('<p>No books match the current filters.</p>');
                 }
 
-                // Update pagination controls
                 updatePagination();
             }
 
-            // Update pagination UI
             function updatePagination() {
-                const totalPages = Math.ceil(allBooks.length / booksPerPage);
+                const totalPages = Math.ceil(filteredBooks.length / booksPerPage) || 1;
                 const paginationContainer = $('#pagination ul');
                 paginationContainer.empty();
 
-                // Previous button
                 paginationContainer.append(`
                             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}" id="prevPage">
                                 <a class="page-link" href="#">Previous</a>
                             </li>
                         `);
+                                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}" id="prevPage">
+                                        <a class="page-link" href="#">Previous</a>
+                                    </li>
+                                `);
 
-                // Page numbers
                 for (let i = 1; i <= totalPages; i++) {
                     paginationContainer.append(`
                                 <li class="page-item ${currentPage === i ? 'active' : ''}">
                                     <a class="page-link" href="#" data-page="${i}">${i}</a>
                                 </li>
                             `);
+                                        <li class="page-item ${currentPage === i ? 'active' : ''}">
+                                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                                        </li>
+                                    `);
                 }
 
-                // Next button
                 paginationContainer.append(`
                             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}" id="nextPage">
                                 <a class="page-link" href="#">Next</a>
                             </li>
                         `);
+                                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}" id="nextPage">
+                                        <a class="page-link" href="#">Next</a>
+                                    </li>
+                                `);
 
-                // Add click event handlers
                 $('#prevPage a').on('click', function (e) {
                     e.preventDefault();
                     if (currentPage > 1) {
@@ -581,57 +537,127 @@
                 });
             }
 
-            // Initial AJAX call to fetch all books
+            function populateFilters(categories, genres) {
+                const categoryDropdown = $('#categoryDropdown');
+                const genreDropdown = $('#genreDropdown');
+
+                // Filter out invalid entries and ensure unique values
+                const validCategories = [...new Set(categories)]
+                    .filter(c => c && c !== 'string' && typeof c === 'string' && c.trim())
+                    .sort();
+                const validGenres = [...new Set(genres)]
+                    .filter(g => g && g !== 'string' && typeof g === 'string' && g.trim())
+                    .sort();
+
+                categoryDropdown.empty();
+                categoryDropdown.append('<li><a class="dropdown-item small" href="#" data-value="">All</a></li>');
+                validCategories.forEach(category => {
+                    categoryDropdown.append(`<li><a class="dropdown-item small" href="#" data-value="${category}">${category}</a></li>`);
+                });
+                if (validCategories.length === 0) {
+                    categoryDropdown.append('<li><a class="dropdown-item small disabled" href="#">No categories available</a></li>');
+                }
+
+                genreDropdown.empty();
+                genreDropdown.append('<li><a class="dropdown-item small" href="#" data-value="">All</a></li>');
+                validGenres.forEach(genre => {
+                    genreDropdown.append(`<li><a class="dropdown-item small" href="#" data-value="${genre}">${genre}</a></li>`);
+                });
+                if (validGenres.length === 0) {
+                    genreDropdown.append('<li><a class="dropdown-item small disabled" href="#">No genres available</a></li>');
+                }
+            }
+
+            // Fetch filters
+            $.ajax({
+                url: filterApiUrl,
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response && Array.isArray(response.categories) && Array.isArray(response.genres)) {
+                        populateFilters(response.categories, response.genres);
+                    } else {
+                        console.error('Invalid filter API response:', response);
+                        $('#categoryDropdown').append('<li><a class="dropdown-item small disabled" href="#">Error loading categories</a></li>');
+                        $('#genreDropdown').append('<li><a class="dropdown-item small disabled" href="#">Error loading genres</a></li>');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching filters:', status, error, xhr.responseText);
+                    $('#categoryDropdown').append('<li><a class="dropdown-item small disabled" href="#">Error loading categories</a></li>');
+                    $('#genreDropdown').append('<li><a class="dropdown-item small disabled" href="#">Error loading genres</a></li>');
+                }
+            });
+
+            // Fetch all books
             $.ajax({
                 url: apiUrl,
                 type: 'GET',
                 dataType: 'json',
                 success: function (response) {
                     if (response && Array.isArray(response)) {
-                        allBooks = response; // Store all books
-                        loadBooks(currentPage); // Load the first page
+                        allBooks = response;
+                        filteredBooks = [...allBooks];
+                        loadBooks(currentPage);
                     } else {
+                        console.error('Invalid books API response:', response);
                         $('#bookList').html('<p>No books found or invalid data format.</p>');
-                        console.error('Invalid API response format:', response);
                     }
                 },
-                error: function (error) {
-                    console.error('Error fetching books:', error);
+                error: function (xhr, status, error) {
+                    console.error('Error fetching books:', status, error, xhr.responseText);
                     $('#bookList').html('<p>Failed to load books.</p>');
                 }
             });
 
-            // Logout button
+            // Filter and sort event handlers
+            $('#categoryDropdown').on('click', '.dropdown-item:not(.disabled)', function (e) {
+                e.preventDefault();
+                selectedCategory = $(this).data('value') || '';
+                $('#categoryFilter').text(selectedCategory || 'All Categories');
+                currentPage = 1;
+                loadBooks(currentPage);
+            });
+
+            $('#genreDropdown').on('click', '.dropdown-item:not(.disabled)', function (e) {
+                e.preventDefault();
+                selectedGenre = $(this).data('value') || '';
+                $('#genreFilter').text(selectedGenre || 'All Genres');
+                currentPage = 1;
+                loadBooks(currentPage);
+            });
+
+            $('#sortDropdown').on('click', '.dropdown-item', function (e) {
+                e.preventDefault();
+                sortOrder = $(this).data('sort') || '';
+                $('#sortFilter').text($(this).text());
+                currentPage = 1;
+                loadBooks(currentPage);
+            });
+
+            $('#searchInput').on('input', function () {
+                searchQuery = $(this).val().trim();
+                currentPage = 1;
+                loadBooks(currentPage);
+            });
+
+            // Logout
             $('#logoutBtn').on('click', function (e) {
                 e.preventDefault();
-
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('cartId');
-
-                if (typeof Toastify !== 'undefined') {
-                    Toastify({
-                        text: "Logged out successfully!",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right",
-                        style: {
-                            background: "linear-gradient(to right, #00b09b, #96c93d)",
-                        }
-                    }).showToast();
-                } else {
-                    alert("Logged out successfully!");
-                }
-
+                Toastify({
+                    text: "Logged out successfully!",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    style: { background: "linear-gradient(to right, #00b09b, #96c93d)" }
+                }).showToast();
                 setTimeout(function () {
                     window.location.href = 'login.html';
                 }, 1000);
             });
-
-            // Function to check if user is logged in
-            function isUserLoggedIn() {
-                return localStorage.getItem('authToken') !== null;
-            }
         });
     </script>
     <script src="../js/cart.js"></script>
