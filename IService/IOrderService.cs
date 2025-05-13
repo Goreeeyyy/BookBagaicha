@@ -11,8 +11,11 @@ namespace BookBagaicha.IService
         // Get the count of successful orders for a user
         Task<int> GetSuccessfulOrderCountAsync(long userId);
 
+
         // Get order details by ID
         Task<OrderDto> GetOrderDetailsAsync(Guid orderId);
+
+
 
         // Place a new order based on cart contents
         Task<OrderDto> PlaceOrderAsync(long userId, PlaceOrderRequest request);

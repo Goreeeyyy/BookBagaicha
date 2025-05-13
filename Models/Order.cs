@@ -12,6 +12,7 @@ namespace BookBagaicha.Models
         public decimal TotalPrice { get; set; }
         public string ClaimCode { get; set; } // Unique code for order identification
         public decimal AppliedDiscount { get; set; }
+        public bool AppliedDiscountIsLoyalty { get; set; }
         public bool ConfirmationEmailSent { get; set; }
 
         // Navigation properties

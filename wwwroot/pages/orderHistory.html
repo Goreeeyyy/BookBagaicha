@@ -7,6 +7,12 @@
     <!-- Add Toastify CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="../css/orderHistory.css" />
+    <style>
+        .status-completed {
+            background-color: #DEBC40;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
@@ -54,7 +60,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2>My Orders</h2>
-                <p class="text-muted mb-0" id="loyaltyStatus"></p>
+                <p>For each 10 successfully completed orders, you get 10% discount on your next order.</p>
             </div>
             <a href="browseBooks.html" class="btn btn-outline-primary">
                 <i class="fas fa-book me-2"></i>Continue Shopping
@@ -332,7 +338,12 @@
                         minute: '2-digit'
                     });
 
-                    const statusClass = order.status === 'Confirmed' ? 'status-confirmed' : 'status-cancelled';
+                    let statusClass = 'status-cancelled'; 
+                    if (order.status === 'Confirmed') {
+                        statusClass = 'status-confirmed'; 
+                    } else if (order.status === 'Completed') {
+                        statusClass = 'status-completed'; 
+                    }
 
                     const orderCard = $(`
                                                 <div class="order-card position-relative">
@@ -419,7 +430,14 @@
                     minute: '2-digit'
                 });
 
-                const statusClass = order.status === 'Confirmed' ? 'status-confirmed' : 'status-cancelled';
+                let statusClass = 'status-cancelled'; // default red
+
+                if (order.status === 'Confirmed') {
+                    statusClass = 'status-confirmed'; // green
+                } else if (order.status === 'Completed') {
+                    statusClass = 'status-completed'; // yellow
+                }
+
 
                 // Update modal title
                 $('#orderDetailsModalLabel').text(`Order #${order.claimCode}`);
