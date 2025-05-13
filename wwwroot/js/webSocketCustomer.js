@@ -29,7 +29,7 @@ notificationSocket.onmessage = (event) => {
 
 notificationSocket.onclose = (event) => {
     console.log('[CUSTOMER] WebSocket connection closed:', event);
-            setTimeout(connectWebSocket, 5000); // Reconnect after 5 seconds
+            setTimeout(connectWebSocket, 3000); // Reconnect after 5 seconds
 };
 
 notificationSocket.onerror = (error) => {
@@ -75,7 +75,7 @@ notificationSocket.onerror = (error) => {
         // Auto-dismiss after 5 seconds
         setTimeout(() => {
             $(notificationElement).alert('close');
-        }, 5000);
+        }, 3000);
     }
 
     // Start WebSocket connection
