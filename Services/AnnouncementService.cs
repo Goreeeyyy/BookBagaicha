@@ -19,7 +19,14 @@ namespace BookBagaicha.Services
         public virtual async Task<List<Announcement>> GetActiveAnnouncementsAsync()
         {
             return await _context.Announcements
-                .Where(a => a.IsActive && a.StartDateTime <= DateTime.UtcNow && a.EndDateTime >= DateTime.UtcNow)
+                .Where(a => a.StartDateTime <= DateTime.UtcNow && a.EndDateTime >= DateTime.UtcNow)
+                .OrderByDescending(a => a.StartDateTime)
+                .ToListAsync();
+        }
+
+        public virtual async Task<List<Announcement>> GetAllAnnouncementsAsync()
+        {
+            return await _context.Announcements
                 .OrderByDescending(a => a.StartDateTime)
                 .ToListAsync();
         }

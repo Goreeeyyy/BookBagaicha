@@ -39,6 +39,30 @@ namespace BookBagaicha.Controllers
                 return StatusCode(500, "An error occurred while fetching announcements.");
             }
         }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllAnnouncements()
+        {
+            try
+            {
+                var announcements = await _announcementService.GetAllAnnouncementsAsync();
+                var announcementDtos = announcements.Select(a => new AnnouncementDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Message = a.Message,
+                    StartDateTime = a.StartDateTime,
+                    EndDateTime = a.EndDateTime,
+                    IsActive = a.IsActive
+                }).ToList();
+                return Ok(announcementDtos);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching all announcements: {ex.Message}");
+                return StatusCode(500, "An error occurred while fetching announcements.");
+            }
+        }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAnnouncementById(int id)
