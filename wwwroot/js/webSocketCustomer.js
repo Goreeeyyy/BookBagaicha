@@ -48,7 +48,7 @@ notificationSocket.onerror = (error) => {
         let message = '';
         switch (notification.type) {
             case 'order_confirmed':
-                message = `<strong>Order Confirmed!</strong><br>Order ID: ${notification.orderId}<br>Order Date: ${new Date(notification.orderDate).toLocaleString()}<br>Claim Code: ${notification.claimCode}<br>Total Price: $${notification.totalPrice.toFixed(2)}`;
+                message = `<strong>Order Confirmed!</strong><br>Order ID: ${notification.orderId}<br>Order Date: ${new Date(notification.orderDate).toLocaleString()}<br>Claim Code: ${notification.claimCode}<br>Total Price: Rs ${notification.totalPrice.toFixed(2)}`;
                 break;
             case 'order_completed':
                 message = `<strong>Order Completed!</strong><br>Order ID: ${notification.orderId}<br>Claim Code: ${notification.claimCode}<br>Total Price: ${notification.totalPrice.toFixed(2)}`;

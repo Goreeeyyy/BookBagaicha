@@ -20,7 +20,7 @@ namespace BookBagaicha.Controllers
             _logger = logger;
         }
 
-        // Get the current user's wishlist
+        // Get the current user wishlist
         [HttpGet]
         public async Task<IActionResult> GetWishlist()
         {

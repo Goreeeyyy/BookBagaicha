@@ -9,7 +9,6 @@ namespace BookBagaicha.Models
         public Guid BookId { get; set; }
         public int Quantity { get; set; }
 
-        // Navigation properties
         public Cart Cart { get; set; }
         public Book Book { get; set; }
     }
