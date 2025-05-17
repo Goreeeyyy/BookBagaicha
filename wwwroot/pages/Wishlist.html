@@ -103,7 +103,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -157,7 +157,7 @@
                         const wishlistData = await response.json();
                         displayWishlistItems(wishlistData);
                     } else {
-                        // Show simple error message
+                        // Show error message
                         wishlistContainer.html(`
                                     <div class="alert alert-danger">
                                         Unable to load wishlist. <a href="javascript:location.reload()">Try again</a> or
@@ -166,7 +166,7 @@
                                 `);
                     }
                 } catch (error) {
-                    // Minimal error handling
+                    // error handling
                     $('#wishlistContainer').html(`
                                 <div class="alert alert-danger">
                                     An error occurred. <a href="javascript:location.reload()">Try again</a> or
@@ -184,7 +184,6 @@
                 // Find the items array
                 let itemsArray = extractItemsArray(wishlistData);
 
-                // Show empty state if needed
                 if (itemsArray.length === 0) {
                     wishlistContainer.html(`
                                 <div class="empty-wishlist">
@@ -251,7 +250,6 @@
                     return data;
                 }
 
-                // If we still don't have an array, try to find any array property
                 for (const key in data) {
                     if (Array.isArray(data[key])) {
                         return data[key];
@@ -388,7 +386,7 @@
                             }
                         }).showToast();
 
-                        // Remove item with animation
+                        // Remove item 
                         const itemElement = button.closest('.col');
                         itemElement.fadeOut(300, function () {
                             $(this).remove();
@@ -491,7 +489,7 @@
                         return;
                     }
 
-                    // Try primary endpoint format
+                    // Try primary endpoint 
                     let response = await fetch(`/api/cart/addCartItem/${cartId}/cartItems/${bookId}`, {
                         method: 'POST',
                         headers: {
@@ -591,6 +589,7 @@
             });
         });
     </script>
+    <!--Import cart and web socket script-->
     <script src="../js/cart.js"></script>
     <script src="../js/webSocketCustomer.js"></script>
 </body>

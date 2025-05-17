@@ -5,7 +5,7 @@ namespace BookBagaicha.IService
 {
     public interface IWishlistService
     {
-        // Get a user's wishlist
+        // Get a user wishlist
         Task<WishlistDto> GetWishlistByUserIdAsync(long userId);
 
         // Add a book to the wishlist

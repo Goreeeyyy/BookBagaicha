@@ -11,11 +11,9 @@ namespace BookBagaicha.Models
         [Required]
         public long UserId { get; set; }
 
-        // Navigation property
+
         [ForeignKey("UserId")]
         public User User { get; set; } = null!;
-
-        // Collection navigation property
         public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
     }
 

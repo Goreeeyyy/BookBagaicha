@@ -24,14 +24,14 @@ namespace BookBagaicha.Services
             {
                 _logger.LogInformation("Getting cart for user {UserId}", userId);
 
-                // Try to get the user's cart with all items
+                // get the user cart with all items
                 var cart = await _context.Carts
                     .Include(c => c.CartItems)
                     .ThenInclude(ci => ci.Book)
                     .ThenInclude(b => b.Authors)
                     .FirstOrDefaultAsync(c => c.UserId == userId);
 
-                // If the user doesn't have a cart yet, create one
+                // create cart if it doesnt exist
                 if (cart == null)
                 {
                     _logger.LogInformation("Creating new cart for user {UserId}", userId);
@@ -65,11 +65,11 @@ namespace BookBagaicha.Services
                     };
                 }
 
-                // Recalculate cart total
+                // recalculate cart total
                 cart.CartTotal = cart.CartItems.Sum(ci => ci.Book.Price * ci.Quantity);
                 await _context.SaveChangesAsync();
 
-                // Map the cart to DTO
+                // map the cart to DTO
                 var cartDto = MapCartToDto(cart);
                 return cartDto;
             }
@@ -98,11 +98,11 @@ namespace BookBagaicha.Services
                     throw new ArgumentException($"Cart with ID {cartId} not found.");
                 }
 
-                // Recalculate cart total
+                // recalculate cart total
                 cart.CartTotal = cart.CartItems.Sum(ci => ci.Book.Price * ci.Quantity);
                 await _context.SaveChangesAsync();
 
-                // Map the cart to DTO
+                // map the cart to DTO
                 var cartDto = MapCartToDto(cart);
                 return cartDto;
             }
@@ -179,7 +179,6 @@ namespace BookBagaicha.Services
 
                 await _context.SaveChangesAsync();
 
-                // Return the DTO
                 var cartItemDto = new CartItemDto
                 {
                     CartItemId = existingItem.CartItemId,
@@ -250,13 +249,13 @@ namespace BookBagaicha.Services
                 cartItem.Quantity = quantity;
                 _context.CartItems.Update(cartItem);
 
-                // Recalculate cart total
+                // recalculate cart total
                 cart.CartTotal = cart.CartItems.Sum(ci => ci.Book.Price * ci.Quantity);
                 _logger.LogInformation("Updated cart total to {CartTotal}", cart.CartTotal);
 
                 await _context.SaveChangesAsync();
 
-                // Return the DTO
+                // return the DTO
                 var cartItemDto = new CartItemDto
                 {
                     CartItemId = cartItem.CartItemId,
@@ -312,10 +311,10 @@ namespace BookBagaicha.Services
                     return false;
                 }
 
-                // Remove the item
+                // remove the item
                 _context.CartItems.Remove(cartItem);
 
-                // Recalculate cart total
+                // recalculate cart total
                 cart.CartTotal = cart.CartItems
                     .Where(ci => ci.BookId != bookId)
                     .Sum(ci => ci.Book.Price * ci.Quantity);
@@ -354,10 +353,10 @@ namespace BookBagaicha.Services
                     .Where(ci => ci.CartId == cartId)
                     .ToListAsync();
 
-                // Remove all items
+                // remove all items
                 _context.CartItems.RemoveRange(cartItems);
 
-                // Reset cart total
+                // reset cart total
                 cart.CartTotal = 0;
 
                 await _context.SaveChangesAsync();

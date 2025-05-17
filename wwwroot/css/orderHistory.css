@@ -74,7 +74,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
-    z-index: 1060 !important; /* Bootstrap modal backdrop is 1050 */
+    z-index: 1060 !important; 
 }
 
     .confirmation-dialog.active {

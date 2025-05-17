@@ -9,7 +9,6 @@ namespace BookBagaicha.Models
         public long UserId { get; set; }
         public decimal CartTotal { get; set; }
 
-        // Navigation properties
         public User User { get; set; }
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
