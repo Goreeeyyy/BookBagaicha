@@ -55,14 +55,7 @@ builder.Services.AddIdentity<User, IdentityRole<long>>()
 // Get JWT token info
 var jwtTokeInfo = builder.Configuration.GetSection("jwt").Get<JWTTokenInfo>();
 
-<<<<<<< HEAD
 
-
-// JWT Registration
-builder.Services.AddAuthentication(
-
-    (options) =>
-=======
 // JWT Registration with Logger
 builder.Services.AddAuthentication(options =>
 {
@@ -72,7 +65,6 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
->>>>>>> 17faaceed86e8d33184d627fb7213dea0f26f325
     {
         ValidateIssuer = true,
         ValidIssuer = jwtTokeInfo!.Issuer,
@@ -168,10 +160,7 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-<<<<<<< HEAD
-// Enable static file serving
-app.UseStaticFiles();
-=======
+
 var webSocketOptions = new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromMinutes(2)
@@ -192,7 +181,6 @@ app.Map("/ws/notifications", async (HttpContext context) =>
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
     }
 });
->>>>>>> 17faaceed86e8d33184d627fb7213dea0f26f325
 
 app.MapControllers();
 

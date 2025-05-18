@@ -6,6 +6,7 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
+
 namespace BookBagaicha.Controllers
 {
     [ApiController]
@@ -123,16 +124,8 @@ namespace BookBagaicha.Controllers
                 }
 
                 _logger.LogInformation("Placing order for user {UserId}", userId);
-
-                // Generate unique claim code
-                var claimCode = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
-
-                var order = await _orderService.PlaceOrderAsync(userId, request, claimCode);
-
-                // Send order confirmation email
-                await SendOrderConfirmationEmail(userId, order);
+                var order = await _orderService.PlaceOrderAsync(userId, request);
                 return Ok(order);
-
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -191,42 +184,8 @@ namespace BookBagaicha.Controllers
             }
         }
 
-<<<<<<< HEAD
 
-        // Send order confirmation email
-        private async Task SendOrderConfirmationEmail(long userId, OrderDto order)
-        {
-            try
-            {
-                var userEmail = User.FindFirstValue(ClaimTypes.Email);
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    _logger.LogWarning("User email not found in claims for user {UserId}", userId);
-                    return; // Optionally, retrieve email from a user service
-                }
 
-                var emailSubject = "Your BookBagaicha Order Confirmation";
-                var emailBody = $@"Dear Customer,
-
-Your order has been successfully placed!
-Order ID: {order.OrderId}
-Order Code: {order.ClaimCode:N} (Please keep this code for reference)
-Total Amount: {order.TotalPrice:C}
-Date: {DateTime.UtcNow:dd-MM-yyyy HH:mm:ss UTC}
-
-Thank you for shopping with BookBagaicha!
-Best regards,
-BookBagaicha Team";
-
-                await _emailService.SendEmailAsync(userEmail, emailSubject, emailBody);
-                _logger.LogInformation("Order confirmation email sent to {UserEmail} for order {OrderId}", userEmail, order.OrderId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send order confirmation email to user {UserId} for order {OrderId}", userId, order.OrderId);
-            }
-        }
-=======
         [Authorize(Roles = "Staff")]
         [HttpGet("claim/{claimCode}")]
         public async Task<IActionResult> GetOrderByClaimCode(string claimCode)
@@ -256,6 +215,9 @@ BookBagaicha Team";
                 return StatusCode(500, "An error occurred while retrieving order details");
             }
         }
+
+
+
         [Authorize(Roles = "Staff")]
         [HttpPost("{orderId}/complete")]
         public async Task<IActionResult> CompleteOrder(Guid orderId)
@@ -290,7 +252,5 @@ BookBagaicha Team";
                 return StatusCode(500, "An error occurred while completing the order");
             }
         }
-
->>>>>>> 17faaceed86e8d33184d627fb7213dea0f26f325
     }
 }
