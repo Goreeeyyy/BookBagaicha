@@ -24,14 +24,14 @@ namespace BookBagaicha.Services
             {
                 _logger.LogInformation("Getting wishlist for user {UserId}", userId);
 
-                // Try to get the user's wishlist
+                // get the user wishlist
                 var wishlist = await _context.Wishlists
                     .Include(w => w.WishlistItems)
                     .ThenInclude(wi => wi.Book)
                     .ThenInclude(b => b.Authors)
                     .FirstOrDefaultAsync(w => w.UserId == userId);
 
-                // If the user doesn't have a wishlist yet, create one
+                // create wishlist if it doesnt exist
                 if (wishlist == null)
                 {
                     _logger.LogInformation("Creating new wishlist for user {UserId}", userId);
@@ -110,7 +110,7 @@ namespace BookBagaicha.Services
                     throw new ArgumentException($"Book with ID {bookId} not found.");
                 }
 
-                // Get or create the user's wishlist
+                // Get or create the user wishlist
                 var wishlist = await _context.Wishlists
                     .FirstOrDefaultAsync(w => w.UserId == userId);
 
@@ -146,7 +146,7 @@ namespace BookBagaicha.Services
                 {
                     _logger.LogInformation("Book {BookId} is already in wishlist {WishlistId}", bookId, wishlist.WishlistId);
 
-                    // Book is already in the wishlist, return the existing item
+                    // return the existing item if book is in wishlist
                     return new WishlistItemDto
                     {
                         WishlistItemId = existingItem.WishlistItemId,
@@ -175,7 +175,7 @@ namespace BookBagaicha.Services
                 _logger.LogInformation("Creating wishlist item: {WishlistItem}",
                     new { wishlistItem.WishlistItemId, wishlistItem.WishlistId, wishlistItem.BookId });
 
-                // Use a separate transaction for adding the item
+                // separate transaction for adding the item
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
@@ -217,7 +217,7 @@ namespace BookBagaicha.Services
             }
             catch (ArgumentException)
             {
-                // Rethrow ArgumentException (book not found)
+                // book not found
                 throw;
             }
             catch (Exception ex)
@@ -234,7 +234,7 @@ namespace BookBagaicha.Services
             {
                 _logger.LogInformation("Removing wishlist item {WishlistItemId} for user {UserId}", wishlistItemId, userId);
 
-                // Get the user's wishlist
+                // Get the user wishlist
                 var wishlist = await _context.Wishlists
                     .FirstOrDefaultAsync(w => w.UserId == userId);
 
@@ -285,7 +285,7 @@ namespace BookBagaicha.Services
             {
                 _logger.LogInformation("Checking if book {BookId} is in wishlist for user {UserId}", bookId, userId);
 
-                // Get the user's wishlist
+                // Get the user wishlist
                 var wishlist = await _context.Wishlists
                     .FirstOrDefaultAsync(w => w.UserId == userId);
 

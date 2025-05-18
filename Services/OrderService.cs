@@ -83,39 +83,6 @@ namespace BookBagaicha.Services
             }
         }
 
-        // Method to get the count of completed orders since the last loyalty discount
-        private async Task<int> GetCompletedOrdersSinceLastLoyaltyDiscountAsync(long userId)
-        {
-            try
-            {
-                // Get the most recent order where a loyalty discount was applied
-                var lastLoyaltyOrder = await _context.Orders
-                    .Where(o => o.UserId == userId && o.AppliedDiscountIsLoyalty)
-                    .OrderByDescending(o => o.OrderDate)
-                    .FirstOrDefaultAsync();
-
-                if (lastLoyaltyOrder == null)
-                {
-                    // If no loyalty discount has ever been applied, count all completed orders
-                    return await _context.Orders
-                        .CountAsync(o => o.UserId == userId && o.Status == "Completed");
-                }
-                else
-                {
-                    // If a loyalty discount has been applied before, count completed orders since that date
-                    return await _context.Orders
-                        .CountAsync(o => o.UserId == userId &&
-                                  o.Status == "Completed" &&
-                                  o.OrderDate > lastLoyaltyOrder.OrderDate);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error counting completed orders since last loyalty discount for user {UserId}", userId);
-                return 0;
-            }
-        }
-
         public async Task<OrderDto> GetOrderDetailsAsync(Guid orderId)
         {
             try
@@ -207,24 +174,24 @@ namespace BookBagaicha.Services
                     OrderItems = new List<OrderItem>()
                 };
 
-                // Get completed orders since last loyalty discount
-                int completedSinceLastDiscount = await GetCompletedOrdersSinceLastLoyaltyDiscountAsync(userId);
-                _logger.LogInformation("User {UserId} has {CompletedCount} completed orders since last loyalty discount",
-                    userId, completedSinceLastDiscount);
+                // Get successful order count for loyalty discount
+                int completedOrderCount = await GetSuccessfulOrderCountAsync(userId);
+                _logger.LogInformation("User {UserId} has {CompletedCount} completed orders", userId, completedOrderCount);
 
-                // Apply 10% loyalty discount if completed EXACTLY 10 orders since last discount
-                if (completedSinceLastDiscount >= 10)
+                // Apply 10% loyalty discount if completed at least 10 orders 
+                if (completedOrderCount >= 10 && (completedOrderCount % 10 == 0))
                 {
                     decimal discountAmount = Math.Round(order.TotalPrice * 0.1m, 2);
+                    // Override any existing discount with the loyalty discount
                     order.AppliedDiscount = discountAmount;
                     order.TotalPrice -= discountAmount;
                     order.AppliedDiscountIsLoyalty = true;
-                    _logger.LogInformation("Applied 10% loyalty discount of {DiscountAmount} for user {UserId} on order {OrderId} after {CompletedCount} completed orders",
-                        discountAmount, userId, order.OrderId, completedSinceLastDiscount);
+                    _logger.LogInformation("Applied 10% loyalty discount of {DiscountAmount} for user {UserId} on order {OrderId}",
+                        discountAmount, userId, order.OrderId);
                 }
                 else if (request.AppliedDiscount.HasValue && request.AppliedDiscount.Value > 0)
                 {
-                    // Apply any other discount that might have been passed (like quantity discount)
+                    // Apply any other discount 
                     order.TotalPrice -= request.AppliedDiscount.Value;
                 }
 
@@ -312,6 +279,7 @@ namespace BookBagaicha.Services
                 throw;
             }
         }
+
         // Method to send order confirmation email with invoice
         private async Task SendOrderConfirmationEmailAsync(string email, Order order)
         {
@@ -330,7 +298,7 @@ namespace BookBagaicha.Services
                     return;
                 }
 
-                // Prepare email body with order details
+                // Email body with order details
                 string emailBody = $@"
                 <h1>Your Order Confirmation</h1>
                 <p>Thank you for your order from Book Bagaicha!</p>
@@ -406,10 +374,9 @@ namespace BookBagaicha.Services
                     email,
                     $"Your Book Bagaicha Order Confirmation - {order.ClaimCode}",
                     emailBody,
-                    true // isHtml
+                    true 
                 );
 
-                // Update the email sent flag
                 order.ConfirmationEmailSent = true;
                 _context.Orders.Update(order);
                 await _context.SaveChangesAsync();
@@ -429,7 +396,7 @@ namespace BookBagaicha.Services
                 _logger.LogInformation("Cancelling order {OrderId} for user {UserId}", orderId, userId);
 
                 var order = await _context.Orders
-                    .Include(o => o.OrderItems) // Ensure OrderItems are loaded
+                    .Include(o => o.OrderItems) 
                     .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
                 if (order == null)
@@ -469,7 +436,7 @@ namespace BookBagaicha.Services
                         else
                         {
                             _logger.LogWarning("Book with ID {BookId} not found while cancelling order {OrderId}.", orderItem.BookId, orderId);
-                            // Consider how to handle this scenario: log a warning, or potentially an error depending on your requirements
+                            
                         }
                     }
 

@@ -32,10 +32,9 @@ function displayNewOrderNotificationForStaff(orderId, orderDate, customerUserId,
     if (staffNotificationArea) {
         const notificationElement = document.createElement('div');
         notificationElement.classList.add('notification-staff');
-        notificationElement.innerHTML = `<strong>New Order Received!</strong><br>Order ID: ${orderId}<br>Order Date: ${orderDate}<br>Customer ID: ${customerUserId}<br>Total Price: $${totalPrice.toFixed(2)}`;
+        notificationElement.innerHTML = `<strong>New Order Received!</strong><br>Order ID: ${orderId}<br>Order Date: ${orderDate}<br>Customer ID: ${customerUserId}<br>Total Price: Rs ${totalPrice.toFixed(2)}`;
         staffNotificationArea.prepend(notificationElement);
         console.log('[STAFF] Displayed "new_order" notification for order ID:', orderId);
     }
 }
 
-// ... (Rest of your staff-specific JavaScript) ...

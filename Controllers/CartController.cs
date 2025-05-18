@@ -20,7 +20,7 @@ namespace BookBagaicha.Controllers
             _logger = logger;
         }
 
-        // Get user's cart
+        // Get user cart
         [HttpGet("getUserCart")]
         public async Task<IActionResult> GetUserCart()
         {

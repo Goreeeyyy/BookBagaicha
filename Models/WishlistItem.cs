@@ -15,7 +15,6 @@ namespace BookBagaicha.Models
         [Required]
         public Guid BookId { get; set; }
 
-        // Navigation properties
         [ForeignKey("WishlistId")]
         public Wishlist Wishlist { get; set; } = null!;
 

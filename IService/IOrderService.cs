@@ -17,7 +17,7 @@ namespace BookBagaicha.IService
 
 
 
-        // Place a new order based on cart contents
+        // Place a new order based on cart items
         Task<OrderDto> PlaceOrderAsync(long userId, PlaceOrderRequest request);
 
         // Cancel an existing order

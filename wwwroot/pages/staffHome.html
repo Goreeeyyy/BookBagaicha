@@ -51,7 +51,7 @@
     right: -3vw; 
     font-size: 1.8em;
     color: #0584f9;
-    z-index: 5; /* Keep it below the close button if they overlap */
+    z-index: 5; 
 }
 
         .order-card {
@@ -279,7 +279,7 @@
                             <p><strong>Claim Code:</strong> ${order.claimCode}</p>
                             <p><strong>Order Date:</strong> ${new Date(order.orderDate).toLocaleString()}</p>
                             <p><strong>Status:</strong> ${order.status}</p>
-                            <p><strong>Total Price:</strong> $${order.totalPrice.toFixed(2)}</p>
+                            <p><strong>Total Price:</strong> Rs ${order.totalPrice.toFixed(2)}</p>
                             <h5 class="mt-3">Order Items</h5>
                 `;
 
@@ -291,7 +291,7 @@
                                     <p><strong>ISBN:</strong> ${item.isbn}</p>
                                     <p><strong>Authors:</strong> ${item.authors.join(', ')}</p>
                                     <p><strong>Quantity:</strong> ${item.quantity}</p>
-                                    <p><strong>Price:</strong> $${item.priceAtPurchase.toFixed(2)}</p>
+                                    <p><strong>Price:</strong> Rs  ${item.priceAtPurchase.toFixed(2)}</p>
                                 </div>
                             </div>
                     `;

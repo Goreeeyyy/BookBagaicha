@@ -10,7 +10,6 @@ namespace BookBagaicha.Models
         public int Quantity { get; set; }
         public decimal PriceAtPurchase { get; set; }
 
-        // Navigation properties
         public Order Order { get; set; }
         public Book Book { get; set; }
     }

@@ -154,15 +154,14 @@
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script>
         const editSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M15.748 2.947a2 2 0 0 1 2.828 0l2.475 2.475a2 2 0 0 1 0 2.829L9.158 20.144l-6.38 1.076l1.077-6.38zm-.229 3.057l2.475 2.475l1.643-1.643l-2.475-2.474zm1.06 3.89l-2.474-2.475l-8.384 8.384l-.503 2.977l2.977-.502z"/>
-                                    </svg>`;
+                <path fill="currentColor" d="M15.748 2.947a2 2 0 0 1 2.828 0l2.475 2.475a2 2 0 0 1 0 2.829L9.158 20.144l-6.38 1.076l1.077-6.38zm-.229 3.057l2.475 2.475l1.643-1.643l-2.475-2.474zm1.06 3.89l-2.474-2.475l-8.384 8.384l-.503 2.977l2.977-.502z"/>
+            </svg>`;
 
         const saveSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M20.285 6.709l-11.2 11.2l-5.657-5.657L5.8 10.88l3.286 3.285L18.17 5.08z"/>
-                                    </svg>`;
+                <path fill="currentColor" d="M20.285 6.709l-11.2 11.2l-5.657-5.657L5.8 10.88l3.286 3.285L18.17 5.08z"/>
+            </svg>`;
 
         const BASE_URL = "https://localhost:44351/api/Announcement";
 
@@ -175,14 +174,15 @@
         function fetchAnnouncements() {
             showLoading();
             $.ajax({
-                url: `${BASE_URL.replace('/api/announcements', '/api/Announcement')}/active`, 
+                url: `${BASE_URL}/all`,
                 method: "GET",
-                success: function (announcements) {
-                    updateAnnouncementTable(announcements);
+                success: function (data) {
+                    console.log('[ANNOUNCEMENT] API response:', data);
+                    updateAnnouncementTable(data);
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error fetching announcements:", xhr.status, status, error);
-                    alert(`Failed to load announcements: ${xhr.status} ${xhr.statusText}`);
+                    console.error('[ANNOUNCEMENT] Error fetching announcements:', xhr.status, status, error);
+                    $(".announcementTable tbody").html('<tr><td colspan="7" class="text-center">Failed to load announcements.</td></tr>');
                 }
             });
         }
@@ -190,58 +190,50 @@
         // Update table with announcements
         function updateAnnouncementTable(data) {
             const tbody = $(".announcementTable tbody");
-            tbody.empty(); // Clear existing rows
+            tbody.empty();
 
-            let announcementData = data;
-            if (!Array.isArray(data) && data && Object.keys(data).length > 0) {
-                announcementData = Object.values(data);
-                if (announcementData.length > 0 && !announcementData.some(item => typeof item === 'object' && 'id' in item)) {
-       
-                    if (Array.isArray(data)) {
-                        announcementData = data;
-                    } else if (data.$values) {
-                        announcementData = data.$values;
-                    }
-                } else if (announcementData.length === 1 && Array.isArray(announcementData[0])) {
-                    announcementData = announcementData[0]; 
-                }
-            } else if (!Array.isArray(data)) {
-                console.error("Error: Invalid announcement data structure received from the API", data);
-                alert("Invalid data structure received from the API.");
+            // Convert single object to array, handle arrays, or show empty state
+            let announcements = [];
+            if (Array.isArray(data)) {
+                announcements = data;
+            } else if (data && typeof data === 'object' && 'id' in data) {
+                announcements = [data];
+            }
+
+            if (announcements.length === 0) {
+                tbody.html('<tr><td colspan="7" class="text-center">No active announcements found.</td></tr>');
+                console.log('[ANNOUNCEMENT] No announcements to display');
                 return;
             }
 
-            if (Array.isArray(announcementData)) {
-                announcementData.forEach(dto => { 
-                    const row = `
-                                            <tr>
-                                                <td>${dto.id}</td>
-                                                <td>${dto.title}</td>
-                                                <td>${dto.message}</td>
-                                                <td>${new Date(dto.startDateTime).toLocaleString()}</td>
-                                                <td>${new Date(dto.endDateTime).toLocaleString()}</td>
-                                                <td>${dto.isActive ? "Yes" : "No"}</td>
-                                                <td class="actionBtns d-flex justify-content-between">
-                                                    <button class="edit-Btn" data-announcement-id="${dto.id}">${editSVG}</button>
-                                                    <button onclick="deleteAnnouncement(${dto.id})">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                                            <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z" stroke-width="0" stroke="currentColor" />
-                                                        </svg>
-                                                    </button>
-                                                </td>
-                                            </tr>`;
-                    tbody.append(row);
-                });
-                attachEditListeners();
-            } else {
-                console.error("Error: Processed data is not an array", announcementData);
-                alert("Invalid data format received from the API.");
-            }
+            announcements.forEach(dto => {
+                const row = `
+                        <tr>
+                            <td>${dto.id}</td>
+                            <td>${dto.title}</td>
+                            <td>${dto.message}</td>
+                            <td>${new Date(dto.startDateTime).toLocaleString()}</td>
+                            <td>${new Date(dto.endDateTime).toLocaleString()}</td>
+                            <td>${dto.isActive ? "Yes" : "No"}</td>
+                            <td class="actionBtns d-flex justify-content-between">
+                                <button class="edit-Btn" data-announcement-id="${dto.id}">${editSVG}</button>
+                                <button onclick="deleteAnnouncement(${dto.id})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z" stroke-width="0" stroke="currentColor" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>`;
+                tbody.append(row);
+            });
+
+            console.log('[ANNOUNCEMENT] Table updated with', announcements.length, 'announcements');
+            attachEditListeners();
         }
 
         // Attach edit button listeners
         function attachEditListeners() {
-            $(".edit-Btn").off("click").on("click", function () { 
+            $(".edit-Btn").off("click").on("click", function () {
                 const row = $(this).closest("tr");
                 const id = row.find("td:eq(0)").text();
                 const title = row.find("td:eq(1)").text();
@@ -257,7 +249,7 @@
                 $("#endDateTime").val(endDateTime);
                 $("#isActive").prop("checked", isActive);
 
-                $("#announcementForm").data("id", id); // Store the ID for editing
+                $("#announcementForm").data("id", id);
 
                 const modal = new bootstrap.Modal(document.getElementById("announcementModal"));
                 modal.show();
@@ -272,39 +264,14 @@
                     method: "DELETE",
                     success: function () {
                         showSuccess("Announcement deleted successfully!");
-                        fetchAnnouncements(); // Refresh the table
+                        fetchAnnouncements();
                     },
                     error: function (xhr, status, error) {
-                        console.error("Error deleting announcement:", xhr.status, status, error);
+                        console.error('[ANNOUNCEMENT] Error deleting announcement:', xhr.status, status, error);
                         alert(`Failed to delete announcement: ${xhr.status} ${xhr.statusText}`);
                     }
                 });
             }
-        }
-
-        // Attach edit button listeners
-        function attachEditListeners() {
-            $(".edit-Btn").on("click", function () {
-                const row = $(this).closest("tr");
-                const id = row.find("td:eq(0)").text();
-                const title = row.find("td:eq(1)").text();
-                const message = row.find("td:eq(2)").text();
-                const startDateTime = new Date(row.find("td:eq(3)").text()).toISOString().slice(0, 16);
-                const endDateTime = new Date(row.find("td:eq(4)").text()).toISOString().slice(0, 16);
-                const isActive = row.find("td:eq(5)").text() === "Yes";
-
-                $("#announcementModalLabel").text("Edit Announcement");
-                $("#title").val(title);
-                $("#message").val(message);
-                $("#startDateTime").val(startDateTime);
-                $("#endDateTime").val(endDateTime);
-                $("#isActive").prop("checked", isActive);
-
-                const modal = new bootstrap.Modal(document.getElementById("announcementModal"));
-                modal.show();
-
-                $("#announcementForm").data("id", id); 
-            });
         }
 
         // Show success message
@@ -328,7 +295,7 @@
             };
 
             const method = id > 0 ? "PUT" : "POST";
-            const url = id > 0 ? `https://localhost:44351/api/Announcement/${id}` : `https://localhost:44351/api/Announcement`;
+            const url = id > 0 ? `${BASE_URL}/${id}` : BASE_URL;
 
             $.ajax({
                 url: url,
@@ -337,13 +304,13 @@
                 data: JSON.stringify(announcement),
                 success: function () {
                     const modalElement = document.getElementById("announcementModal");
-                    const modal = new bootstrap.Modal(modalElement);
+                    const modal = bootstrap.Modal.getInstance(modalElement);
                     modal.hide();
                     showSuccess(`Announcement ${id > 0 ? "updated" : "added"} successfully!`);
-                    fetchAnnouncements(); // Refresh the table
+                    fetchAnnouncements();
                 },
                 error: function (xhr, status, error) {
-                    console.error(`Error ${id > 0 ? "updating" : "adding"} announcement:`, xhr.status, status, error);
+                    console.error(`[ANNOUNCEMENT] Error ${id > 0 ? "updating" : "adding"} announcement:`, xhr.status, status, error);
                     alert(`Failed to ${id > 0 ? "update" : "add"} announcement: ${xhr.status} ${xhr.statusText}`);
                 }
             });
