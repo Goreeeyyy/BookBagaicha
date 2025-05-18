@@ -4,7 +4,6 @@
     <title>My Wishlist - Book Bagaicha</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <!-- Add Toastify CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         .book-img {
@@ -28,20 +27,20 @@
             padding: 3rem 0;
         }
 
-        .empty-wishlist i {
-            font-size: 4rem;
-            color: #ccc;
-            margin-bottom: 1rem;
-        }
-        
+            .empty-wishlist i {
+                font-size: 4rem;
+                color: #ccc;
+                margin-bottom: 1rem;
+            }
+
         .card {
             transition: transform 0.2s;
         }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
     </style>
 </head>
 <body>
@@ -49,16 +48,16 @@
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagaicha</a>
             <div class="d-flex align-items-center ms-auto">
-                <ul class="navbar-nav me-4">
+                <ul class="navbar-nav me-auto me-lg-2">
                     <li class="nav-item">
-                        <a class="nav-link" href="HomePage.html">HOME</a>
+                        <a class="nav-link" href="userHome.html">HOME</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="browseBooks.html">BOOKS</a>
+                        <a class="nav-link active" href="browseBooks.html">BOOKS</a>
                     </li>
                 </ul>
                 <div class="d-flex me-3">
-                    <input class="form-control form-control-sm" type="search" placeholder="Search for products..." aria-label="Search" />
+                    <input class="form-control form-control-sm search-bar" type="search" id="searchInput" placeholder="Search by book title..." aria-label="Search" />
                 </div>
                 <div class="d-flex gap-2">
                     <div class="dropdown">
@@ -66,8 +65,7 @@
                             <i class="fas fa-user"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
-                            <li><a class="dropdown-item" href="userHome.html">User Profile</a></li>
-                            <li><a class="dropdown-item active" href="Wishlist.html">My Wishlist</a></li>
+                            <li><a class="dropdown-item" href="Wishlist.html">My Wishlist</a></li>
                             <li><a class="dropdown-item" href="orderHistory.html">Order History</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
@@ -76,11 +74,15 @@
                     <a href="cart.html" class="btn btn-outline-light btn-sm">
                         <i class="fas fa-shopping-cart"></i>
                     </a>
+                    <a href="orderHistory.html" class="btn btn-outline-light btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M12 21q-3.15 0-5.575-1.912T3.275 14.2q-.1-.375.15-.687t.675-.363q.4-.05.725.15t.45.6q.6 2.25 2.475 3.675T12 19q2.925 0 4.963-2.037T19 12t-2.037-4.962T12 5q-1.725 0-3.225.8T6.25 8H8q.425 0 .713.288T9 9t-.288.713T8 10H4q-.425 0-.712-.288T3 9V5q0-.425.288-.712T4 4t.713.288T5 5v1.35q1.275-1.6 3.113-2.475T12 3q1.875 0 3.513.713t2.85 1.924t1.925 2.85T21 12t-.712 3.513t-1.925 2.85t-2.85 1.925T12 21m1-9.4l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T11 11.975V8q0-.425.288-.712T12 7t.713.288T13 8z" />
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
-
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>My Wishlist</h2>
@@ -100,19 +102,15 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Add Toastify JS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        // Wishlist functionality
         $(document).ready(function () {
             // Check if user is logged in
-            if (!isUserLoggedIn()) {
-                // Save current page as redirect URL
+            if (!localStorage.getItem('authToken')) {
                 localStorage.setItem('redirectAfterLogin', window.location.href);
-                // Redirect to login page
                 window.location.href = 'login.html';
                 return;
             }
@@ -120,53 +118,60 @@
             // Load wishlist items
             loadWishlistItems();
 
-            // Function to check if user is logged in
-            function isUserLoggedIn() {
-                return localStorage.getItem('authToken') !== null;
-            }
-
             // Function to load wishlist items
             async function loadWishlistItems() {
                 try {
-                    // Get wishlist using the endpoint from WishlistController
-                    const response = await fetch('/api/wishlist', {
+                    const wishlistContainer = $('#wishlistContainer');
+
+                    const authToken = localStorage.getItem('authToken');
+
+                    // Try primary endpoint
+                    let response = await fetch('/api/wishlist', {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            'Authorization': `Bearer ${authToken}`,
+                            'Accept': 'application/json'
                         }
                     });
+
+                    // Try alternative endpoint if needed
+                    if (response.status === 404) {
+                        response = await fetch('/api/wishlist/user', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`,
+                                'Accept': 'application/json'
+                            }
+                        });
+                    }
+
+                    // Handle expired auth
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.setItem('redirectAfterLogin', window.location.href);
+                        window.location.href = 'login.html';
+                        return;
+                    }
 
                     if (response.ok) {
                         const wishlistData = await response.json();
                         displayWishlistItems(wishlistData);
                     } else {
-                        // Handle error response
-                        if (response.status === 401) {
-                            // Unauthorized - token might be expired
-                            Toastify({
-                                text: "Your session has expired. Please login again.",
-                                duration: 5000,
-                                close: true,
-                                gravity: "top",
-                                position: "right",
-                                style: {
-                                    background: "#dc3545",
-                                }
-                            }).showToast();
-
-                            // Clear token and redirect to login
-                            localStorage.removeItem('authToken');
-                            localStorage.setItem('redirectAfterLogin', window.location.href);
-                            setTimeout(() => {
-                                window.location.href = 'login.html';
-                            }, 2000);
-                        } else {
-                            handleLoadError('Failed to load wishlist items.');
-                        }
+                        // Show error message
+                        wishlistContainer.html(`
+                                    <div class="alert alert-danger">
+                                        Unable to load wishlist. <a href="javascript:location.reload()">Try again</a> or
+                                        <a href="browseBooks.html">Browse Books</a>
+                                    </div>
+                                `);
                     }
                 } catch (error) {
-                    console.error('Error loading wishlist items:', error);
-                    handleLoadError('An error occurred while loading your wishlist.');
+                    // error handling
+                    $('#wishlistContainer').html(`
+                                <div class="alert alert-danger">
+                                    An error occurred. <a href="javascript:location.reload()">Try again</a> or
+                                    <a href="browseBooks.html">Browse Books</a>
+                                </div>
+                            `);
                 }
             }
 
@@ -175,21 +180,18 @@
                 const wishlistContainer = $('#wishlistContainer');
                 wishlistContainer.empty();
 
-                // Adjust to handle .NET format where items are in wishlistData.items.$values
-                const itemsArray = wishlistData.items && wishlistData.items.$values
-                    ? wishlistData.items.$values
-                    : [];
+                // Find the items array
+                let itemsArray = extractItemsArray(wishlistData);
 
                 if (itemsArray.length === 0) {
-                    // Display empty wishlist message
                     wishlistContainer.html(`
-                            <div class="empty-wishlist">
-                                <i class="far fa-heart"></i>
-                                <h4>Your wishlist is empty</h4>
-                                <p class="text-muted">Browse our books and add your favorites to the wishlist</p>
-                                <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
-                            </div>
-                        `);
+                                <div class="empty-wishlist">
+                                    <i class="far fa-heart"></i>
+                                    <h4>Your wishlist is empty</h4>
+                                    <p class="text-muted">Browse our books and add your favorites to the wishlist</p>
+                                    <a href="browseBooks.html" class="btn btn-primary mt-3">Browse Books</a>
+                                </div>
+                            `);
                     return;
                 }
 
@@ -197,83 +199,159 @@
                 let booksRow = $('<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">');
                 wishlistContainer.append(booksRow);
 
+                // Process and display each item
                 itemsArray.forEach(item => {
-                    // Extract book information properly based on structure
-                    const bookId = item.bookId || (item.book ? item.book.bookId : null);
-                    const bookTitle = item.bookTitle || (item.book ? item.book.title : "Unknown Title");
-                    const image = item.image || (item.book ? item.book.image : "default-book.jpg");
-                    const price = item.price || (item.book ? item.book.price : 0);
-                    const onSale = item.onSale || (item.book ? item.book.onSale : false);
-                    const wishlistItemId = item.wishlistItemId || item.id || "unknown";
-
-                    // Get authors array
-                    let authors = [];
-                    if (item.authors && Array.isArray(item.authors)) {
-                        authors = item.authors;
-                    } else if (item.book && item.book.authors) {
-                        if (Array.isArray(item.book.authors)) {
-                            authors = item.book.authors;
-                        } else if (item.book.authors.$values && Array.isArray(item.book.authors.$values)) {
-                            authors = item.book.authors.$values.map(a => a.firstName + ' ' + a.lastName);
-                        }
-                    }
-
+                    const bookData = extractBookData(item);
                     const wishlistItem = `
-                            <div class="col">
-                                <div class="card h-100 text-center p-2 position-relative">
-                                    <img src="../${image}" class="card-img-top book-img" alt="${bookTitle}" />
-                                    <div class="card-body">
-                                        <h6 class="card-title mb-1">${bookTitle}</h6>
-                                        <p class="card-subtitle text-muted small mb-2">
-                                            ${authors.length > 0 ? authors.join(', ') : 'No Author'}
-                                        </p>
-                                        <p class="mb-2 text-dark fw-bold">Rs. ${price}/-</p>
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <a href="BookDetails.html?id=${bookId}" class="btn btn-sm btn-outline-secondary">
-                                                Details
-                                            </a>
-                                            <button class="btn btn-sm btn-primary add-to-cart-btn" data-book-id="${bookId}">
-                                                Add to Cart
-                                            </button>
-                                            <button class="btn btn-sm btn-danger remove-from-wishlist-btn" data-wishlist-item-id="${wishlistItemId}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                <div class="col">
+                                    <div class="card h-100 text-center p-2 position-relative">
+                                        <img src="../${bookData.image}" class="card-img-top book-img"
+                                             alt="${bookData.title}"
+                                             onerror="this.src='../images/default-book.jpg'" />
+                                        <div class="card-body">
+                                            <h6 class="card-title mb-1">${bookData.title}</h6>
+                                            <p class="card-subtitle text-muted small mb-2">
+                                                ${bookData.authors}
+                                            </p>
+                                            <p class="mb-2 text-dark fw-bold">Rs. ${bookData.price}/-</p>
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a href="BookDetails.html?id=${bookData.id}" class="btn btn-sm btn-outline-secondary">
+                                                    Details
+                                                </a>
+                                                <button class="btn btn-sm btn-primary add-to-cart-btn" data-book-id="${bookData.id}">
+                                                    Add to Cart
+                                                </button>
+                                                <button class="btn btn-sm btn-danger remove-from-wishlist-btn" data-wishlist-item-id="${bookData.wishlistItemId}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </div>
+                                        ${bookData.onSale ? '<span class="on-sale">Sale!</span>' : ''}
                                     </div>
-                                    ${onSale ? '<span class="on-sale">Sale!</span>' : ''}
                                 </div>
-                            </div>
-                        `;
+                            `;
                     booksRow.append(wishlistItem);
                 });
 
-                // Add event listeners for buttons
+                // Set up event listeners
                 setupEventListeners();
             }
 
-            // Function to handle loading errors
-            function handleLoadError(message) {
-                const wishlistContainer = $('#wishlistContainer');
-                wishlistContainer.html(`
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            ${message}
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="browseBooks.html" class="btn btn-primary">Browse Books</a>
-                        </div>
-                    `);
+            // Helper function to extract items array
+            function extractItemsArray(data) {
+                if (data.items && data.items.$values && Array.isArray(data.items.$values)) {
+                    return data.items.$values;
+                } else if (data.items && Array.isArray(data.items)) {
+                    return data.items;
+                } else if (data.$values && Array.isArray(data.$values)) {
+                    return data.$values;
+                } else if (Array.isArray(data)) {
+                    return data;
+                }
+
+                for (const key in data) {
+                    if (Array.isArray(data[key])) {
+                        return data[key];
+                    } else if (data[key] && data[key].$values && Array.isArray(data[key].$values)) {
+                        return data[key].$values;
+                    }
+                }
+
+                return [];
+            }
+
+            // Helper function to extract book data from an item
+            function extractBookData(item) {
+                const bookData = {
+                    id: null,
+                    title: "Unknown Title",
+                    image: "images/default-book.jpg",
+                    price: 0,
+                    onSale: false,
+                    wishlistItemId: "unknown",
+                    authors: "No Author"
+                };
+
+                // Extract book ID
+                if (item.bookId !== undefined) {
+                    bookData.id = item.bookId;
+                } else if (item.book && item.book.bookId !== undefined) {
+                    bookData.id = item.book.bookId;
+                } else if (item.book && item.book.id !== undefined) {
+                    bookData.id = item.book.id;
+                } else if (item.id !== undefined) {
+                    bookData.id = item.id;
+                }
+
+                // Extract title
+                if (item.bookTitle !== undefined) {
+                    bookData.title = item.bookTitle;
+                } else if (item.title !== undefined) {
+                    bookData.title = item.title;
+                } else if (item.book && item.book.title !== undefined) {
+                    bookData.title = item.book.title;
+                }
+
+                // Extract image
+                if (item.image !== undefined) {
+                    bookData.image = item.image;
+                } else if (item.book && item.book.image !== undefined) {
+                    bookData.image = item.book.image;
+                }
+
+                // Extract price
+                if (item.price !== undefined && !isNaN(item.price)) {
+                    bookData.price = item.price;
+                } else if (item.book && item.book.price !== undefined && !isNaN(item.book.price)) {
+                    bookData.price = item.book.price;
+                }
+
+                // Extract onSale
+                if (item.onSale !== undefined) {
+                    bookData.onSale = Boolean(item.onSale);
+                } else if (item.book && item.book.onSale !== undefined) {
+                    bookData.onSale = Boolean(item.book.onSale);
+                }
+
+                // Extract wishlistItemId
+                if (item.wishlistItemId !== undefined) {
+                    bookData.wishlistItemId = item.wishlistItemId;
+                } else if (item.id !== undefined) {
+                    bookData.wishlistItemId = item.id;
+                }
+
+                // Extract authors
+                let authorsList = [];
+                if (item.authors && Array.isArray(item.authors)) {
+                    authorsList = item.authors;
+                } else if (item.authors && typeof item.authors === 'string') {
+                    authorsList = [item.authors];
+                } else if (item.book && item.book.authors) {
+                    if (Array.isArray(item.book.authors)) {
+                        authorsList = item.book.authors;
+                    } else if (item.book.authors.$values && Array.isArray(item.book.authors.$values)) {
+                        authorsList = item.book.authors.$values.map(a => {
+                            if (typeof a === 'string') return a;
+                            if (a.name) return a.name;
+                            if (a.firstName && a.lastName) return `${a.firstName} ${a.lastName}`;
+                            if (a.firstName) return a.firstName;
+                            if (a.lastName) return a.lastName;
+                            return 'Unknown Author';
+                        });
+                    }
+                }
+
+                bookData.authors = authorsList.length > 0 ? authorsList.join(', ') : 'No Author';
+                return bookData;
             }
 
             // Function to set up event listeners
             function setupEventListeners() {
-                // Remove from wishlist button
                 $('.remove-from-wishlist-btn').on('click', function () {
                     const wishlistItemId = $(this).data('wishlist-item-id');
                     removeFromWishlist(wishlistItemId);
                 });
 
-                // Add to cart button
                 $('.add-to-cart-btn').on('click', function () {
                     const bookId = $(this).data('book-id');
                     addToCartFromWishlist(bookId);
@@ -283,7 +361,10 @@
             // Function to remove item from wishlist
             async function removeFromWishlist(wishlistItemId) {
                 try {
-                    // According to the endpoint in your WishlistController
+                    const button = $(`.remove-from-wishlist-btn[data-wishlist-item-id="${wishlistItemId}"]`);
+                    button.html('<span class="spinner-border spinner-border-sm"></span>');
+                    button.prop('disabled', true);
+
                     const response = await fetch(`/api/wishlist/remove/${wishlistItemId}`, {
                         method: 'DELETE',
                         headers: {
@@ -292,6 +373,7 @@
                     });
 
                     if (response.ok) {
+                        // Show success toast
                         Toastify({
                             text: "Item removed from wishlist!",
                             duration: 3000,
@@ -303,21 +385,22 @@
                             }
                         }).showToast();
 
-                        // Remove item from DOM with animation
-                        const itemElement = $(`.remove-from-wishlist-btn[data-wishlist-item-id="${wishlistItemId}"]`).closest('.col');
+                        // Remove item 
+                        const itemElement = button.closest('.col');
                         itemElement.fadeOut(300, function () {
                             $(this).remove();
-
-                            // Check if wishlist is now empty
                             if ($('#wishlistContainer .col').length === 0) {
-                                // Reload the wishlist to show empty state
                                 loadWishlistItems();
                             }
                         });
                     } else {
+                        button.html('<i class="fas fa-trash"></i>');
+                        button.prop('disabled', false);
+
+                        // Show error toast
                         Toastify({
-                            text: "Failed to remove item from wishlist.",
-                            duration: 5000,
+                            text: "Could not remove item from wishlist",
+                            duration: 3000,
                             close: true,
                             gravity: "top",
                             position: "right",
@@ -327,10 +410,14 @@
                         }).showToast();
                     }
                 } catch (error) {
-                    console.error('Error removing item from wishlist:', error);
+                    $(`.remove-from-wishlist-btn[data-wishlist-item-id="${wishlistItemId}"]`)
+                        .html('<i class="fas fa-trash"></i>')
+                        .prop('disabled', false);
+
+                    // Show error toast
                     Toastify({
-                        text: "An unexpected error occurred.",
-                        duration: 5000,
+                        text: "An error occurred while removing the item",
+                        duration: 3000,
                         close: true,
                         gravity: "top",
                         position: "right",
@@ -343,10 +430,8 @@
 
             // Function to get cart ID
             async function getCartId() {
-                // If you store cartId in localStorage
                 let cartId = localStorage.getItem('cartId');
 
-                // If not stored, you might need to fetch it from the server
                 if (!cartId) {
                     try {
                         const response = await fetch('/api/cart/getUserCart', {
@@ -358,11 +443,19 @@
 
                         if (response.ok) {
                             const data = await response.json();
-                            cartId = data.cartId;
-                            localStorage.setItem('cartId', cartId);
+
+                            if (data.cartId) {
+                                cartId = data.cartId;
+                            } else if (data.id) {
+                                cartId = data.id;
+                            }
+
+                            if (cartId) {
+                                localStorage.setItem('cartId', cartId);
+                            }
                         }
                     } catch (error) {
-                        console.error('Error fetching cart ID:', error);
+                        console.error('Error fetching cart ID');
                     }
                 }
 
@@ -372,15 +465,31 @@
             // Function to add item to cart from wishlist
             async function addToCartFromWishlist(bookId) {
                 try {
-                    // First get the cart ID
-                    const cartId = await getCartId();
+                    const button = $(`.add-to-cart-btn[data-book-id="${bookId}"]`);
+                    button.html('<span class="spinner-border spinner-border-sm"></span>');
+                    button.prop('disabled', true);
 
+                    const cartId = await getCartId();
                     if (!cartId) {
-                        throw new Error('Could not determine cart ID');
+                        button.html('Add to Cart');
+                        button.prop('disabled', false);
+
+                        // Show error toast
+                        Toastify({
+                            text: "Could not add to cart. Please try again.",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#dc3545",
+                            }
+                        }).showToast();
+                        return;
                     }
 
-                    // Add to cart using the correct endpoint
-                    const response = await fetch(`/api/cart/addCartItem/${cartId}/cartItems/${bookId}`, {
+                    // Try primary endpoint 
+                    let response = await fetch(`/api/cart/addCartItem/${cartId}/cartItems/${bookId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -391,7 +500,27 @@
                         })
                     });
 
+                    // Try alternative endpoint if needed
+                    if (!response.ok && response.status === 404) {
+                        response = await fetch(`/api/cart/items`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            },
+                            body: JSON.stringify({
+                                cartId: cartId,
+                                bookId: bookId,
+                                quantity: 1
+                            })
+                        });
+                    }
+
                     if (response.ok) {
+                        button.html('Add to Cart');
+                        button.prop('disabled', false);
+
+                        // Show success toast
                         Toastify({
                             text: "Book added to cart successfully!",
                             duration: 3000,
@@ -403,11 +532,8 @@
                             }
                         }).showToast();
 
-                        // Ask if user wants to remove the item from wishlist
-                        const shouldRemove = confirm('Item added to cart. Would you like to remove it from your wishlist?');
-
+                        const shouldRemove = confirm('Item added to cart. Remove from wishlist?');
                         if (shouldRemove) {
-                            // Find the wishlistItemId for this book
                             const wishlistItemId = $(`.add-to-cart-btn[data-book-id="${bookId}"]`)
                                 .closest('.card')
                                 .find('.remove-from-wishlist-btn')
@@ -416,14 +542,15 @@
                             if (wishlistItemId) {
                                 await removeFromWishlist(wishlistItemId);
                             }
-
-                            window.updateCartBadge();
                         }
                     } else {
-                        const errorData = await response.json();
+                        button.html('Add to Cart');
+                        button.prop('disabled', false);
+
+                        // Show error toast
                         Toastify({
-                            text: errorData.message || "Failed to add book to cart.",
-                            duration: 5000,
+                            text: "Could not add item to cart",
+                            duration: 3000,
                             close: true,
                             gravity: "top",
                             position: "right",
@@ -433,15 +560,20 @@
                         }).showToast();
                     }
                 } catch (error) {
-                    console.error('Error adding to cart:', error);
+                    $(`.add-to-cart-btn[data-book-id="${bookId}"]`)
+                        .html('Add to Cart')
+                        .prop('disabled', false);
+
+                    // Show error toast
                     Toastify({
-                        text: "An unexpected error occurred.",
-                        duration: 5000,
+                        text: "An error occurred while adding to cart",
+                        duration: 3000,
                         close: true,
                         gravity: "top",
                         position: "right",
                         style: {
                             background: "#dc3545",
+                            color: "white",
                         }
                     }).showToast();
                 }
@@ -450,29 +582,14 @@
             // Logout button
             $('#logoutBtn').on('click', function (e) {
                 e.preventDefault();
-
-                // Clear authentication token and other data
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('cartId');
-
-                Toastify({
-                    text: "Logged out successfully!",
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    style: {
-                        background: "linear-gradient(to right, #00b09b, #96c93d)",
-                    }
-                }).showToast();
-
-                // Redirect to login page after a short delay
-                setTimeout(function () {
-                    window.location.href = 'login.html';
-                }, 1000);
+                window.location.href = 'login.html';
             });
         });
     </script>
+    <!--Import cart and web socket script-->
     <script src="../js/cart.js"></script>
+    <script src="../js/webSocketCustomer.js"></script>
 </body>
 </html>

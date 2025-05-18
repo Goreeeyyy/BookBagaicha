@@ -7,32 +7,39 @@
     <link href="Content/style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!--toastify css -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagsicha</a>
+            <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagaicha</a>
             <div class="d-flex align-items-center ms-auto">
-                <ul class="navbar-nav me-4">
+                <ul class="navbar-nav me-auto me-lg-2">
                     <li class="nav-item">
-                        <a class="nav-link active" href="HomePage.html">HOME</a>
+                        <a class="nav-link" href="userHome.html">HOME</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="Books.html">BOOKS</a>
+                        <a class="nav-link active" href="browseBooks.html">BOOKS</a>
                     </li>
                 </ul>
                 <div class="d-flex me-3">
-                    <input class="form-control form-control-sm"
-                           type="search"
-                           placeholder="Search for products..."
-                           aria-label="Search">
+                    <input class="form-control form-control-sm search-bar" type="search" id="searchInput" placeholder="Search by book title..." aria-label="Search" />
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="UserProfile.html" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-user"></i>
-                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                            <li><a class="dropdown-item" href="Wishlist.html">My Wishlist</a></li>
+                            <li><a class="dropdown-item" href="orderHistory.html">Order History</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                        </ul>
+                    </div>
                     <a href="cart.html" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-shopping-basket"></i>
+                        <i class="fas fa-shopping-cart"></i>
                     </a>
                     <a href="orderHistory.html" class="btn btn-outline-light btn-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -43,7 +50,6 @@
             </div>
         </div>
     </nav>
-
     <div class="container my-5">
         <div class="row g-5">
             <div class="col-md-5">
@@ -86,10 +92,10 @@
                 </div>
 
                 <div class="d-flex gap-3 mb-5 border-top border-bottom py-4">
-                    <button class="btn btn-outline-primary px-4" id="btnWishlist">
+                    <button class="btn btn-outline-primary px-4" id="btnWishlist"> 
                         Add to Wishlist
                     </button>
-                    <button class="btn btn-primary px-4" id="btnCart">
+                    <button class="btn btn-primary px-4" id="btnCart"> 
                         Add to Cart
                     </button>
                 </div>
@@ -185,7 +191,7 @@
                     })
                     .then(bookDetails => {
                         if (bookDetails) {
-                            // Update book details on the page (your existing code for this)
+                            // Update book details on the page 
                             const bookImage = document.getElementById('book-image');
                             const bookTitle = document.getElementById('book-title');
                             const bookFormat = document.getElementById('book-format');
@@ -276,5 +282,307 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get current book ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+
+            // Function to check if user is logged in
+            function isUserLoggedIn() {
+                return localStorage.getItem('authToken') !== null;
+            }
+
+            // Function to redirect to login page
+            function redirectToLogin() {
+                localStorage.setItem('redirectAfterLogin', window.location.href);
+                window.location.href = 'login.html';
+            }
+
+            // Get cart ID for the current user
+            async function getCartId() {
+                let cartId = localStorage.getItem('cartId');
+
+                if (!cartId) {
+                    try {
+                        const response = await fetch('/api/cart/getUserCart', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            cartId = data.cartId;
+                            localStorage.setItem('cartId', cartId);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching cart ID:', error);
+                    }
+                }
+
+                return cartId;
+            }
+
+            // Add to cart functionality
+            async function addToCart(bookId) {
+                try {
+                    // First get the cart ID
+                    const cartId = await getCartId();
+
+                    if (!cartId) {
+                        throw new Error('Could not determine cart ID');
+                    }
+
+                    // Add to cart using the correct API endpoint
+                    const response = await fetch(`/api/cart/addCartItem/${cartId}/cartItems/${bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({
+                            quantity: 1
+                        })
+                    });
+
+                    if (response.ok) {
+                        // Toastify to display messages
+                        if (typeof Toastify !== 'undefined') {
+                            Toastify({
+                                text: "Book added to cart successfully!",
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                style: {
+                                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                                }
+                            }).showToast();
+                        } else {
+                            alert("Book added to cart successfully!");
+                        }
+
+                        // Update cart badge 
+                        if (typeof window.updateCartBadge === 'function') {
+                            window.updateCartBadge();
+                        }
+                    } else {
+                        let errorMessage = "Failed to add book to cart.";
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.message || errorMessage;
+                        } catch (parseError) {
+                            console.error("Error parsing error response:", parseError);
+                            const errorText = await response.text();
+                            if (errorText) {
+                                errorMessage = errorText;
+                            }
+                        }
+
+                        if (typeof Toastify !== 'undefined') {
+                            Toastify({
+                                text: errorMessage,
+                                duration: 5000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                style: {
+                                    background: "#dc3545",
+                                }
+                            }).showToast();
+                        } else {
+                            alert(errorMessage);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+
+                    if (typeof Toastify !== 'undefined') {
+                        Toastify({
+                            text: "An unexpected error occurred: " + error.message,
+                            duration: 5000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#dc3545",
+                            }
+                        }).showToast();
+                    } else {
+                        alert("An error occurred while adding to cart: " + error.message);
+                    }
+                }
+            }
+
+            // Add to wishlist functionality
+            async function addToWishlist(bookId) {
+                try {
+                    console.log("Adding to wishlist, book ID:", bookId);
+
+                    // Use the correct endpoint same as in WishlistController
+                    const response = await fetch('/api/wishlist/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify({
+                            bookId: bookId
+                        })
+                    });
+
+                    console.log("Wishlist response status:", response.status);
+
+                    // Get response content as text first
+                    const responseText = await response.text();
+                    console.log("Raw response:", responseText);
+
+                    if (response.ok) {
+                        if (typeof Toastify !== 'undefined') {
+                            Toastify({
+                                text: "Book added to wishlist successfully!",
+                                duration: 3000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                style: {
+                                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                                }
+                            }).showToast();
+                        } else {
+                            alert("Book added to wishlist successfully!");
+                        }
+
+                        // Update wishlist button 
+                        const wishlistBtn = document.getElementById('btnWishlist');
+                        if (wishlistBtn) {
+                            wishlistBtn.textContent = "Added To Wishlist";
+                            wishlistBtn.classList.remove('btn-outline-primary');
+                            wishlistBtn.classList.add('btn-primary');
+                        }
+                    } else {
+                        let errorMessage = "Failed to add book to wishlist.";
+
+                        if (responseText) {
+                            // Try to parse as JSON
+                            try {
+                                const errorData = JSON.parse(responseText);
+                                errorMessage = errorData.message || errorMessage;
+                            } catch (e) {
+                                errorMessage = responseText.substring(0, 100) + "..."; 
+                            }
+                        }
+
+                        if (typeof Toastify !== 'undefined') {
+                            Toastify({
+                                text: errorMessage,
+                                duration: 5000,
+                                close: true,
+                                gravity: "top",
+                                position: "right",
+                                style: {
+                                    background: "#dc3545",
+                                }
+                            }).showToast();
+                        } else {
+                            alert(errorMessage);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error adding to wishlist:', error);
+
+                    if (typeof Toastify !== 'undefined') {
+                        Toastify({
+                            text: "An unexpected error occurred: " + error.message,
+                            duration: 5000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#dc3545",
+                            }
+                        }).showToast();
+                    } else {
+                        alert("An error occurred while adding to wishlist: " + error.message);
+                    }
+                }
+            }
+
+            // Check if book is in wishlist
+            async function checkWishlistStatus(bookId) {
+                if (!isUserLoggedIn()) return;
+
+                try {
+                    const response = await fetch(`/api/wishlist/check/${bookId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.isInWishlist) {
+                            const wishlistBtn = document.getElementById('btnWishlist');
+                            if (wishlistBtn) {
+                                wishlistBtn.textContent = "Added To Wishlist";
+                                wishlistBtn.classList.remove('btn-outline-primary');
+                                wishlistBtn.classList.add('btn-primary');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking wishlist status:', error);
+                }
+            }
+
+            const cartIcon = document.querySelector('.fa-shopping-cart');
+            if (cartIcon && cartIcon.parentElement) {
+                cartIcon.parentElement.style.position = 'relative';
+            }
+
+            // Add event listeners to buttons
+            const addToCartBtn = document.getElementById('btnCart');
+            const addToWishlistBtn = document.getElementById('btnWishlist');
+
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function () {
+                    if (!isUserLoggedIn()) {
+                        redirectToLogin();
+                        return;
+                    }
+                    addToCart(bookId);
+                });
+            }
+
+            if (addToWishlistBtn) {
+                addToWishlistBtn.addEventListener('click', function () {
+                    if (!isUserLoggedIn()) {
+                        redirectToLogin();
+                        return;
+                    }
+                    addToWishlist(bookId);
+                });
+            }
+
+            // Check wishlist status
+            if (isUserLoggedIn() && bookId) {
+                checkWishlistStatus(bookId);
+            }
+
+            // Update cart badge
+            if (isUserLoggedIn()) {
+                if (typeof window.updateCartBadge === 'function') {
+                    window.updateCartBadge();
+                }
+            }
+        });
+    </script>
+    <!--Importing cart and web socket js -->
+    <script src="../js/cart.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 </body>
 </html>

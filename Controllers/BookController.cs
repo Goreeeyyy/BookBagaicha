@@ -107,5 +107,26 @@ namespace BookBagaicha.Controllers
             await _context.SaveChangesAsync();
             return Ok(book);
         }
+
+        [HttpGet("api/bookFilters")]
+        public async Task<IActionResult> GetBookFilters()
+        {
+            var categories = await _context.Books
+                .Where(b => !string.IsNullOrEmpty(b.Category))
+                .Select(b => b.Category)
+                .Distinct()
+                .ToListAsync();
+
+            var genres = await _context.Genres
+                .Select(g => g.Name)
+                .Distinct()
+                .ToListAsync();
+
+            return Ok(new
+            {
+                Categories = categories,
+                Genres = genres
+            });
+        }
     }
 }

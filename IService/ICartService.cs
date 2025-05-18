@@ -5,7 +5,7 @@ namespace BookBagaicha.IService
 {
     public interface ICartService
     {
-        // Get a user's cart or create a new one if it doesn't exist
+        // Get a user cart or create a new one 
         Task<CartDto> GetCartByUserIdAsync(long userId);
 
         // Get cart by cart ID

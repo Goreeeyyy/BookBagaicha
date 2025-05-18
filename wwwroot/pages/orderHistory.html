@@ -4,25 +4,31 @@
     <title>Order History - Book Bagaicha</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <!-- Add Toastify CSS -->
+    <!--toastify css -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="../css/orderHistory.css" />
+    <style>
+        .status-completed {
+            background-color: #DEBC40;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="HomePage.html">Book Bagaicha</a>
             <div class="d-flex align-items-center ms-auto">
-                <ul class="navbar-nav me-4">
+                <ul class="navbar-nav me-auto me-lg-2">
                     <li class="nav-item">
-                        <a class="nav-link" href="HomePage.html">HOME</a>
+                        <a class="nav-link" href="userHome.html">HOME</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="browseBooks.html">BOOKS</a>
+                        <a class="nav-link active" href="browseBooks.html">BOOKS</a>
                     </li>
                 </ul>
                 <div class="d-flex me-3">
-                    <input class="form-control form-control-sm" type="search" placeholder="Search for products..." aria-label="Search" />
+                    <input class="form-control form-control-sm search-bar" type="search" id="searchInput" placeholder="Search by book title..." aria-label="Search" />
                 </div>
                 <div class="d-flex gap-2">
                     <div class="dropdown">
@@ -30,9 +36,8 @@
                             <i class="fas fa-user"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
-                            <li><a class="dropdown-item" href="userHome.html">User Profile</a></li>
                             <li><a class="dropdown-item" href="Wishlist.html">My Wishlist</a></li>
-                            <li><a class="dropdown-item active" href="orderHistory.html">Order History</a></li>
+                            <li><a class="dropdown-item" href="orderHistory.html">Order History</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
                         </ul>
@@ -49,12 +54,11 @@
             </div>
         </div>
     </nav>
-
     <div class="container mt-4 mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2>My Orders</h2>
-                <p class="text-muted mb-0" id="loyaltyStatus"></p>
+                <p>For each 10 successfully completed orders, you get 10% discount on your next order.</p>
             </div>
             <a href="browseBooks.html" class="btn btn-outline-primary">
                 <i class="fas fa-book me-2"></i>Continue Shopping
@@ -69,12 +73,11 @@
                 </div>
                 <p class="mt-2">Loading your orders...</p>
             </div>
-
-            <!-- Orders will be loaded here -->
+            <!--Orders displayed-->
         </div>
     </div>
 
-    <!-- Order Details Modal -->
+    <!-- Order details Modal -->
     <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -83,7 +86,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="orderDetailsContent">
-                    <!-- Order details will be loaded here -->
+                    <!-- Order details displayed-->
                     <div class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
@@ -99,7 +102,7 @@
         </div>
     </div>
 
-    <!-- Cancel Order Confirmation Dialog -->
+    <!-- Cancel order confirmation Dialog -->
     <div class="confirmation-dialog" id="cancelOrderDialog">
         <div class="confirmation-content">
             <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
@@ -112,7 +115,7 @@
         </div>
     </div>
 
-    <!-- Order Cancelled Success Dialog -->
+    <!-- Order cancelled success Dialog -->
     <div class="confirmation-dialog" id="cancelSuccessDialog">
         <div class="confirmation-content">
             <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
@@ -177,7 +180,6 @@
         $(document).ready(function () {
             // Check if user is logged in
             if (!isUserLoggedIn()) {
-                // Save current page as redirect URL
                 localStorage.setItem('redirectAfterLogin', window.location.href);
                 // Redirect to login page
                 window.location.href = 'login.html';
@@ -215,14 +217,12 @@
                         const data = await response.json();
                         console.log("Orders API response data:", data);
 
-                        // Handle different potential response formats
                         let orders = [];
                         if (Array.isArray(data)) {
                             console.log("Response is an array");
                             orders = data;
                         } else if (data && typeof data === 'object') {
                             console.log("Response is an object");
-                            // Check if it might be in a property like 'orders', '$values', or just the object itself
                             if (data.orders && Array.isArray(data.orders)) {
                                 console.log("Found orders array in data.orders");
                                 orders = data.orders;
@@ -233,7 +233,6 @@
                                 console.log("Found orders array in data.items");
                                 orders = data.items;
                             } else if (data.orderId) {
-                                // It might be a single order
                                 console.log("Found a single order");
                                 orders = [data];
                             } else {
@@ -258,14 +257,14 @@
 
                     // Show empty state with error message
                     $('#ordersContainer').html(`
-                                            <div class="alert alert-danger" role="alert">
-                                                <i class="fas fa-exclamation-circle me-2"></i>
-                                                Failed to load your orders. Please try again later.
-                                            </div>
-                                            <div class="text-center mt-3">
-                                                <button class="btn btn-primary" onclick="window.location.reload()">Retry</button>
-                                            </div>
-                                        `);
+                                                <div class="alert alert-danger" role="alert">
+                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    Failed to load your orders. Please try again later.
+                                                </div>
+                                                <div class="text-center mt-3">
+                                                    <button class="btn btn-primary" onclick="window.location.reload()">Retry</button>
+                                                </div>
+                                            `);
                 } finally {
                     // Hide loading spinner
                     $('#loadingSpinner').hide();
@@ -280,46 +279,45 @@
 
                     if (confirmedOrders >= 10) {
                         $('#loyaltyStatus').html(`
-                                                <span class="badge bg-primary">
-                                                    <i class="fas fa-crown me-1"></i> Loyal Customer: ${confirmedOrders} successful orders
-                                                </span>
-                                                <span class="ms-2 text-success">
-                                                    <i class="fas fa-tag"></i> You get 10% discount on your orders!
-                                                </span>
-                                            `);
+                                                    <span class="badge bg-primary">
+                                                        <i class="fas fa-crown me-1"></i> Loyal Customer: ${confirmedOrders} successful orders
+                                                    </span>
+                                                    <span class="ms-2 text-success">
+                                                        <i class="fas fa-tag"></i> You get 10% discount on your orders!
+                                                    </span>
+                                                `);
                     } else {
                         const ordersNeeded = 10 - confirmedOrders;
                         $('#loyaltyStatus').html(`
-                                                <span>
-                                                    <i class="fas fa-info-circle me-1"></i> Place ${ordersNeeded} more order${ordersNeeded !== 1 ? 's' : ''} to get a 10% loyalty discount!
-                                                </span>
-                                            `);
+                                                    <span>
+                                                        <i class="fas fa-info-circle me-1"></i> Place ${ordersNeeded} more order${ordersNeeded !== 1 ? 's' : ''} to get a 10% loyalty discount!
+                                                    </span>
+                                                `);
                     }
                 } catch (error) {
                     console.error('Error updating loyalty status:', error);
-                    // Don't show error to user, just log it
                 }
             }
 
             // Function to display orders
             function displayOrders(orders) {
                 const ordersContainer = $('#ordersContainer');
-                ordersContainer.empty(); // Remove loading spinner
+                ordersContainer.empty(); 
 
                 if (!orders || orders.length === 0) {
                     // Display empty orders message
                     ordersContainer.html(`
-                                            <div class="empty-orders">
-                                                <i class="fas fa-shopping-bag"></i>
-                                                <h4>No Orders Yet</h4>
-                                                <p class="text-muted">You haven't placed any orders yet.</p>
-                                                <a href="browseBooks.html" class="btn btn-primary mt-3">Start Shopping</a>
-                                            </div>
-                                        `);
+                                              <div class="empty-orders">
+                                                    <i class="fas fa-shopping-bag"></i>
+                                                    <h4>No Orders Yet</h4>
+                                                    <p class="text-muted">You haven't placed any orders yet.</p>
+                                                    <a href="browseBooks.html" class="btn btn-primary mt-3">Start Shopping</a>
+                                                </div>
+                                            `);
                     return;
                 }
 
-                // Sort orders by date (newest first)
+                // Sort orders by date asc
                 orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
 
                 // Create orders list
@@ -332,32 +330,37 @@
                         minute: '2-digit'
                     });
 
-                    const statusClass = order.status === 'Confirmed' ? 'status-confirmed' : 'status-cancelled';
+                    let statusClass = 'status-cancelled'; 
+                    if (order.status === 'Confirmed') {
+                        statusClass = 'status-confirmed'; 
+                    } else if (order.status === 'Completed') {
+                        statusClass = 'status-completed'; 
+                    }
 
                     const orderCard = $(`
-                                            <div class="order-card position-relative">
-                                                <div class="order-header d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <h5 class="mb-1">Order #${order.claimCode}</h5>
-                                                        <p class="text-muted mb-0">${orderDate}</p>
+                                                <div class="order-card position-relative">
+                                                    <div class="order-header d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h5 class="mb-1">Order #${order.claimCode}</h5>
+                                                            <p class="text-muted mb-0">${orderDate}</p>
+                                                        </div>
+                                                        <span class="status-badge ${statusClass}">${order.status}</span>
                                                     </div>
-                                                    <span class="status-badge ${statusClass}">${order.status}</span>
-                                                </div>
-                                                <div class="order-footer d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <p class="mb-0"><strong>${order.itemCount}</strong> item${order.itemCount !== 1 ? 's' : ''} • <strong>Rs. ${order.totalPrice.toFixed(2)}</strong></p>
+                                                    <div class="order-footer d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <p class="mb-0"><strong>${order.itemCount}</strong> item${order.itemCount !== 1 ? 's' : ''} • <strong>Rs. ${order.totalPrice.toFixed(2)}</strong></p>
+                                                        </div>
+                                                        <button class="btn btn-outline-primary btn-sm view-details-btn" data-order-id="${order.orderId}">
+                                                            View Details
+                                                        </button>
                                                     </div>
-                                                    <button class="btn btn-outline-primary btn-sm view-details-btn" data-order-id="${order.orderId}">
-                                                        View Details
-                                                    </button>
                                                 </div>
-                                            </div>
-                                        `);
+                                            `);
 
                     ordersContainer.append(orderCard);
                 });
 
-                // Set up event listeners for view details buttons
+                //event listeners for view details buttons
                 $('.view-details-btn').on('click', function () {
                     const orderId = $(this).data('order-id');
                     loadOrderDetails(orderId);
@@ -367,16 +370,16 @@
             // Function to load order details
             async function loadOrderDetails(orderId) {
                 try {
-                    // Show modal with loading state
+                    // Show modals
                     orderDetailsModal.show();
                     $('#orderDetailsContent').html(`
-                                            <div class="text-center py-4">
-                                                <div class="spinner-border text-primary" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
+                                                <div class="text-center py-4">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <p class="mt-2">Loading order details...</p>
                                                 </div>
-                                                <p class="mt-2">Loading order details...</p>
-                                            </div>
-                                        `);
+                                            `);
 
                     // Update cancel button with order ID
                     $('#cancelOrderBtn').data('order-id', orderId);
@@ -419,35 +422,42 @@
                     minute: '2-digit'
                 });
 
-                const statusClass = order.status === 'Confirmed' ? 'status-confirmed' : 'status-cancelled';
+                let statusClass = 'status-cancelled'; //default red
+
+                if (order.status === 'Confirmed') {
+                    statusClass = 'status-confirmed'; //confirmed green
+                } else if (order.status === 'Completed') {
+                    statusClass = 'status-completed'; //completed yellow
+                }
+
 
                 // Update modal title
                 $('#orderDetailsModalLabel').text(`Order #${order.claimCode}`);
 
                 // Create order details content
                 const orderDetailsContent = $(`
-                                        <div>
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <div>
-                                                    <p class="mb-1"><strong>Order Date:</strong> ${orderDate}</p>
-                                                    <p class="mb-0"><strong>Status:</strong> <span class="status-badge ${statusClass}">${order.status}</span></p>
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <div>
+                                                        <p class="mb-1"><strong>Order Date:</strong> ${orderDate}</p>
+                                                        <p class="mb-0"><strong>Status:</strong> <span class="status-badge ${statusClass}">${order.status}</span></p>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <p class="mb-1"><strong>Total:</strong> Rs. ${order.totalPrice.toFixed(2)}</p>
+                                                        ${order.appliedDiscount > 0 ? `<p class="mb-0 text-success"><strong>Discount Applied:</strong> Rs. ${order.appliedDiscount.toFixed(2)}</p>` : ''}
+                                                    </div>
                                                 </div>
-                                                <div class="text-end">
-                                                    <p class="mb-1"><strong>Total:</strong> Rs. ${order.totalPrice.toFixed(2)}</p>
-                                                    ${order.appliedDiscount > 0 ? `<p class="mb-0 text-success"><strong>Discount Applied:</strong> Rs. ${order.appliedDiscount.toFixed(2)}</p>` : ''}
+                                                <h5 class="mb-3">Order Items</h5>
+                                                <div class="order-items">
+                                                    <!-- Order items will be added here -->
                                                 </div>
                                             </div>
-                                            <h5 class="mb-3">Order Items</h5>
-                                            <div class="order-items">
-                                                <!-- Order items will be added here -->
-                                            </div>
-                                        </div>
-                                    `);
+                                        `);
 
                 // Add order items
                 const orderItemsContainer = orderDetailsContent.find('.order-items');
 
-                // Check for items in different possible formats
+                // Check for items 
                 let items = [];
                 if (order.items && Array.isArray(order.items)) {
                     items = order.items;
@@ -463,10 +473,10 @@
 
                 if (items.length > 0) {
                     items.forEach(item => {
-                        // Handle potential missing data gracefully
+                        // Handle missing data 
                         const imageUrl = item.image ? `../${item.image}` : 'https://via.placeholder.com/80x120?text=No+Image';
 
-                        // Handle authors in different possible formats
+                        // Handle authors 
                         let authors = 'Unknown';
                         if (item.authors && Array.isArray(item.authors)) {
                             authors = item.authors.join(', ');
@@ -489,31 +499,31 @@
                         // Get book title
                         const bookTitle = item.bookTitle || (item.book ? item.book.title : 'Unknown Book');
 
-                        // Get price - could be in different properties
+                        // Get price 
                         const price = item.priceAtPurchase || item.price || (item.book ? item.book.price : 0);
 
                         // Get quantity
                         const quantity = item.quantity || 1;
 
                         const itemElement = $(`
-                                                <div class="order-item">
-                                                    <div class="row">
-                                                        <div class="col-md-8 d-flex">
-                                                            <img src="${imageUrl}" class="book-img me-3" alt="${bookTitle}">
-                                                            <div>
-                                                                <h6 class="mb-1">${bookTitle}</h6>
-                                                                <p class="text-muted small mb-1">${authors}</p>
-                                                                <p class="mb-0">Rs. ${price.toFixed(2)} × ${quantity}</p>
+                                                    <div class="order-item">
+                                                        <div class="row">
+                                                            <div class="col-md-8 d-flex">
+                                                                <img src="${imageUrl}" class="book-img me-3" alt="${bookTitle}">
+                                                                <div>
+                                                                    <h6 class="mb-1">${bookTitle}</h6>
+                                                                    <p class="text-muted small mb-1">${authors}</p>
+                                                                    <p class="mb-0">Rs. ${price.toFixed(2)} × ${quantity}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4 text-md-end">
+                                                                <h6 class="mt-3 mt-md-0">Rs. ${(price * quantity).toFixed(2)}</h6>
+                                                                ${order.status === 'Completed' ? `<button class="btn btn-sm btn-outline-success mt-2 add-review-btn" data-book-id="${item.bookId}" data-order-item-id="${item.orderItemId}">Add Review</button>` : ''}
+
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4 text-md-end">
-                                                            <h6 class="mt-3 mt-md-0">Rs. ${(price * quantity).toFixed(2)}</h6>
-                                                            ${order.status === 'Confirmed' ? `<button class="btn btn-sm btn-outline-success mt-2 add-review-btn" data-book-id="${item.bookId}" data-order-item-id="${item.orderItemId}">Add Review</button>` : ''}
-
-                                                        </div>
                                                     </div>
-                                                </div>
-                                            `);
+                                                `);
 
                         orderItemsContainer.append(itemElement);
                         itemElement.find('.add-review-btn').on('click', function () {
@@ -521,11 +531,11 @@
                             const bookId = $(this).data('book-id');
                             const orderItemId = $(this).data('order-item-id');
 
-                            // Store bookId and orderItemId in hidden input fields of the modal
+                            // Store bookId and orderItemId 
                             $('#reviewBookId').val(bookId);
                             $('#reviewOrderItemId').val(orderItemId);
 
-                            // Open the add review modal
+                            //add review modal
                             addReviewModal.show();
                         });
                     });
@@ -534,17 +544,17 @@
                 } else {
                     // Handle case with no items
                     orderItemsContainer.html(`
-                                            <div class="alert alert-warning">
-                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                No items found in this order.
-                                            </div>
-                                        `);
+                                                <div class="alert alert-warning">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    No items found in this order.
+                                                </div>
+                                            `);
                 }
 
                 // Update modal content
                 $('#orderDetailsContent').html(orderDetailsContent);
 
-                // Show/hide cancel button based on order status
+                // Show or hide cancel button based on order status
                 if (order.status === 'Confirmed') {
                     $('#cancelOrderBtn').show();
                 } else {
@@ -620,7 +630,7 @@
 
             $('#confirmCancelBtn').on('click', async function () {
                 try {
-                    // Show loading state
+                   
                     $(this).prop('disabled', true);
                     $(this).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...');
 
@@ -639,19 +649,16 @@
 
                     if (response.ok) {
                         // Hide cancel confirmation dialog
-                        // Hide cancel confirmation dialog
                         $('#cancelOrderDialog').removeClass('active');
-
-                        // Hide modal first
                         orderDetailsModal.hide();
 
-                        // Show success dialog after modal is hidden (wait ~500ms for animation)
+                        // Success dialog 
                         setTimeout(() => {
 
 
                             $('#cancelSuccessDialog').addClass('active');
 
-                            // Update order status text immediately in the order card
+                            // Update order status 
                             $(`.view-details-btn[data-order-id="${orderId}"]`)
                                 .closest('.order-card')
                                 .find('.status-badge')
@@ -689,20 +696,20 @@
                 console.log("Handling API error, status:", response.status);
 
                 if (response.status === 401) {
-                    // Unauthorized - token might be expired
+                    // Unauthorized token expired
                     showToastMessage("Your session has expired. Please login again.", "error");
                     handleSessionExpired();
                     return;
                 }
 
                 if (response.status === 404) {
-                    // Not found - order may have been deleted
+                    // Not found 
                     showToastMessage("The requested order was not found.", "error");
                     return;
                 }
 
                 if (response.status === 500) {
-                    // Server error - likely due to IOrderService not being registered correctly
+                    // Server error
                     showToastMessage("The server encountered an error. Please try again later.", "error");
                     console.error("Server returned 500 error - check that IOrderService is registered correctly");
                     return;
@@ -731,7 +738,7 @@
                 }, 2000);
             }
 
-            // Function to display toast notifications
+            // Function to display toast msgs
             function showToastMessage(message, type = 'success') {
                 const backgroundColor = type === 'success'
                     ? "linear-gradient(to right, #00b09b, #96c93d)"
@@ -758,13 +765,16 @@
 
                 showToastMessage("Logged out successfully!");
 
-                // Redirect to login page after a short delay
+                // Redirect to login page 
                 setTimeout(function () {
                     window.location.href = 'login.html';
                 }, 1000);
             });
         });
     </script>
+    <!--Import cart and web socket scripts-->
     <script src="../js/cart.js"></script>
+    <script src="../js/webSocketCustomer.js"></script>
+
 </body>
 </html>

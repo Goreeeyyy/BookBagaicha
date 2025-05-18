@@ -191,6 +191,7 @@ namespace BookBagaicha.Controllers
             }
         }
 
+<<<<<<< HEAD
 
         // Send order confirmation email
         private async Task SendOrderConfirmationEmail(long userId, OrderDto order)
@@ -225,5 +226,71 @@ BookBagaicha Team";
                 _logger.LogError(ex, "Failed to send order confirmation email to user {UserId} for order {OrderId}", userId, order.OrderId);
             }
         }
+=======
+        [Authorize(Roles = "Staff")]
+        [HttpGet("claim/{claimCode}")]
+        public async Task<IActionResult> GetOrderByClaimCode(string claimCode)
+        {
+            try
+            {
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userIdString) || !long.TryParse(userIdString, out var userId))
+                {
+                    _logger.LogWarning("User ID not found in token or invalid");
+                    return Unauthorized("Invalid user authentication");
+                }
+
+                _logger.LogInformation("Getting order details for claim code {ClaimCode} by admin {UserId}", claimCode, userId);
+                var orderDetails = await _orderService.GetOrderByClaimCodeAsync(claimCode);
+
+                return Ok(orderDetails);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Order not found: {Message}", ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting order details by claim code");
+                return StatusCode(500, "An error occurred while retrieving order details");
+            }
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpPost("{orderId}/complete")]
+        public async Task<IActionResult> CompleteOrder(Guid orderId)
+        {
+            try
+            {
+                var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userIdString) || !long.TryParse(userIdString, out var userId))
+                {
+                    _logger.LogWarning("User ID not found in token or invalid");
+                    return Unauthorized("Invalid user authentication");
+                }
+
+                _logger.LogInformation("Completing order {OrderId} by admin {UserId}", orderId, userId);
+                var success = await _orderService.CompleteOrderAsync(orderId);
+
+                if (!success)
+                {
+                    return StatusCode(500, "Failed to complete the order");
+                }
+
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Order not found: {Message}", ex.Message);
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error completing order");
+                return StatusCode(500, "An error occurred while completing the order");
+            }
+        }
+
+>>>>>>> 17faaceed86e8d33184d627fb7213dea0f26f325
     }
 }

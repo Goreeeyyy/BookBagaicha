@@ -226,6 +226,9 @@ namespace BookBagaicha.Migrations
                     b.Property<decimal>("AppliedDiscount")
                         .HasColumnType("numeric");
 
+                    b.Property<bool>("AppliedDiscountIsLoyalty")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ClaimCode")
                         .IsRequired()
                         .HasColumnType("text");
